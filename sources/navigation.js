@@ -36,8 +36,8 @@
         throw 'unable to scroll';
     };
 
-    var requestAnimFrame=(function(callback){
-      return window.requestAnimationFrame ||
+    window.requestAnimationFrame=
+      window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
       window.oRequestAnimationFrame ||
@@ -45,7 +45,6 @@
       function(callback){
         window.setTimeout(callback, 1000 / 60 );
       };
-    })();
 
 
 

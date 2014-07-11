@@ -13,8 +13,8 @@ var requestAnimationFrame =
   window.msRequestAnimationFrame ||
   function(f){ setTimeout(f, 1000/30); };
 // stretch canvas to screen size (once, wont onresize!)
-a.style.width = (a.width = innerWidth) + 'px';
-a.style.height = (a.height = innerHeight) + 'px';
+a.style.width = (a.width = a.parentNode.offsetWidth) + 'px';
+a.style.height = (a.height = a.parentNode.offsetHeight) + 'px';
 
 var c = a.getContext('2d');
 		
