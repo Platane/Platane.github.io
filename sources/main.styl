@@ -1,0 +1,27 @@
+
+@import 'jeet'
+@import 'nib'
+
+body 
+    margin : 0
+
+*
+    box-sizing border-box
+
+.button
+    display inline-block
+    border-radius 5px
+    border solid 3px #333
+    min-width  40px
+    min-height  40px
+    background-color red
+
+    margin 14px
+
+    &.button-big
+        min-width : 80px
+        min-height : 80px
+
+forestBackground()
+   background-image  radial-gradient( 65% 50%, ellipse cover , rgba(243,244,232,0) 0%, rgba(186,191,132,0.8) 120% )    ,     linear-gradient( -65deg , rgba(243,244,232,0.7) 30% , rgba(243,244,232,0) 70% ) ,    linear-gradient( left , rgba(232,234,208,1) 10% , rgba(243,244,232,0) 50% )   , url("assets/images/fond.png")    ,   radial-gradient( 65% 50%, ellipse cover, rgba(243,244,232,0.6) 0%, rgba(232,234,208,0.8) 100% )      
+   background-attachment fixed

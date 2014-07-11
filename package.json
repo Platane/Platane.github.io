@@ -1,0 +1,28 @@
+{
+  "name": "platane-me",
+  "version": "1.0.0",
+  "author": "Platane <me@platane.me>",
+  "license": "MIT",
+
+  "dependencies": {
+    
+  },
+  
+  "devDependencies": {
+    "gulp" : "*",
+    "require-dir" : "*",
+    "stylus" : "*",
+    "jeet" : "*",
+    "nib" : "*",
+    "gulp-stylus" : "*",
+    "gulp-concat" : "*",
+    "gulp-watch" : "*",
+    "gulp-connect" : "*",
+    "gulp-livereload" : "*",
+    "gulp-image-resize" : "*"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+
+}
