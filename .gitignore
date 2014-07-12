@@ -3,6 +3,8 @@
 *.sublime-workspace
 
 build
+dist
+!gulp/tasks/build
 
 .tmp
 .sass-cache
