@@ -7,7 +7,7 @@ var   gulp = require('gulp')
 
 gulp.task('css', function() {
   gulp.src('../sources/**/*.styl')
-      .pipe(stylus({
+    .pipe(stylus({
         errors: true,
         //compress: true,
         use : [ 
