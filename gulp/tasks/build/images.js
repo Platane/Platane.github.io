@@ -3,7 +3,7 @@ var   gulp = require('gulp')
 
 
 
-gulp.task('images', function() {
+gulp.task('build.images', function() {
   gulp.src( '../sources/**/*.{jpeg,jpg,png}')
     .pipe(gulp.dest('../build/'));
 

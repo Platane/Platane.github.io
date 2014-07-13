@@ -4,9 +4,8 @@ var   gulp = require('gulp')
   , connect = require('gulp-connect')
 
 
-requireDir('./tasks', {recurse: true});
+requireDir('./tasks');
 
-gulp.task('build', [ 'css' , 'html' , 'images' , 'js'  ]);
 gulp.task('default', [ 'build' , 'watch' ]);
 
 
@@ -25,11 +24,13 @@ gulp.task('watch', function () {
 	 });
 */
 
-	gulp.watch('../sources/**/*.js',['js'] )
+	gulp.watch('../sources/**/*.js',['build.js'] )
 
-	gulp.watch('../sources/**/*.styl',['css'] )
+	gulp.watch('../sources/**/*.styl',['build.css'] )
 
-	gulp.watch('../sources/**/*.html',['html'] )
+	gulp.watch('../sources/**/*.html',['build.html'] )
+
+	gulp.watch('../sources/data/**/*',['build.data'] )
 	
 });
 

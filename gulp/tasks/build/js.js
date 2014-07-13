@@ -1,7 +1,7 @@
 var   gulp = require('gulp')
 
 
-gulp.task('js', function() {
+gulp.task('build.js', function() {
   gulp.src('../sources/**/*.js')
     .pipe(gulp.dest('../build/'));
 

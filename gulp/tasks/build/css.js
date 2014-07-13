@@ -5,7 +5,7 @@ var   gulp = require('gulp')
     , nib = require('nib')
 
 
-gulp.task('css', function() {
+gulp.task('build.css', function() {
   gulp.src('../sources/**/*.styl')
     .pipe(stylus({
         errors: true,
