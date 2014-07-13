@@ -30,7 +30,10 @@ gulp.task('watch', function () {
 
 	gulp.watch('../sources/**/*.html',['build.html'] )
 
-	gulp.watch('../sources/data/**/*',['build.data'] )
+	gulp.watch('../sources/data/**/*',['build'] )
+
+	gulp.watch('../sources/templates/**/*',['gen'] )
 	
 });
 
+gulp.run('gen')

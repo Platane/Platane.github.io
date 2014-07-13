@@ -1,0 +1,33 @@
+<html>
+<link rel="stylesheet" href="style.css" ></link>
+
+<body version="{{build}}">
+
+
+	{{#works}}
+	<!-- <section class="work" style="font-size:{{rank}}px;"> -->
+	<section class="work">
+		<div class="work-date">{{date}}</div>
+		<div class="work-illu-group">
+			<div class="work-illu work-illu-main" style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+			<div class="work-illu-secondary-group">
+				{{#illustration-second}}
+					<div class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
+				{{/illustration-second}}
+			</div>
+		</div>
+		<div class="work-content">
+
+			<span class="work-title">{{title}}</span>
+
+			<div class="work-sum-up markdowned">
+				{{{sum-up}}}
+			</div>
+		</div>
+	</section>
+
+
+	{{/works}}
+
+</body>
+</html>

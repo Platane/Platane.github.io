@@ -6,4 +6,5 @@ collaborators
 ============
  * Kevin Aubert
  * Lucie Vitale
+ * Arthur Brongniart
 

@@ -6,10 +6,12 @@ var   gulp = require('gulp')
 
 
 gulp.task('build.css', function() {
-  gulp.src('../sources/**/*.styl')
+  //gulp.src('../sources/**/*.styl')
+  return gulp.src('../sources/home.styl')
     .pipe(stylus({
         errors: true,
         //compress: true,
+        
         use : [ 
           jeet(),
           nib()

@@ -143,8 +143,8 @@ var forEachFolder=function( opts , fn ){
 
 gulp.task('build.data', function() {
   
-  forEachFolder( '../sources/data/works/' , concatSumUp )
+  return forEachFolder( '../sources/data/works/' , concatSumUp )
   .pipe( concatJson() )
   .pipe( rename('works.json') )
-  .pipe( gulp.dest('../build/data/works/') )
+  .pipe( gulp.dest('../build/data/') )
 })
