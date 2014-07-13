@@ -4,30 +4,37 @@
 <body version="{{build}}">
 
 
+<ul class="work-list grid">
+
 	{{#works}}
 	<!-- <section class="work" style="font-size:{{rank}}px;"> -->
-	<section class="work">
-		<div class="work-date">{{date}}</div>
-		<div class="work-illu-group">
-			<div class="work-illu work-illu-main" style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
-			<div class="work-illu-secondary-group">
-				{{#illustration-second}}
-					<div class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
-				{{/illustration-second}}
+	<li id="{{id}}" class="grid-tile">
+		<section id="{{id}}" class="work">
+			<div class="work-date">{{rank}}</div>
+			<div class="work-illu-group">
+				<div class="work-illu work-illu-main" style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+				<div class="work-illu-secondary-group">
+					{{#illustration-second}}
+						<div class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
+					{{/illustration-second}}
+				</div>
 			</div>
-		</div>
-		<div class="work-content">
+			<div class="work-content">
 
-			<span class="work-title">{{title}}</span>
+				<span class="work-title">{{title}}</span>
 
-			<div class="work-sum-up markdowned">
-				{{{sum-up}}}
+				<div class="work-sum-up markdowned">
+					{{{sum-up}}}
+				</div>
 			</div>
-		</div>
-	</section>
-
-
+		</section>
+	</li>
 	{{/works}}
 
+
+</ul>
 </body>
+
+<script type="text/javascript" src="gridLayout.js"></script>
+
 </html>

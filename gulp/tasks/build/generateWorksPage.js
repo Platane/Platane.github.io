@@ -78,6 +78,9 @@ var prepareData = function( data ){
 
 
         w['rank'] = w['coolness'] * w['weight']
+        w['rank'] = Math.random()
+
+        w['id'] = w['title'].split(' ').join('-')
 
         return w
     })
