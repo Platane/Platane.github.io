@@ -41,11 +41,13 @@
 
 			tilesGeom[i].x = 0
 			tilesGeom[i].y = 0
+
+			tilesGeom[i].large = DOMtiles[i].indexOf('tile-large')>=0
 		}
 
 		// comptue the best fit
 
-		bestFit( DomHelper.getWidth( DOMgrid ) , tilesGeom );
+		bestFit( DomHelper.getWidth( DOMgrid ) , tilesGeom[0].w , tilesGeom );
 
 		if( typeof modifier === 'function' )
 			modifier( tilesGeom )
@@ -55,39 +57,64 @@
 			DomHelper.setPosition( DOMtiles[i] , tilesGeom[i].x , tilesGeom[i].y )
 	}
 
-	var bestFit = function( w , tiles ){
+
+	var Stack = function(){
+		this._array=[]
+		this.sum=0
+	}
+	Stack.prototype.push=function( tile ){
+		this.sum += tile.h
+		this._array.unshift( tile )
+	}
+	Stack.prototype.pop=function( ){
+		var t = this.array.shift()
+		this.sum -= t.h
+		return t
+	}
+	Stack.prototype.whatIfPop=function( k ){
+		var s = this.sum
+		for(var i=0;i<k && i<this._array.length;i++)
+			s-=this.array[i].h
+		return s
+	}
+
+
+	var bestFit = function( w , averageW , tiles_ ){
 
 		// how many collums?
-		var cn = Math.floor( w/tiles[0].w + 0.05 )
-
-		// height sum
-		var hs=0
-		for( var i=tiles.length;i--;)
-			hs+=tiles[i].h
-
-		// column height
-		var ch = hs/cn
+		var cn = Math.floor( w/averageW + 0.01 )
 
 
 		// fill row first
-		var tube = new Array( cn )
+		var tube = new Array( cn );
 		for( var i=cn;i--;)
-			tube[i] = (i%2)*30
+			( tube[i] = new Stack() ).sum = (i%2)*30
 
-		for( var i=0,l=tiles.length;i<l;i++){
+		var tiles = tiles_.slice().reverse()
 
-			// fill the less filled tube
+		while( tiles.length ){
 
-			var less = cn-1
-			for(var j=cn-1;j--;)
-				if( tube[less]>=tube[j])
-					less=j
+			var tile = tiles.shift()
+
+			// fill the less filled set of tubes
+
+			var size = Math.ceil( w/averageW - 0.01 )
+
+			if( tile.large ){
 
 
-			tiles[ i ].x = less / cn * w
-			tiles[ i ].y = tube[ less ]
 
-			tube[ less ] += tiles[ i ].h
+			}else{
+				var less = cn-1
+				for(var j=cn-1;j--;)
+					if( tube[less].sum>=tube[j].sum )
+						less=j
+
+				tile.x = less / cn * w
+				tile.y = tube[ less ].sum
+
+				tube[ less ].push( tile )
+			}
 		}
 	}
 

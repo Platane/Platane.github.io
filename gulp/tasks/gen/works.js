@@ -27,9 +27,11 @@ var prepareData = function( data ){
 
         return w
     })
+    /*
     .sort(function(a,b){
         return a.rank < b.rank ? 1 : -1
     });
+*/
     return data
 }
 
