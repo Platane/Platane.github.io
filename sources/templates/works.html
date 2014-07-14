@@ -8,18 +8,35 @@
 
 	{{#works}}
 	<!-- <section class="work" style="font-size:{{rank}}px;"> -->
-	<li id="{{id}}" class="grid-tile">
-		<section id="{{id}}" class="work">
-			<div class="work-date">{{rank}}</div>
-			<div class="work-illu-group">
-				<div class="work-illu work-illu-main" style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+	<li id="{{id}}" class="grid-tile work-wrap">
+		<section id="{{id}}" class="work" style="height:{{height}}px;">
+
+			<div class="work-illu-group" >
+				<div class="work-illu work-illu-main work-illu-skewed" >
+					<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+				</div>
 				<div class="work-illu-secondary-group">
 					{{#illustration-second}}
 						<div class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
 					{{/illustration-second}}
 				</div>
 			</div>
-			<div class="work-content">
+
+			<div class="work-content work-content-shrinked">
+
+				<span class="work-title">{{title}}</span>
+
+				<div class="work-sum-up markdowned">
+					{{{shrink-sum-up}}}
+				</div>
+
+				<div class="hide-bar"></div>
+
+			</div>
+
+
+
+			<div class="work-content work-content-long">
 
 				<span class="work-title">{{title}}</span>
 
@@ -27,9 +44,15 @@
 					{{{sum-up}}}
 				</div>
 			</div>
+
 		</section>
 	</li>
 	{{/works}}
+
+
+
+
+
 
 
 </ul>

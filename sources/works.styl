@@ -4,28 +4,112 @@ ul.grid
     list-style none
     padding 0
 
+
     li.grid-tile
         margin 0
-        padding 0
+        padding 10px
         position absolute
-        width 33%
+        width 33.3%
+
+        &.grid-animated
+            will-change transform -webkit-transform -moz-transform
+            transition transform 600ms ease 0ms, top 600ms ease 0ms, left 600ms ease 0ms
+
+
+@media screen and (max-width: 980px)
+    ul.grid li.grid-tile
+        width 50%
+
+@media screen and (max-width: 640px)
+    ul.grid li.grid-tile
+        width 100%
 
 .work-list
 
-    center( 800px , 50px )
+    center(   1150px   ,   50px   )
 
     .work
-        float left
         cursor pointer
         display block
         position relative
         width 100%
         
-
-
+    
 section.work
     background-color  rgba(33,33,33,0.1)
-    margin 12px
-    padding 4px
+    center( 360px )
+    
+
+workBackColor = #FFF
 
 
+.work-illu
+    display inline-block
+    position relative
+    width 100%
+    height 65%
+    overflow hidden
+
+    div
+        background-size cover
+        background-position center
+        width 100%
+        height 100%
+    
+    &.work-illu-skewed
+        
+        perspective 220px
+        transition perspective 400ms ease
+        div
+                
+            transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
+            transition transform 400ms ease
+
+            transform-style preserve-3d
+            width 130%
+            height 120%
+        /*
+        &:before
+            transform: none;
+            z-index 0
+            content ''
+            position absolute
+            display block
+            width 100%
+            height 100%
+            background-image  linear-gradient( 
+                0deg ,
+                rgba( 255,255,255 , 1 ) 0% ,
+                rgba( 255,255,255 , 0.2 ) 100%
+            )
+            box-shadow 0 0 5px 0px #333 inset
+        */
+        &:hover
+            perspective 150px
+            div 
+                transform rotateZ(3deg) rotateY(13deg) translate3d(-30px,-10%,0px) scale(1.1,1.1)
+           
+
+.work-content-long,
+.work-illu-secondary-group
+    display none
+
+.work-content
+    padding 10px
+
+.work-content-shrinked
+    height  35%
+    overflow hidden
+    position relative
+    background workBackColor
+    
+    .hide-bar
+        background-image  linear-gradient( 
+            0deg ,
+            workBackColor 0% ,
+            rgba( red( workBackColor ) , green( workBackColor ) , blue( workBackColor ) , 0 ) 100%
+        )
+        height 35%
+        width 100%
+        position absolute
+        bottom 0

@@ -8,7 +8,9 @@ var   gulp = require('gulp')
 var prepareData = function( data ){
     data.works = data.works
     .map(function(w){
+        var shrink = w['sum-up'].split('\n').slice(0,4).join('\n')
         w['sum-up'] = markdown.toHTML( w['sum-up'] )
+        w['shrink-sum-up'] = markdown.toHTML( shrink )
 
         w['illustration-main'] = w['screenShots'][0]
         w['illustration-second'] = []
@@ -17,7 +19,9 @@ var prepareData = function( data ){
 
 
         w['rank'] = w['coolness'] * w['weight']
-        w['rank'] = Math.random()
+        w['rank'] = Math.random() * 100
+
+        w['height'] = Math.max( Math.min( Math.sqrt( w['rank'] )*1.2 , 10 ) , 3.5 )*60
 
         w['id'] = w['title'].split(' ').join('-')
 
@@ -31,7 +35,7 @@ var prepareData = function( data ){
 
 gulp.task('gen.works', function() {
     
-    templating( '../build/templates/works.html' , '../build/data/works.json' , prepareData )
+    templating( '../sources/templates/works.html' , '../build/data/works.json' , prepareData )
     .pipe( htmlmin() )
     .pipe( rename('works.html') )
     .pipe( gulp.dest('../build/') )
