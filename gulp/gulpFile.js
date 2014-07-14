@@ -35,5 +35,3 @@ gulp.task('watch', function () {
 	gulp.watch('../sources/templates/**/*',['gen'] )
 	
 });
-
-gulp.run('gen')
