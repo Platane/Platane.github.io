@@ -15,6 +15,9 @@ ul.grid
             will-change transform -webkit-transform -moz-transform
             transition transform 600ms ease 0ms, top 600ms ease 0ms, left 600ms ease 0ms
 
+        &.grid-tile-large
+            width 100%
+            box-shadow 0 0 10px 10px red 
 
 @media screen and (max-width: 980px)
     ul.grid li.grid-tile
@@ -43,6 +46,7 @@ section.work
 workBackColor = #FFF
 
 
+
 .work-illu
     display inline-block
     position relative
@@ -57,11 +61,9 @@ workBackColor = #FFF
         height 100%
     
     &.work-illu-skewed
-        
         perspective 220px
         transition perspective 400ms ease
         div
-                
             transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
             transition transform 400ms ease
 
@@ -88,7 +90,6 @@ workBackColor = #FFF
             perspective 150px
             div 
                 transform rotateZ(3deg) rotateY(13deg) translate3d(-30px,-10%,0px) scale(1.1,1.1)
-           
 
 .work-content-long,
 .work-illu-secondary-group
