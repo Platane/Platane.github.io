@@ -32,7 +32,7 @@
 	var recompute = function( modifier ){
 
 		// grab some values
-
+		var smallW = Infinity
 		for(var i=0,l=DOMtiles.length;i<l;i++){
 			tilesGeom[i] = tilesGeom[i] || {}
 
@@ -43,11 +43,16 @@
 			tilesGeom[i].y = 0
 
 			tilesGeom[i].large = DOMtiles[i].className.indexOf('grid-tile-large')>=0
+
+			tilesGeom[i].i = i
+
+			if( tilesGeom[i].w< smallW )
+				smallW=tilesGeom[i].w
 		}
 
 		// comptue the best fit
 
-		bestFit( DomHelper.getWidth( DOMgrid ) , tilesGeom[0].w , tilesGeom );
+		bestFit( DomHelper.getWidth( DOMgrid ) , smallW , tilesGeom );
 
 		if( typeof modifier === 'function' )
 			modifier( tilesGeom )
@@ -106,7 +111,7 @@
 				var max = 0
 				var n=0
 				for( var k=cn;k--;){
-					var s= offsetY===0 ? (k%2)*30 : 0
+					var s= offsetY===0 ? (k%2)*30 : offsetY
 					for( var j=best[k].length;j--;){
 						best[k][j].x = averageW * k
 						best[k][j].y =  s
@@ -122,7 +127,7 @@
 				large.x = 0
 				large.y = max
 
-				offsetY += max + large.h
+				offsetY = max + large.h
 
 			} else {
 
@@ -161,9 +166,14 @@
 			( tubes[i] = new Stack() ).sum = offset ?  (i%2)*30 : 0
 
 		var best = [],bestF=Infinity;
+		for(var i=nc;i--;)
+			best.push([])
 
-		var k=0;
+		var l=0
+		var k=-1;
 		var rec = function(){
+
+			l++
 
 			// analyze the current state
 			var max=nc-1,
@@ -177,7 +187,7 @@
 			}
 
 			// fitness
-			var f = 2 * ( tubes[max].sum - tubes[min].sum )  +  ( tiles.length - k ) * ( sum / tiles.length )
+			var f = 2 * ( tubes[max].sum - tubes[min].sum )  +  ( tiles.length - (k+1) ) * ( sum / tiles.length )
 
 			// save the best one
 			if( f < bestF ){
@@ -197,14 +207,16 @@
 			if( k<tiles.length )
 				for(var i=nc;i--;){
 
-					tubes[i].push( tiles[k] )
+					tubes[(i-k+nc*10)%nc].push( tiles[k] )
 					rec();
-					tubes[i].pop( )
+					tubes[(i-k+nc*10)%nc].pop( )
 				}
 
 			k--;
 		}
 		rec();
+
+		console.log ( l )
 
 		return best;
 	}
@@ -268,8 +280,10 @@
 	var a = DOMgrid.offsetHeight;
 
 	// make the tiles animatable
-	for(var i=DOMtiles.length;i--;)
+	for(var i=DOMtiles.length;i--;){
 		DOMtiles[i].className += ' grid-animated'
+		DOMtiles[i].style.transitionDelay = ( (Math.random() * 600)|0)+"ms"
+	}
 
 	// replace, at correct state
 	setTimeout( recompute,200 );

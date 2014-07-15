@@ -21,7 +21,7 @@ var prepareData = function( data ){
         w['rank'] = w['coolness'] * w['weight']
         w['rank'] = Math.random() * 100
 
-        w['height'] = Math.max( Math.min( Math.sqrt( w['rank'] )*1.2 , 10 ) , 3.5 )*60
+        w['height'] = Math.max( Math.min( Math.sqrt( (0.6+Math.random()*0.8) * w['rank'] )*1.2 , 10 ) , 3.5 )*60
 
         w['id'] = w['title'].split(' ').join('-')
 
@@ -31,7 +31,10 @@ var prepareData = function( data ){
     .sort(function(a,b){
         return a.rank < b.rank ? 1 : -1
     });
-*/
+    */
+    .sort(function(a,b){
+        return Math.random() < 0.5 ? 1 : -1
+    });
     return data
 }
 

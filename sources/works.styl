@@ -1,4 +1,6 @@
 
+@import 'const'
+
 ul.grid
     position relative
     list-style none
@@ -13,11 +15,12 @@ ul.grid
 
         &.grid-animated
             will-change transform -webkit-transform -moz-transform
-            transition transform 600ms ease 0ms, top 600ms ease 0ms, left 600ms ease 0ms
+            transition transform 600ms ease-in-out 0ms, top 600ms ease-in-out 0ms, left 600ms ease-in-out 0ms
 
         &.grid-tile-large
+            transition width 600ms ease-in-out 500ms
             width 100%
-            box-shadow 0 0 10px 10px red 
+            /*box-shadow 0 0 10px 10px red */
 
 @media screen and (max-width: 980px)
     ul.grid li.grid-tile
@@ -36,12 +39,16 @@ ul.grid
         display block
         position relative
         width 100%
-        
+ 
     
 section.work
     background-color  rgba(33,33,33,0.1)
     center( 360px )
-    
+
+.grid-tile-large 
+    section.work
+        max-width none
+        height 500px !important
 
 workBackColor = #FFF
 
@@ -62,10 +69,10 @@ workBackColor = #FFF
     
     &.work-illu-skewed
         perspective 220px
-        transition perspective 400ms ease
+        transition perspective 400ms ease-in-out
         div
             transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
-            transition transform 400ms ease
+            transition transform 400ms ease-in-out
 
             transform-style preserve-3d
             width 130%
