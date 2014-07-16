@@ -12,6 +12,7 @@ ul.grid
         padding 10px
         position absolute
         width 33.3%
+        background-color  rgba(33,33,33,0.1)
 
         &.grid-animated
             will-change transform -webkit-transform -moz-transform
@@ -43,12 +44,13 @@ ul.grid
     
 section.work
     background-color  rgba(33,33,33,0.1)
+    border-bottom solid 5px pulseGreen
     center( 360px )
 
 .grid-tile-large 
     section.work
         max-width none
-        height 500px !important
+        height 620px !important
 
 workBackColor = #FFF
 
@@ -69,14 +71,14 @@ workBackColor = #FFF
     
     &.work-illu-skewed
         perspective 220px
-        transition perspective 400ms ease-in-out
+        transition perspective 400ms ease-in-out , height 400ms ease-in-out
         div
             transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
             transition transform 400ms ease-in-out
 
             transform-style preserve-3d
             width 130%
-            height 120%
+            height 130%
         /*
         &:before
             transform: none;
@@ -98,9 +100,37 @@ workBackColor = #FFF
             div 
                 transform rotateZ(3deg) rotateY(13deg) translate3d(-30px,-10%,0px) scale(1.1,1.1)
 
+
+.grid-tile-large 
+    .work-illu
+    
+        height 20px
+
+        /* reset hover */
+        &.work-illu-skewed
+            perspective 1020px
+            div 
+                transform rotateZ(1deg) rotateY(12deg) translate3d(0px,0px,0px) scale(1.2,1.4)
+            &:hover
+                perspective 1020px
+                div 
+                    transform rotateZ(1deg) rotateY(12deg) translate3d(0px,0px,0px) scale(1.2,1.4)
+
+    .work-content-long
+            
+        display block
+        height calc( 100% - 20px )
+
+    .work-content-shrinked
+            
+        display none
+
+
+
 .work-content-long,
 .work-illu-secondary-group
     display none
+    background workBackColor
 
 .work-content
     padding 10px

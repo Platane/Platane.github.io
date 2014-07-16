@@ -60,8 +60,8 @@
 			tilesGeom[i].w = DomHelper.getWidth( DOMtiles[i] )
 			tilesGeom[i].h = DomHelper.getHeight( DOMtiles[i] )
 
-			tilesGeom[i].x = DomHelper.getX( DOMtiles[i] )
-			tilesGeom[i].y = DomHelper.getY( DOMtiles[i] )
+			//tilesGeom[i].x = DomHelper.getX( DOMtiles[i] )
+			//tilesGeom[i].y = DomHelper.getY( DOMtiles[i] )
 
 			tilesGeom[i].large = DOMtiles[i].className.indexOf('grid-tile-large')>=0
 			//tilesGeom[i].large = DOMtiles[i].getAttribute('data-large') == 'true'
