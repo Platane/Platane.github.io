@@ -24,6 +24,7 @@
 
 			<div class="work-content work-content-shrinked">
 
+
 				<span class="work-title">{{title}}</span>
 
 				<div class="work-sum-up markdowned">
@@ -38,11 +39,27 @@
 
 			<div class="work-content work-content-long">
 
-				<span class="work-title">{{title}}</span>
+				<section>
+					<div class="work-caroussel">
 
-				<div class="work-sum-up markdowned">
-					{{{sum-up}}}
-				</div>
+						<div class="work-illu work-illu-main" >
+							<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+						</div>
+						<div class="work-illu-secondary-group">
+							{{#illustration-second}}
+								<div class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
+							{{/illustration-second}}
+						</div>
+
+					</div>
+				</section>
+				<section>
+					<span class="work-title">{{title}}</span>
+
+					<div class="work-sum-up markdowned">
+						{{{sum-up}}}
+					</div>
+				</section>
 			</div>
 
 		</section>

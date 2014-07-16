@@ -1,5 +1,7 @@
 
 @import 'const'
+@import 'work-content'
+@import 'work-illu'
 
 ul.grid
     position relative
@@ -12,16 +14,15 @@ ul.grid
         padding 10px
         position absolute
         width 33.3%
-        background-color  rgba(33,33,33,0.1)
 
         &.grid-animated
             will-change transform -webkit-transform -moz-transform
             transition transform 600ms ease-in-out 0ms, top 600ms ease-in-out 0ms, left 600ms ease-in-out 0ms
 
         &.grid-tile-large
-            transition width 600ms ease-in-out 500ms
+            transition width 100ms ease-in-out 500ms
             width 100%
-            /*box-shadow 0 0 10px 10px red */
+            box-shadow 0 0 10px 10px red
 
 @media screen and (max-width: 980px)
     ul.grid li.grid-tile
@@ -43,87 +44,18 @@ ul.grid
  
     
 section.work
-    background-color  rgba(33,33,33,0.1)
     border-bottom solid 5px pulseGreen
-    center( 360px )
+    center( 380px )
 
 .grid-tile-large 
     section.work
         max-width none
-        height 620px !important
+        height auto !important
 
 workBackColor = #FFF
 
 
 
-.work-illu
-    display inline-block
-    position relative
-    width 100%
-    height 65%
-    overflow hidden
-
-    div
-        background-size cover
-        background-position center
-        width 100%
-        height 100%
-    
-    &.work-illu-skewed
-        perspective 220px
-        transition perspective 400ms ease-in-out , height 400ms ease-in-out
-        div
-            transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
-            transition transform 400ms ease-in-out
-
-            transform-style preserve-3d
-            width 130%
-            height 130%
-        /*
-        &:before
-            transform: none;
-            z-index 0
-            content ''
-            position absolute
-            display block
-            width 100%
-            height 100%
-            background-image  linear-gradient( 
-                0deg ,
-                rgba( 255,255,255 , 1 ) 0% ,
-                rgba( 255,255,255 , 0.2 ) 100%
-            )
-            box-shadow 0 0 5px 0px #333 inset
-        */
-        &:hover
-            perspective 150px
-            div 
-                transform rotateZ(3deg) rotateY(13deg) translate3d(-30px,-10%,0px) scale(1.1,1.1)
-
-
-.grid-tile-large 
-    .work-illu
-    
-        height 20px
-
-        /* reset hover */
-        &.work-illu-skewed
-            perspective 1020px
-            div 
-                transform rotateZ(1deg) rotateY(12deg) translate3d(0px,0px,0px) scale(1.2,1.4)
-            &:hover
-                perspective 1020px
-                div 
-                    transform rotateZ(1deg) rotateY(12deg) translate3d(0px,0px,0px) scale(1.2,1.4)
-
-    .work-content-long
-            
-        display block
-        height calc( 100% - 20px )
-
-    .work-content-shrinked
-            
-        display none
 
 
 

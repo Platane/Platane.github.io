@@ -19,7 +19,7 @@
 		}
 
 		var transformProp = ['webkitTransform' , 'mozTransform' , 'transform' ]
-		this.setPosition=function( el , x , y ){
+		this.setPosition2=function( el , x , y ){
 			var value = 'translate3d(' + x + 'px,' + y + 'px,0px)'
 
 			for( var i=transformProp.length;i--;)
@@ -183,7 +183,7 @@
 
 			}else{
 
-				var marge = 100
+				var marge = 120
 				var wishedY = tile.y;
 
 				var bestFitness = Infinity,
