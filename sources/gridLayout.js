@@ -25,6 +25,27 @@
 			for( var i=transformProp.length;i--;)
 				el.style[ transformProp[i] ] = value
 		}
+
+		this.getX=function( el ){
+			var value = ""
+			for( var i=transformProp.length;i--;)
+				if( ( value = el.style[ transformProp[i] ] ) )
+					break
+
+			var m = value.match(/\( *([\d.-]+)/)
+
+			return !m ? 0 : +m[1]
+		}
+		this.getY=function( el ){
+			var value = ""
+			for( var i=transformProp.length;i--;)
+				if( ( value = el.style[ transformProp[i] ] ) )
+					break
+
+			var m = value.match(/\( *[\d.-]+ *px *, *([\d.-]+)/)
+
+			return !m ? 0 : +m[1]
+		}
 	})();
 
 
@@ -39,10 +60,11 @@
 			tilesGeom[i].w = DomHelper.getWidth( DOMtiles[i] )
 			tilesGeom[i].h = DomHelper.getHeight( DOMtiles[i] )
 
-			tilesGeom[i].x = 0
-			tilesGeom[i].y = 0
+			tilesGeom[i].x = DomHelper.getX( DOMtiles[i] )
+			tilesGeom[i].y = DomHelper.getY( DOMtiles[i] )
 
 			tilesGeom[i].large = DOMtiles[i].className.indexOf('grid-tile-large')>=0
+			//tilesGeom[i].large = DOMtiles[i].getAttribute('data-large') == 'true'
 
 			tilesGeom[i].i = i
 
@@ -76,6 +98,12 @@
 		this.sum -= t.h
 		return t
 	}
+	Stack.prototype.first=function( ){
+		return this.length() ? this._array[0] : null
+	}
+	Stack.prototype.length=function( ){
+		return this._array.length
+	}
 	Stack.prototype.whatIfPop=function( k ){
 		var s = this.sum
 		for(var i=0;i<k && i<this._array.length;i++)
@@ -90,177 +118,156 @@
 		var cn = Math.floor( w/averageW + 0.01 )
 
 
+		var maxTube = function( ){
+			var ii = cn-1,
+				m = tubes[ii].whatIfPop( goBack[ii] )
+
+			for(var i=cn-1;i--;){
+				var tmp = tubes[i].whatIfPop( goBack[i] )
+				
+				if( m < tmp ){
+					m = tmp
+					ii = i
+				}
+			}
+
+			return ii
+		}
+
+		var minTube = function(  ){
+			var ii = cn-1,
+				m = tubes[ii].whatIfPop( goBack[ii] )
+
+			for(var i=cn-1;i--;){
+				var tmp = tubes[i].whatIfPop( goBack[i] )
+				
+				if( m > tmp ){
+					m = tmp
+					ii = i
+				}
+			}
+
+			return ii
+		}
+
+		var deltaTube = function( ){
+
+			var max = maxTube( )
+			var min = minTube( )
+
+			return tubes[ max ].whatIfPop( goBack[ max ] ) - tubes[ min ].whatIfPop( goBack[ min ] )
+		}
 
 		var offsetY=0
+		var tubes = new Array(cn)
+		for(var i=cn;i--;)
+			( tubes[i] = new Stack() ).sum = (i%2)*30 
+
+
 		var tiles = tiles_.slice()
-		while( tiles.length ){
-
-			// get the first large one
-			for( var i=0,l=tiles.length;i<l;i++)
-				if( tiles[i].large )
-					break
-
-			if( i<l ){
-				// i is the large one
-
-				var frag = tiles.slice( 0,i )
-				var large = tiles[ i ]
-
-				var best = partialBestFit( cn , frag , offsetY===0 );
-
-				var max = 0
-				var n=0
-				for( var k=cn;k--;){
-					var s= offsetY===0 ? (k%2)*30 : offsetY
-					for( var j=best[k].length;j--;){
-						best[k][j].x = averageW * k
-						best[k][j].y =  s
-						s+= best[k][j].h
-						n++
-					}
-					if( s > max )
-						max = s
-				}
-
-				tiles = frag.slice(n).concat( tiles.slice( i+1 ) )
-
-				large.x = 0
-				large.y = max
-
-				offsetY = max + large.h
-
-			} else {
-
-				var tubes = new Array(cn)
-				for(var i=cn;i--;)
-					( tubes[i] = new Stack() ).sum = offsetY===0 ?  (i%2)*30 : offsetY
-
-
-				while( tiles.length ){
-
-					var tile = tiles.shift()
-
-					var less = cn-1
-					for(var j=cn-1;j--;)
-						if( tubes[less].sum>=tubes[j].sum )
-							less=j
-
-					tile.x = less / cn * w
-					tile.y = tubes[ less ].sum
-
-					tubes[ less ].push( tile )
-
-				}
-
-			}
-		}
-	}
-	var partialBestFit = function( nc , tiles , offset ){
-
-		var sum=0
-		for(var i=tiles.length;i--;)
-			sum += tiles[i].h
-
-		var tubes = new Array(nc)
-		for(var i=nc;i--;)
-			( tubes[i] = new Stack() ).sum = offset ?  (i%2)*30 : 0
-
-		var best = [],bestF=Infinity;
-		for(var i=nc;i--;)
-			best.push([])
-
-		var l=0
-		var k=-1;
-		var rec = function(){
-
-			l++
-
-			// analyze the current state
-			var max=nc-1,
-				min=nc-1
-
-			for(var i=nc;i--;){
-				if( tubes[ i ].sum < tubes[ min ].sum )
-					min = i
-				if( tubes[ i ].sum > tubes[ max ].sum )
-					max = i
-			}
-
-			// fitness
-			var f = 2 * ( tubes[max].sum - tubes[min].sum )  +  ( tiles.length - (k+1) ) * ( sum / tiles.length )
-
-			// save the best one
-			if( f < bestF ){
-				bestF = f;
-				best=[]
-				for(var i=nc;i--;)
-					best.push( tubes[i]._array.slice() )
-			}
-
-
-			// stop generate
-			if( tubes[max].sum > sum / nc + 200 )
-				return
-
-			// place the k tiles, rec
-			k++;
-			if( k<tiles.length )
-				for(var i=nc;i--;){
-
-					tubes[(i-k+nc*10)%nc].push( tiles[k] )
-					rec();
-					tubes[(i-k+nc*10)%nc].pop( )
-				}
-
-			k--;
-		}
-		rec();
-
-		console.log ( l )
-
-		return best;
-	}
-
-	/*
-	var bestFit = function( w , averageW , tiles_ ){
-
-		// how many collums?
-		var cn = Math.floor( w/averageW + 0.01 )
-
-
-		// fill row first
-		var tube = new Array( cn );
-		for( var i=cn;i--;)
-			( tube[i] = new Stack() ).sum = (i%2)*30
-
-		var tiles = tiles_.slice().reverse()
-
 		while( tiles.length ){
 
 			var tile = tiles.shift()
 
-			// fill the less filled set of tubes
+			if( !tile.large ){
 
-			var size = Math.ceil( w/averageW - 0.01 )
-
-			if( tile.large ){
-
-
-
-			}else{
 				var less = cn-1
 				for(var j=cn-1;j--;)
-					if( tube[less].sum>=tube[j].sum )
+					if( tubes[less].sum>=tubes[j].sum )
 						less=j
 
 				tile.x = less / cn * w
-				tile.y = tube[ less ].sum
+				tile.y = tubes[ less ].sum
 
-				tube[ less ].push( tile )
+				tubes[ less ].push( tile )
+
+			}else{
+
+				var marge = 100
+				var wishedY = tile.y;
+
+				var bestFitness = Infinity,
+					bestGoBack = [],
+					bestMax
+
+				for(var i=cn;i--;)
+					bestGoBack.push(0)
+
+				var goBack = bestGoBack.slice()
+				
+
+				while( true ){
+
+					var imax = maxTube(),
+						imin = minTube(),
+						max = tubes[ imax ].whatIfPop( goBack[ imax ] ),
+						min = tubes[ imin ].whatIfPop( goBack[ imin ] )
+
+					
+					if( max < wishedY + marge ){
+						
+						// acceptable
+						var fitness  = 2 * ( max - min ) + Math.abs( wishedY - ( min+max )/2 )
+
+						if( fitness < bestFitness ){
+							bestFitness = fitness
+							bestGoBack = goBack.slice()
+							bestMax = max
+						}
+					}
+
+					// early exit
+					if( wishedY - ( min+max )/2 > bestFitness )
+						break;
+
+
+					// determine what to pop
+					var f = Infinity,
+						incr=-1;
+					for(var i=cn;i--;){
+
+						if( goBack[i] >= tubes[i].length()  )
+							continue
+
+						goBack[i] ++ 
+						var tmp = deltaTube()
+						goBack[i] --
+
+						if( tmp < f ){
+							incr = i
+							f = tmp
+						}
+					}
+
+					if( incr == -1 )
+						break
+
+					goBack[incr]++
+				}
+
+				var trash = []
+				for(var i=cn;i--;)
+					for( var k=bestGoBack[i];k--;)
+						trash.push(  tubes[i].pop()  )
+
+				trash = trash.sort( function(a,b){
+					return a.i < b.i ? 1 : -1
+				})
+
+				tiles = trash.concat( tiles )
+
+
+				tile.x = 0
+				tile.y = Math.max( bestMax , ( wishedY + bestMax ) /2 )
+
+
+
+				for(var i=cn;i--;)
+					tubes[i].sum = tile.y + tile.h
+
 			}
 		}
 	}
-	*/
 	
 
 
@@ -282,7 +289,7 @@
 	// make the tiles animatable
 	for(var i=DOMtiles.length;i--;){
 		DOMtiles[i].className += ' grid-animated'
-		DOMtiles[i].style.transitionDelay = ( (Math.random() * 600)|0)+"ms"
+		DOMtiles[i].style.transitionDelay = ( (Math.random() * 100)|0)+"ms"
 	}
 
 	// replace, at correct state
@@ -292,14 +299,34 @@
 
 
 
-	for(var i=DOMtiles.length;i--;)
+	for(var i=DOMtiles.length;i--;){
+
+		DOMtiles[i].setAttribute('data-i',i)
 		DOMtiles[i].addEventListener('click',function(){
-			if( this.className.indexOf('tile-large') >= 0 )
-				this.className = this.className.split('grid-tile-large').join('')
+
+			var largen = !( this.className.indexOf('tile-large') >= 0 )
+			/*
+			if( largen )
+				this.setAttribute('data-large',true)
 			else
+				this.setAttribute('data-large',false)
+			*/
+			if( largen ){
+				
+				for(var i=DOMtiles.length;i--;)
+					DOMtiles[i].className = DOMtiles[i].className.split('grid-tile-large').join('')
+				recompute();
+				
 				this.className += ' grid-tile-large'
+			}
+			else
+				this.className = this.className.split('grid-tile-large').join('')
 
 			recompute();
+
+			
+			
 		},false)
+	}
 
 })( document.getElementsByClassName('grid')[0] );
