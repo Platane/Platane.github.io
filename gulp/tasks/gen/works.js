@@ -6,6 +6,9 @@ var   gulp = require('gulp')
 
 
 var prepareData = function( data ){
+        
+    data=JSON.parse( data )
+
     data.works = data.works
     .map(function(w){
         var shrink = w['sum-up'].split('\n').slice(0,4).join('\n')

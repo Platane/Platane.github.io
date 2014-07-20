@@ -10,5 +10,5 @@ gulp.task('build.clean', function () {
 })
 
 gulp.task('build', [ 'build.clean' ] , function(){
-	return gulp.run([ 'build.css' , 'build.html' , 'build.images' , 'build.js' , 'build.data' ])
+	return gulp.run([ 'build.css' , 'build.html' , 'build.images' , 'build.js' , 'build.works' , 'build.articles-index' ])
 });

@@ -9,10 +9,12 @@ requireDir('./tasks');
 gulp.task('default', [ 'build' , 'watch' ]);
 
 
-gulp.task('reload', function () {
-
-	connect.reload()
-	
+gulp.task('serve', function () {
+	connect.server({
+	    root: '../.',
+	    livereload: false,
+	    port : 8081
+	});
 });
 
 gulp.task('watch', function () {

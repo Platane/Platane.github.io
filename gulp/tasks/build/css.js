@@ -7,7 +7,7 @@ var   gulp = require('gulp')
 
 gulp.task('build.css', function() {
   //gulp.src('../sources/**/*.styl')
-  return gulp.src('../sources/home.styl')
+  return gulp.src( [ '../sources/home.styl' , '../sources/article-style.styl' ] )
     .pipe(stylus({
         errors: true,
         //compress: true,
@@ -17,6 +17,6 @@ gulp.task('build.css', function() {
           nib()
          ]
       }))
-    .pipe(concat('style.css'))
+    //.pipe(concat('style.css'))
     .pipe(gulp.dest('../build/'));
 });

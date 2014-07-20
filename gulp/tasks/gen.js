@@ -4,4 +4,4 @@ var   gulp = require('gulp')
 requireDir('./gen');
 
 
-gulp.task( 'gen', [ 'gen.works' ] );
+gulp.task( 'gen', [ 'gen.works' , 'gen.articles' ] );

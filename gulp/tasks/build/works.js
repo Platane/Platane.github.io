@@ -141,7 +141,7 @@ var forEachFolder=function( opts , fn ){
   return es.concat.apply( null , streams )
 }
 
-gulp.task('build.data', function() {
+gulp.task('build.works', function() {
   
   return forEachFolder( '../sources/data/works/' , concatSumUp )
   .pipe( concatJson() )

@@ -9,13 +9,14 @@
   },
   
   "devDependencies": {
-    "gulp" : "*",
+    "highlight" : "*",
+    "serve" : "*",
     "require-dir" : "*",
     "stylus" : "0.45.0",
     "jeet" : "*",
     "nib" : "*",
-    "event-stream" : "*",
-    "through2" : "*",
+    "stream" : "*",
+    "promise" : "*",
     "vinyl" : "*",
     "mustache" : "*",
     "markdown" : "*",

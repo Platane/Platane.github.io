@@ -12,15 +12,17 @@ module.exports = function( templateSrc , dataSrc , prepareData ){
     stream.setMaxListeners(0) // allow adding more than 11 streams
     stream.writable = stream.readable = true
     
-    prepareData = prepareData || function(r){return r}
+    prepareData = prepareData || function(r){return JSON.parse( r )}
 
-    var template,data,basePath,cwdPath;
+    var template,data,basePath,cwdPath,ended=false;
 
     var mustachify = function(){
-        if( !template || !data )
+        if( !template || !data || ended )
             return;
 
-        var output = Mustache.render( template , prepareData( JSON.parse( data ) ) );
+        var output = Mustache.render( template , prepareData( data ) );
+
+        ended = true
 
         stream.emit( 'data' , new File({
             contents : new Buffer( output ),
@@ -39,7 +41,7 @@ module.exports = function( templateSrc , dataSrc , prepareData ){
     else
         gulp.src( templateSrc )
         .on('data' , function( d ){ 
-            template = d.contents.toString('utf8');
+            templates[ templateSrc ] = template = d.contents.toString('utf8');
             mustachify();
         })
         .on('end' , mustachify )
