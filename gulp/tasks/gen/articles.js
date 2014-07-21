@@ -1,5 +1,4 @@
-var es = require('event-stream')
-  , gulp = require('gulp')
+var gulp = require('gulp')
   , fs = require('fs')
   , path = require('path')
   , Stream = require('promisableStream')

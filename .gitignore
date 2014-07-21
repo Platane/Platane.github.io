@@ -9,5 +9,7 @@ dist
 .tmp
 .sass-cache
 node_modules
+!gulp/tasks/node_modules
+
 bower_components
 npm-debug.log

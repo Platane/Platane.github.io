@@ -15,6 +15,8 @@ I am not a huge fan of __php__ , I prefer avoid using it. As most of the cheap h
 
 
 
+
+
  
     var code = {e:2};
     while( true ){

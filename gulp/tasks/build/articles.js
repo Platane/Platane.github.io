@@ -1,3 +1,4 @@
+
 var   gulp = require('gulp')
     , path = require('path')
     , Stream = require('promisableStream')
@@ -68,6 +69,8 @@ var concatData = function( newName ){
 
 var articlesBuild = '../build/data/articles/',
     articlesSources = '../sources/data/articles/'
+
+return
 
 gulp.task('build.articles', function() {
     
