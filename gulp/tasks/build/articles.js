@@ -70,7 +70,6 @@ var concatData = function( newName ){
 var articlesBuild = '../build/data/articles/',
     articlesSources = '../sources/data/articles/'
 
-return
 
 gulp.task('build.articles', function() {
     
@@ -79,7 +78,7 @@ gulp.task('build.articles', function() {
     .toPromise()
 });
 
-gulp.task('build.articles-index', ['build.articles'] , function() {
+gulp.task('build.articles-index' , function() {
     
     return gulp.src( articlesBuild+'**/data.json'  )
     .pipe( concatData() )

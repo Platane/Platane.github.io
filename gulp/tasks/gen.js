@@ -1,7 +1,7 @@
 var   gulp = require('gulp')
+    , gulpq = require('gulp-queue')
 	, requireDir = require('require-dir')
 
-//requireDir('./gen');
-require('./gen/articles.js')
+requireDir('./gen');
 
-gulp.task( 'gen', [ 'gen.works' ] );
+gulpq.task( 'gen', [ 'gen.works' , 'gen.articles' ] );
