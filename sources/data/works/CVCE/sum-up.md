@@ -22,105 +22,10 @@ We propose the solution of a web technologies based editor which adopt a __conte
  * The map viewer is able to display the final map, using Leaflet too.
 
 I work with 
- * Lucie Vitale
- * Benoit Godart
- * Kevin Aubert
+
+  *  Lucie Vitale
+  *  Benoit Godart
+  *  Kevin Aubert
 
 I myself assure the most of the development of the editor part. 
 I also made the cool poster !
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-
-
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
-As a scolar project, we develop a prototype of map editor in Js
-
-** CVCE **
-
-
-collaborators
-============
- * Kevin Aubert
- * Lucie Vitale
- * Arthur Brongniart
-
