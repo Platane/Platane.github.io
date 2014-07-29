@@ -17,7 +17,7 @@ var prepareData = function( data ){
 
         w['illustration-main'] = w['screenShots'][0]
         w['illustration-second'] = []
-        for(var i=1;i<w['screenShots'].length;i++)
+        for(var i=0;i<w['screenShots'].length;i++)
             w['illustration-second'].push( w['screenShots'][i] );
 
 

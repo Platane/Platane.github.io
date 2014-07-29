@@ -20,6 +20,7 @@
     "vinyl" : "*",
     "mustache" : "*",
     "markdown" : "*",
+    "gulp-minify-css" : "*",
     "gulp-html-minifier" : "*",
     "gulp-stylus" : "1.0.0",
     "gulp-rename" : "*",

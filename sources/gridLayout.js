@@ -19,7 +19,7 @@
 		}
 
 		var transformProp = ['webkitTransform' , 'mozTransform' , 'transform' ]
-		this.setPosition2=function( el , x , y ){
+		this.setPosition=function( el , x , y ){
 			var value = 'translate3d(' + x + 'px,' + y + 'px,0px)'
 
 			for( var i=transformProp.length;i--;)
@@ -207,7 +207,7 @@
 					if( max < wishedY + marge ){
 						
 						// acceptable
-						var fitness  = 2 * ( max - min ) + Math.abs( wishedY - ( min+max )/2 )
+						var fitness  = 2 * ( max - min ) + 5*Math.abs( wishedY - ( min+max )/2 )
 
 						if( fitness < bestFitness ){
 							bestFitness = fitness
@@ -259,7 +259,7 @@
 
 				tile.x = 0
 				tile.y = Math.max( bestMax , ( wishedY + bestMax ) /2 )
-
+				
 
 
 				for(var i=cn;i--;)
@@ -267,6 +267,13 @@
 
 			}
 		}
+
+		var maxY=tubes[cn-1].sum;
+		for(var j=cn-1;j--;)
+			if( tubes[j].sum > maxY )
+				maxY=tubes[j].sum
+
+		DOMgrid.style.height=maxY+"px"
 	}
 	
 

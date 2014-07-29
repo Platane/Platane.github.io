@@ -1,7 +1,14 @@
-
+@import 'main'
 @import 'const'
 @import 'work-content'
 @import 'work-illu'
+@import 'md'
+
+body
+    forestBackground()
+
+
+workBackColor = #FFF
 
 ul.grid
     position relative
@@ -20,9 +27,8 @@ ul.grid
             transition transform 600ms ease-in-out 0ms, top 600ms ease-in-out 0ms, left 600ms ease-in-out 0ms
 
         &.grid-tile-large
-            transition width 100ms ease-in-out 500ms
+            /*transition width 100ms ease-in-out 500ms*/
             width 100%
-            box-shadow 0 0 10px 10px red
 
 @media screen and (max-width: 980px)
     ul.grid li.grid-tile
@@ -46,15 +52,12 @@ ul.grid
 section.work
     border-bottom solid 5px pulseGreen
     center( 380px )
+    background workBackColor
 
-.grid-tile-large 
+.grid-tile-large
     section.work
         max-width none
         height auto !important
-
-workBackColor = #FFF
-
-
 
 
 
@@ -71,8 +74,8 @@ workBackColor = #FFF
     height  35%
     overflow hidden
     position relative
-    background workBackColor
     
+    /*
     .hide-bar
         background-image  linear-gradient( 
             0deg ,
@@ -83,3 +86,4 @@ workBackColor = #FFF
         width 100%
         position absolute
         bottom 0
+        */

@@ -19,7 +19,7 @@ gulp.task('serve', function () {
 	});
 });
 
-gulpq.task( 'regen' , [ ['build.articles','build.works'] , 'gen' ] )
+
 
 gulp.task('watch', function () {
 
@@ -34,7 +34,7 @@ gulp.task('watch', function () {
 
 	gulp.watch('../sources/**/*.styl',['build.css'] )
 
-	gulp.watch('../sources/**/*.html',['build.html'] )
+	gulp.watch('../sources/*.html',['build.html'] )
 
 	gulp.watch('../sources/data/**/*',['regen'] )
 
@@ -45,10 +45,12 @@ gulp.task('watch', function () {
 
 gulp.task('delay', function () {
 	return new Promise(function(resolve){
-		setTimeout( resolve , 1000 )
+		setTimeout( resolve , 500 )
 	})
 	
 })
+
+gulpq.task( 'regen' , [ ['build.html' , 'build.articles', 'build.works']  , 'delay' , 'gen' ] )
 
 gulpq.task( 'fullBuild' , [ 'build.clean' , 'delay' , 'build' , 'delay' , 'gen' ] )
 

@@ -41,7 +41,8 @@ module.exports = function( templateSrc , dataSrc , prepareData ){
     else
         gulp.src( templateSrc )
         .on('data' , function( d ){ 
-            templates[ templateSrc ] = template = d.contents.toString('utf8');
+            template = d.contents.toString('utf8');
+            //templates[ templateSrc ] = template
             mustachify();
         })
         .on('end' , mustachify )

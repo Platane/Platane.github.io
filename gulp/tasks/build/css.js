@@ -3,20 +3,21 @@ var   gulp = require('gulp')
     , concat = require('gulp-concat')
     , jeet = require('jeet')
     , nib = require('nib')
+    , cssmin = require('gulp-minify-css')
 
 
 gulp.task('build.css', function() {
   //gulp.src('../sources/**/*.styl')
-  return gulp.src( [ '../sources/home.styl' , '../sources/article-style.styl' ] )
+  return gulp.src( [ '../sources/home.styl' , '../sources/article-style.styl' , '../sources/works.styl' ] )
     .pipe(stylus({
         errors: true,
-        //compress: true,
+        compress: true,
         
         use : [ 
           jeet(),
           nib()
          ]
       }))
-    //.pipe(concat('style.css'))
+    .pipe(cssmin())
     .pipe(gulp.dest('../build/'));
 });

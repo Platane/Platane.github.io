@@ -1,5 +1,5 @@
 <html>
-<link rel="stylesheet" href="style.css" ></link>
+<link rel="stylesheet" href="works.css" ></link>
 
 <body version="{{build}}">
 
@@ -27,11 +27,11 @@
 
 				<span class="work-title">{{title}}</span>
 
-				<div class="work-sum-up markdowned">
+				<div class="markdowned">
 					{{{shrink-sum-up}}}
 				</div>
 
-				<div class="hide-bar"></div>
+				<!-- <div class="hide-bar"></div> -->
 
 			</div>
 
@@ -39,8 +39,8 @@
 
 			<div class="work-content work-content-long">
 
-				<section>
-					<div class="work-caroussel">
+				<section class="work-content-caroussel">
+					<!--<div class="work-caroussel">-->
 
 						<div class="work-illu work-illu-main" >
 							<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
@@ -51,12 +51,11 @@
 							{{/illustration-second}}
 						</div>
 
-					</div>
 				</section>
-				<section>
+				<section class="work-content-sum-up">
 					<span class="work-title">{{title}}</span>
 
-					<div class="work-sum-up markdowned">
+					<div class="markdowned">
 						{{{sum-up}}}
 					</div>
 				</section>
@@ -76,5 +75,6 @@
 </body>
 
 <script type="text/javascript" src="gridLayout.js"></script>
+<script type="text/javascript" src="workBrowser.js"></script>
 
 </html>

@@ -15,21 +15,62 @@
     .work-content-long
         display flex
         flex-direction row
-        align-items center
+        align-items stretch
         justify-content stretch
         align-content stretch
         width 100%
 
         section
-            display inline-block
+            /*display inline-block*/
             width 50%
             position relative
 
     .work-illu
         height auto
 
-.work-caroussel
+.work-content-caroussel
+    display flex
+    flex-direction column
+    align-items stretch
+    justify-content stretch
+    align-content stretch
+
+    .work-illu-main
+        flex 1 1 420px
+        div
+            position absolute
+            background-size contain
+            background-repeat no-repeat
+            top 0
+            bottom 0
+
+    .work-illu-secondary-group
+        flex 0 1
+        display inline-block
+        padding 5px
+
+        .work-illu
+            margin 5px
+            width 60px
+            height 60px
+            background-size cover
+            background-position center
+    /*
     .work-illu.work-illu-main
         position absolute
         top 0
-        bottom 20px
+        bottom 20px*/
+    /*
+    .work-illu-secondary-group
+        height 50px
+
+    .work-illu-main
+        height calc( 100% - 50px )
+
+    */
+.work-content-sum-up
+    padding-left 10px
+
+.work-title
+    font-family "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif
+    font-size 23px
