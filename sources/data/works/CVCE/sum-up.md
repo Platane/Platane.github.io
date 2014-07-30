@@ -13,8 +13,6 @@ We propose the solution of a web technologies based editor which adopt a __conte
 
    * Missing elements can be drawn ( basic shape edition , and boolean operation on polygon ) and pushed to the store in order to be re-used later.
 
-   * Selected elements are arranged along layers.
-
    * The map is styled using a __CSS-like__ langage. The editor support hight level feature for writing the MCSS, inspired by the chrome devTool.
 
    * Finaly, layers can be linked together, to create a convenient captions. The map is ready to be exported

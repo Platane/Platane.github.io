@@ -8,7 +8,11 @@
 	],
 	"coolness" : 7,
 	"weight" : 3,
-	"links" : {
-		"page" : "http://lisa-et-arthur-mangent.appspot.com/"
-	}
+	"links" : [
+		{
+			"url" : "http://lisa-et-arthur-mangent.appspot.com/",
+			"label" : "lisa et arthur mangent",
+			"type" : "page"
+		}
+	]
 }

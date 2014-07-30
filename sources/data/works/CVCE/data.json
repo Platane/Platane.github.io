@@ -10,6 +10,14 @@
 	"coolness" : 5,
 	"weight" : 4,
 	"links" : [
-
+		{
+			"url" : "http://www.cvce.eu/",
+			"label" : "cvce",
+			"type" : "partner"
+		},
+		{
+			"url" : "http://www.cvce.eu/",
+			"label" : "cvce2"
+		}
 	]
 }

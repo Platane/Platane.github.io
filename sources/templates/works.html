@@ -7,7 +7,6 @@
 <ul class="work-list grid">
 
 	{{#works}}
-	<!-- <section class="work" style="font-size:{{rank}}px;"> -->
 	<li id="{{id}}" class="grid-tile work-wrap">
 		<section id="{{id}}" class="work" style="height:{{height}}px;">
 
@@ -40,7 +39,6 @@
 			<div class="work-content work-content-long">
 
 				<section class="work-content-caroussel">
-					<!--<div class="work-caroussel">-->
 
 						<div class="work-illu work-illu-main" >
 							<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
@@ -51,6 +49,12 @@
 							{{/illustration-second}}
 						</div>
 
+						<section class="work-content-links">
+						{{#links}}
+							<a class="link {{#type}}link-{{type}}{{/type}}" href="{{url}}">{{label}}</a>
+						{{/links}}
+						</section>
+						
 				</section>
 				<section class="work-content-sum-up">
 					<span class="work-title">{{title}}</span>
@@ -59,6 +63,7 @@
 						{{{sum-up}}}
 					</div>
 				</section>
+				
 			</div>
 
 		</section>
