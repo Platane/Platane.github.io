@@ -8,54 +8,38 @@
 
 	{{#works}}
 	<li id="{{id}}" class="grid-tile work-wrap">
-		<section id="{{id}}" class="work" style="height:{{height}}px;">
+		<article id="{{id}}" class="work" style="height:{{height}}px;background-color:{{darkColor}};">
 
-			<div class="work-illu-group" >
-				<div class="work-illu work-illu-main work-illu-skewed" >
-					<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
-				</div>
-				<div class="work-illu-secondary-group">
-					{{#illustration-second}}
-						<div data-image="assets/works-illustrations/{{.}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
-					{{/illustration-second}}
-				</div>
-			</div>
-
-			<div class="work-content work-content-shrinked">
-
-
+			<header class="work-illu work-illu-main work-illu-skewed" >
+				<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+			</header>
+			
+			<section class="work-content work-content-shrinked">
 				<span class="work-title">{{title}}</span>
-
 				<div class="markdowned">
 					{{{shrink-sum-up}}}
 				</div>
-
-				<!-- <div class="hide-bar"></div> -->
-
-			</div>
+			</section>
 
 
 
-			<div class="work-content work-content-long">
+			<section class="work-content work-content-long">
 
-				<section class="work-content-caroussel">
+				<nav>
+					<div class="work-illu-secondary-group">
+						{{#illustration-second}}
+							<div data-image="assets/works-illustrations/{{.}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
+						{{/illustration-second}}
+					</div>
 
-						<div class="work-illu work-illu-main" >
-							<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
-						</div>
-						<div class="work-illu-secondary-group">
-							{{#illustration-second}}
-								<div data-image="assets/works-illustrations/{{.}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
-							{{/illustration-second}}
-						</div>
+					<section class="work-content-links">
+					{{#links}}
+						<a class="link {{#type}}link-{{type}}{{/type}}" href="{{url}}">{{label}}</a>
+					{{/links}}
+					</section>
+				</nav>
 
-						<section class="work-content-links">
-						{{#links}}
-							<a class="link {{#type}}link-{{type}}{{/type}}" href="{{url}}">{{label}}</a>
-						{{/links}}
-						</section>
-						
-				</section>
+
 				<section class="work-content-sum-up">
 					<span class="work-title">{{title}}</span>
 
@@ -64,9 +48,9 @@
 					</div>
 				</section>
 				
-			</div>
+			</section>
 
-		</section>
+		</article>
 	</li>
 	{{/works}}
 
