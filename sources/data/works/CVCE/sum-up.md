@@ -7,25 +7,18 @@ We propose the solution of a web technologies based editor which adopt a __conte
 
  * The app is linked to a __MongoDB__ powered store which contains map elements as shapes ( country border for example ).
 
- * The store can be queried to retreive element based on tags, spacial and time localisation.
+   * The store can be queried to retreive element based on tags, spacial and time localisation.
+ 
+ * The map is displayed using a __Leaflet__ feature to display svg path.
 
- * Missing elements can be drawn ( basic shape edition , and boolean operation on polygon ) and pushed to the store in order to be re-used later.
+   * Missing elements can be drawn ( basic shape edition , and boolean operation on polygon ) and pushed to the store in order to be re-used later.
 
- * Selected elements are arranged along layers.
+   * Selected elements are arranged along layers.
 
- * The map is displayed using a __Leaflet__ function to display svg path.
+   * The map is styled using a __CSS-like__ langage. The editor support hight level feature for writing the MCSS, inspired by the chrome devTool.
 
- * The map is styled using a __CSS-like__ langage. The editor support hight level feature for writing the MCSS, inspired by the chrome devTool.
+   * Finaly, layers can be linked together, to create a convenient captions. The map is ready to be exported
 
- * Finaly, layers can be linked together, to create a convenient captions. The map is ready to be exported
 
- * The map viewer is able to display the final map, using Leaflet too.
-
-I work with 
-
-  *  Lucie Vitale
-  *  Benoit Godart
-  *  Kevin Aubert
-
-I myself assure the most of the development of the editor part. 
+I work with __Lucie Vitale__, __Benoit Godart__, __Kevin Aubert__ . I myself assure the most of the development of the editor part. 
 I also made the cool poster !

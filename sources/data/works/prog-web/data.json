@@ -1,15 +1,14 @@
 {
-	"title" : "Grammar Shooter",
+	"title" : "List Sorting",
 	"date" : "2013",
 	"screenShots" : [
-		"anglais-fire.png",
-		"anglais-face-roll.png",
-		"anglais-orbital-stricke.png",
-		"anglais-intro.png",
-		"anglais-score.png"
+		"pweb-display4.png",
+		"pweb-display.png",
+		"pweb-home.png",
+		"pweb-vote.png"
 	],
-	"coolness" : 8,
-	"weight" : 4,
+	"coolness" : 6,
+	"weight" : 3,
 	"links" : {
 		"page" : "http://lisa-et-arthur-mangent.appspot.com/"
 	}
