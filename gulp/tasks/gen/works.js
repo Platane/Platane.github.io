@@ -31,7 +31,13 @@ var prepareData = function( data ){
 
         var color = Color().rgb( Math.random()*255 , Math.random()*255 , Math.random()*255 )
         w['color'] = color.rgbString()
-        w['darkColor'] = color.darken(0.5).rgbString()
+        w['darkColor'] = color.clone().darken(0.5).rgbString()
+
+        var lightColor = color.clone()
+        lightColor.lightness(90)
+        //lightColor.whiteness(0.9)
+
+        w['lightColor'] = lightColor.rgbString()
 
         return w
     })

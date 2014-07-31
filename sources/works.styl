@@ -39,23 +39,23 @@ ul.grid
         width 100%
 
 .work-list
-
     center(   1150px   ,   50px   )
 
-    .work
-        cursor pointer
-        display block
-        position relative
-        width 100%
- 
-    
-section.work
-    border-bottom solid 5px pulseGreen
+.work
+    cursor pointer
+    display block
+    position relative
+    width 100%
+
     center( 380px )
     background workBackColor
 
+    border-bottom solid 12px pulseGreen
+ 
+    
+
 .grid-tile-large
-    section.work
+    .work
         max-width none
         height auto !important
 
@@ -63,9 +63,8 @@ section.work
 
 
 .work-content-long,
-.work-illu-secondary-group
+nav
     display none
-    background workBackColor
 
 .work-content
     padding 10px
@@ -73,17 +72,4 @@ section.work
 .work-content-shrinked
     height  35%
     overflow hidden
-    position relative
     
-    /*
-    .hide-bar
-        background-image  linear-gradient( 
-            0deg ,
-            workBackColor 0% ,
-            rgba( red( workBackColor ) , green( workBackColor ) , blue( workBackColor ) , 0 ) 100%
-        )
-        height 35%
-        width 100%
-        position absolute
-        bottom 0
-        */

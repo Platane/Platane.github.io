@@ -8,10 +8,12 @@
 
 	{{#works}}
 	<li id="{{id}}" class="grid-tile work-wrap">
-		<article id="{{id}}" class="work" style="height:{{height}}px;background-color:{{darkColor}};">
+		<article id="{{id}}" class="work" style="height:{{height}}px;border-color:{{darkColor}};">
 
-			<header class="work-illu work-illu-main work-illu-skewed" >
-				<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+			<header>
+				<div class="work-illu work-illu-main work-illu-skewed" >
+					<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+				</div>
 			</header>
 			
 			<section class="work-content work-content-shrinked">
@@ -23,16 +25,17 @@
 
 
 
-			<section class="work-content work-content-long">
+			<section class="work-main">
 
-				<nav>
+				<nav style="background-color:{{darkColor}};">
+					
 					<div class="work-illu-secondary-group">
 						{{#illustration-second}}
 							<div data-image="assets/works-illustrations/{{.}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
 						{{/illustration-second}}
 					</div>
 
-					<section class="work-content-links">
+					<section class="work-links">
 					{{#links}}
 						<a class="link {{#type}}link-{{type}}{{/type}}" href="{{url}}">{{label}}</a>
 					{{/links}}
@@ -40,7 +43,7 @@
 				</nav>
 
 
-				<section class="work-content-sum-up">
+				<section class="work-content work-content-long">
 					<span class="work-title">{{title}}</span>
 
 					<div class="markdowned">

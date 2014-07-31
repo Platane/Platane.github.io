@@ -4,72 +4,67 @@
     .work-content-shrinked
         display none
 
-    section.work
+    .work
         display flex
-        flex-direction row
+        flex-direction column
         align-items center
         justify-content stretch
         align-content stretch
 
+        border-bottom-width 1px
 
-    .work-content-long
-        display flex
-        flex-direction row
-        align-items stretch
-        justify-content stretch
-        align-content stretch
+    header
+        height 320px
         width 100%
 
-        section
-            /*display inline-block*/
-            width 50%
-            position relative
+    .work-illu.work-illu-skewed
+        perspective 1000px
+        height 100%
 
-    .work-illu
-        height auto
-
-.work-content-caroussel
-    display flex
-    flex-direction column
-    align-items stretch
-    justify-content stretch
-    align-content stretch
-
-    .work-illu-main
-        flex 0 1 420px
         div
-            position absolute
-            background-size contain
-            background-repeat no-repeat
-            top 0
-            bottom 0
-
-    .work-illu-secondary-group
-        flex 0 1
-        display inline-block
-        padding 5px
-
-        .work-illu
-            margin 5px
-            width 60px
-            height 60px
+            width 120%
+            height 130%
             background-size cover
-            background-position center
-    /*
-    .work-illu.work-illu-main
-        position absolute
-        top 0
-        bottom 20px*/
-    /*
+            background-repeat no-repeat
+            transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
+
+        &:hover
+            perspective 1000px
+
+            div
+                transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
+
+    nav
+        /* flex 2 1 20% */
+        min-width 70px
+        flex 0 1 20%
+        display inline-block
+
+    .work-content-long
+        display inline-block
+
     .work-illu-secondary-group
-        height 50px
+        height 100%
+        display block
 
-    .work-illu-main
-        height calc( 100% - 50px )
+        
 
-    */
-.work-content-sum-up
-    padding-left 10px
+
+.work-main
+    display flex
+    flex-direction row
+    flex-flow space-between
+    align-items stretch
+    align-content stretch
+    width 100%
+
+.work-illu.work-illu-secondary
+    width  60px
+    height 60px
+    margin 5px
+    background-size cover
+    background-position center
+
 
 .work-title
     font-family "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif
