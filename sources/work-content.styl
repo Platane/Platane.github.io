@@ -1,3 +1,29 @@
+
+miniatureSize = 60px
+
+leftArrow( borderSize=2px, arrowSize=20px )
+        
+    position relative
+    border-right solid borderSize
+
+    &:before
+    &:after
+        content ''
+        position absolute
+        border-top solid arrowSize transparent
+        border-bottom solid arrowSize transparent
+        border-left solid arrowSize
+        position absolute
+        width 1px
+        height 1px
+        right (- (arrowSize+borderSize ))
+        top 20%
+        transition border 300ms , right 300ms , top 300ms
+
+    &:after
+        border-left-color #fff
+        right (- (arrowSize ))
+
 .grid-tile-large 
 
     .work-illu-group,
@@ -11,7 +37,7 @@
         justify-content stretch
         align-content stretch
 
-        border-bottom-width 1px
+        /* border-bottom-width 1px */
 
     header
         height 320px
@@ -33,39 +59,79 @@
 
             div
                 transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
+        
 
-    nav
-        /* flex 2 1 20% */
-        min-width 70px
-        flex 0 1 20%
-        display inline-block
+        /*
+        margin 5px 0 5px 5px
+        leftArrow( 2px , 8px )
 
-    .work-content-long
+        &:hover
+            leftArrow( 2px , 14px )
+            &:after
+                right -6px
+                border-width 6
+                top calc( 20% + 8px)
+
+        */
+ 
+
+    .work-content-wrapper
+        width 80%
+        flex-grow 0
         display inline-block
+        transition width 1300ms
 
     .work-illu-secondary-group
         height 100%
         display block
 
+    .work-main
         
+        display flex
+        flex-direction row
+        flex-flow space-between
+        align-items stretch
+        align-content stretch
+        flex-wrap nowrap
+        
+        width 100%
+        overflow hidden
 
 
-.work-main
-    display flex
-    flex-direction row
-    flex-flow space-between
-    align-items stretch
-    align-content stretch
-    width 100%
+nav
+    min-width miniatureSize + 10px
+    max-width miniatureSize*3 + 20px
+    display inline-block
+    flex 1 1
+    display inline-block
+    background-color #ccc
+
+.work-illu-panel
+    display inline-block
+    width 0
+    background-color #333
+    
+
+.illu-displayed 
+    .work-illu-panel
+        width 70%
+        min-width 50%
+        flex 1 0
+    .work-content-wrapper
+        width 50px
 
 .work-illu.work-illu-secondary
-    width  60px
-    height 60px
+    width  miniatureSize
+    height miniatureSize
     margin 5px
     background-size cover
     background-position center
+    background-color #ccc
 
+.work-content-long
+    width 100%
 
 .work-title
     font-family "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif
     font-size 23px
+

@@ -1,55 +1,68 @@
 (function(){
 
-	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	
-
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.d="M150 0 L75 200 L225 200 Z"
-	
-	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-	circle.setAttribute("cx",100)
-	circle.setAttribute("cy",100)
-	circle.setAttribute("r",100)
-	circle.cx = 100
-	circle.cy = 100
-	circle.r = 100
-
-	var mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
-	mask.setAttribute("maskUnits" , "objectBoundingBox")
-	mask.setAttribute("maskContentUnits" , "objectBoundingBox")
-	mask.setAttribute('id',"mask-buble-path")
-
-	svg.appendChild( path )
-	svg.appendChild( mask )
-
-	mask.appendChild( circle )
-
-	document.getElementsByTagName('body')[0].appendChild( svg )
-
-	var startSvg = function(){
-		//SVGPathSegMovetoAbs
+	var hasClass = function( el , c ){
+		return el.className.indexOf(c)>=0
+	}
+	var addClass = function( el , c ){
+		el.className += ' '+c
+	}
+	var removeClass = function( el , c ){
+		el.className = el.className.split( c ).join('')
+	}
+	var getParent = function( el , c ){
+		while(true)
+			if( el !== document && !hasClass( el , c ) )
+				el = el.parentElement
+			else
+				break;
+		return el === document ? null : el
 	}
 
-	var all = document.querySelectorAll( '.work-illu-secondary-group .work-illu' )
+	var all = document.querySelectorAll( '.work-illu.work-illu-secondary' )
+
+	var openIlluPanel = function( main ){
+		var content = main.querySelector('.work-content'),
+			panel = main.querySelector('.work-illu-panel')
+
+		var contentWidth = content.offsetWidth,
+			mainWidth = main.offsetWidth,
+			panelWidth = mainWidth * 0.70
+
+
+		// set as fixed
+		content.style.width = contentWidth+'px'
+		panel.style.width = panelWidth+'px'
+
+		addClass( main , 'illu-displayed' )
+	}
+
+	var changeIllu = function( current , url , noTransition ){
+		current.style.backgroundImage = 'url('+url+')'
+	}
 
 	for(var i=all.length;i--;)
 		all[i]
 		.addEventListener('click',function( e ){
 			
-			// grab the caroussel element
-			var cars = this
-			while(true)
-				if( cars.className.indexOf('work-content-caroussel')<0 )
-					cars = cars.parentElement
-				else
-					break;
+			// grab the main element
+			var main = getParent( this , 'work-main' ),
+				primarIllu = main.querySelector('.work-illu-primar div')
 
-			// grab the primar illu
-			var main = cars.querySelector('.work-illu-main')
+			if( !hasClass( main , 'illu-displayed')  ){
+				// open the panel
 
-			main.querySelector('div').style.backgroundImage = this.style.backgroundImage
-			main.querySelector('div').style.mask =  'url(#mask-buble-path)'
 
+				openIlluPanel( main )
+
+				changeIllu( primarIllu , this.getAttribute( 'data-image' ) , true )
+			}
+			else
+			{
+				// change the image if different
+				changeIllu( primarIllu , this.getAttribute( 'data-image' )  )
+
+			}
 			e.stopPropagation();
+			
 		})
 })()
