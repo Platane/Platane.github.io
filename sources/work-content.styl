@@ -24,6 +24,8 @@ leftArrow( borderSize=2px, arrowSize=20px )
         border-left-color #fff
         right (- (arrowSize ))
 
+
+
 .grid-tile-large 
 
     .work-illu-group,
@@ -77,46 +79,57 @@ leftArrow( borderSize=2px, arrowSize=20px )
 
     .work-content-wrapper
         width 80%
-        flex-grow 0
         display inline-block
-        transition width 1300ms
-
-    .work-illu-secondary-group
-        height 100%
-        display block
 
     .work-main
         
+        display inline-block
+        /*
         display flex
         flex-direction row
         flex-flow space-between
         align-items stretch
         align-content stretch
         flex-wrap nowrap
-        
+        */
+        white-space nowrap
         width 100%
         overflow hidden
 
 
 nav
+    vertical-align top
     min-width miniatureSize + 10px
-    max-width miniatureSize*3 + 20px
-    display inline-block
-    flex 1 1
+    max-width 20%
     display inline-block
     background-color #ccc
+
+    &:before
+        content ''
 
 .work-illu-panel
     display inline-block
     width 0
-    background-color #333
-    
+    /* height is fixed with js */
+    background-color #fafafa
+    /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
+    vertical-align top
+    transition width 800ms ease-in-out
+    overflow hidden
+
+.work-illu-primar.work-illu
+    height 100%
+    padding 5px
+    div
+        background-size contain
+        background-repeat no-repeat
+        background-position center
+
+
 
 .illu-displayed 
     .work-illu-panel
         width 70%
-        min-width 50%
-        flex 1 0
     .work-content-wrapper
         width 50px
 
@@ -127,6 +140,15 @@ nav
     background-size cover
     background-position center
     background-color #ccc
+
+.work-illu-secondary-group
+    display flex
+    align-content flex-start
+    justify-content flex-start
+    flex-direction row
+    flex-wrap wrap
+    white-space normal
+
 
 .work-content-long
     width 100%
