@@ -18,5 +18,5 @@ We propose the solution of a web technologies based editor which adopt a __conte
    * Finaly, layers can be linked together, to create a convenient captions. The map is ready to be exported
 
 
-I work with __Lucie Vitale__, __Benoit Godart__, __Kevin Aubert__ . I myself assure the most of the development of the editor part. 
+I work with __Lucie Vitale__, __Benoit Godart__, __Kevin Aubert__ . I myself assure most of the development for the editor part. 
 I also made the cool poster !

@@ -1,6 +1,6 @@
 {
-	"title" : "deconstruction",
-	"date" : "2012",
+	"title" : "UML diagram creator",
+	"date" : "2013",
 	"screenShots" : [
 		"deconstruction-burst3.png",
 		"deconstruction-burst.png",
@@ -10,21 +10,20 @@
 		"deconstruction-intro.png"
 
 	],
-	"coolness" : 10,
+	"coolness" : 2,
 	"weight" : 5,
 	"tags" : [
 		"Js",
-		"WebGL",
-		"3D",
-		"personal project",
-		"burst",
-		"CV"
+		"Angular",
+		"UML",
+		"canvas",
+		"academic project"
 	],
 	"links" : [
 		{
-			"url" : "https://prometheuscomputing.com/",
-			"label" : "prometheus computing",
-			"type" : "partner"
+			"url" : "http://lisa-et-arthur-mangent.appspot.com/",
+			"label" : "deconstruction",
+			"type" : "page"
 		}
 	]
 }
