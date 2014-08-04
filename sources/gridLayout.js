@@ -1,52 +1,6 @@
-(function( DOMgrid ){
+var gridLayout = (function( DOMgrid ){
 
 	var DOMtiles = DOMgrid.querySelectorAll('.grid-tile');
-
-
-	var DomHelper = new (function(){
-
-		this.getWidth=function( el ){
-			return el.offsetWidth
-		}
-
-		this.getHeight=function( el ){
-			return el.offsetHeight
-		}
-
-		this.setPosition=function( el , x , y ){
-			el.style.left = x+'px'
-			el.style.top = y+'px'
-		}
-
-		var transformProp = ['webkitTransform' , 'mozTransform' , 'transform' ]
-		this.setPosition=function( el , x , y ){
-			var value = 'translate3d(' + x + 'px,' + y + 'px,0px)'
-
-			for( var i=transformProp.length;i--;)
-				el.style[ transformProp[i] ] = value
-		}
-
-		this.getX=function( el ){
-			var value = ""
-			for( var i=transformProp.length;i--;)
-				if( ( value = el.style[ transformProp[i] ] ) )
-					break
-
-			var m = value.match(/\( *([\d.-]+)/)
-
-			return !m ? 0 : +m[1]
-		}
-		this.getY=function( el ){
-			var value = ""
-			for( var i=transformProp.length;i--;)
-				if( ( value = el.style[ transformProp[i] ] ) )
-					break
-
-			var m = value.match(/\( *[\d.-]+ *px *, *([\d.-]+)/)
-
-			return !m ? 0 : +m[1]
-		}
-	})();
 
 
 	var tilesGeom = [];
@@ -304,36 +258,8 @@
 
 
 
-
-
-	for(var i=DOMtiles.length;i--;){
-
-		DOMtiles[i].setAttribute('data-i',i)
-		DOMtiles[i].addEventListener('click',function(){
-
-			var largen = !( this.className.indexOf('tile-large') >= 0 )
-			/*
-			if( largen )
-				this.setAttribute('data-large',true)
-			else
-				this.setAttribute('data-large',false)
-			*/
-			if( largen ){
-				
-				for(var i=DOMtiles.length;i--;)
-					DOMtiles[i].className = DOMtiles[i].className.split('grid-tile-large').join('')
-				recompute();
-				
-				this.className += ' grid-tile-large'
-			}
-			else
-				this.className = this.className.split('grid-tile-large').join('')
-
-			recompute();
-
-			
-			
-		},false)
+	return {
+		update : recompute 
 	}
 
 })( document.getElementsByClassName('grid')[0] );

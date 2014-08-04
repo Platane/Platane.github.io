@@ -96,6 +96,8 @@ leftArrow( borderSize=2px, arrowSize=20px )
         width 100%
         overflow hidden
 
+        min-height 500px
+
 
 nav
     vertical-align top
@@ -103,6 +105,7 @@ nav
     max-width 20%
     display inline-block
     background-color #ccc
+    height 100%
 
     &:before
         content ''
@@ -111,11 +114,14 @@ nav
     display inline-block
     width 0
     /* height is fixed with js */
-    background-color #fafafa
+    background-color #ccc
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
     vertical-align top
     transition width 800ms ease-in-out
     overflow hidden
+
+    &.dragged
+        transition none
 
 .work-illu-primar.work-illu
     height 100%

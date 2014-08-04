@@ -1,0 +1,505 @@
+
+root { 
+    display: block;
+}
+.popUpPanel {
+    position: absolute;
+    background:-moz-linear-gradient(top,#555,#2C2C2C);
+    background:-webkit-gradient(linear, left top, left bottom, from(#555), to(#2C2C2C));
+    border-radius: 10px;
+    
+    padding: 16px;
+    
+    border-style:dashed;
+    border-color:blue;
+    border-width:5px;
+    
+    color:#AAAAAA;
+    
+    z-index: 99;
+}
+
+.miniature {
+    
+   display:inline-block; 
+  
+   margin-right: 16px; 
+   
+   text-align: right;
+   line-height: 0;
+   
+}
+.miniature i {
+    font-size: 11px;
+}
+
+
+/* début css rajouté pour menu */
+#menu {
+	width: 940px;
+	height: 76px;
+	margin: 0px auto;
+	padding: 20px 20px 0px 20px;
+}
+
+#menu ul {
+	margin: 0;
+	padding: 0px 0px 0px 0px;
+	list-style: none;
+	line-height: normal;
+}
+
+#menu li {
+	float: left;
+}
+
+#menu a {
+	display: block;
+	float: left;
+	height: 56px;
+	margin: 0px;
+	padding: 0px 30px 0px 30px;
+	line-height: 56px;
+	letter-spacing: -1px;
+	text-decoration: none;
+	text-transform: uppercase;
+	font-family: 'Arvo', serif;
+	font-size: 14px;
+	font-weight: normal;
+	color: #B5B5B5;
+	border: none;
+}
+
+#menu .current_page_item a {
+	background: url(ressource/img03.jpg) repeat-x left top;
+	color: #FFFFFF;
+}
+/* fin du css rajouté pour menu */
+
+
+.popUpPanel .popUpDroitUtilisateur {
+    
+    
+    width : 300px;
+    height : 200px;
+}
+
+.element {
+    margin:auto;
+    text-align: center;
+    display: inline-block;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    
+}
+
+.popUpPanel .popUpAddElement {
+    
+    
+    width : 500px;
+    height : 500px;
+}
+
+.vote {
+    
+    font-family: Impact;
+    font-size : 21px;
+    
+    text-shadow: 2px 0px 7px #458BA9;
+    
+    background-image:url("ressource/etoile.png");
+    
+    background-repeat: no-repeat;
+    position:relative;
+    top:-120px;
+    left:-60px;
+    display : inline-block;
+    
+    
+    width:47px;
+    height : 55px;
+    
+    text-align: center;
+    
+}
+
+.vote div{
+    position:relative;
+    top:11px;
+}
+
+
+.infoElement {
+    
+    
+    border-radius: 10px;
+    
+    display : inline-block;
+    padding: 16px;
+    
+    border:dashed #458BA9 5px;
+    
+    position: absolute;
+    right : 16px;
+        
+    text-align: center;
+    
+    min-width: 300px;
+    
+}
+
+/* sur la page où on affiche toutes les listes en ligne */
+.ligne_listes {
+
+    overflow-x:auto;
+    overflow-y:hidden;
+    
+    height : 190px;
+    white-space:nowrap;
+}
+.ligne_liste_container{
+    padding-bottom: 10px;
+    margin-bottom : 10px;
+    border-bottom:dotted #458BA9 5px;
+}
+
+
+h1{
+    color:#458BA9;
+    
+}
+
+h2{
+    color:#458BA9;
+    text-shadow: 2px 0px 5px #777;
+}
+h3{
+    color:#458BA9;
+    text-shadow: 2px 0px 5px #777;
+    display:inline;
+}
+
+.img_container {
+    max-height: 100px;
+    max-width: 100px;
+}
+
+img {
+    max-height: 300px;
+    max-width: 300px;
+    
+    
+    border: 5px solid #fff;
+    -moz-box-shadow: 0px 0px 12px #555;
+    -webkit-box-shadow: 0px 0px 12px #555;
+    box-shadow: 0px 0px 12px #555;
+    
+}
+
+
+.popUpPanel .bouton {
+    
+    font-family: Arial;
+    font-size: 16px;
+    
+    color:#FFF;
+    
+    vertical-align: middle;
+    
+    
+    -moz-box-shadow: 0px 0px 0px #343434;
+-webkit-box-shadow: 0px 0px 0px #343434;
+-o-box-shadow: 0px 0px 0px #343434;
+box-shadow: 0px 0px 0px #343434;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+border: 2px solid #656565;
+background:#9b9b9b;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="9b9b9b", endColorstr="656565"); /* Pour IE seulement et mode gradient à linear */
+
+background: -moz-linear-gradient(top, rgba(240,183,161,1) 0%, rgba(140,51,16,1) 50%, rgba(117,34,1,1) 51%, rgba(191,110,78,1) 100%); 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(240,183,161,1)), color-stop(50%,rgba(140,51,16,1)), color-stop(51%,rgba(117,34,1,1)), color-stop(100%,rgba(191,110,78,1))); 
+background: -webkit-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: -o-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: -ms-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+
+
+/*
+background-image: -webkit-gradient(linear, left top, left bottom, from(#9b9b9b), to(#656565));
+background-image: -moz-linear-gradient(top center, #9b9b9b, #656565);
+background-image: -o-linear-gradient(top, #9b9b9b, #656565); /*uniquement en mode linear*/
+    
+}
+
+
+.bouton {
+    
+    font-family: Arial;
+    font-size: 16px;
+    
+    color:#ffffff;
+    
+    vertical-align: middle;
+    
+    
+    -moz-box-shadow: 0px 0px 0px #343434;
+-webkit-box-shadow: 0px 0px 0px #343434;
+-o-box-shadow: 0px 0px 0px #343434;
+box-shadow: 0px 0px 0px #343434;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+border: 2px solid #656565;
+background:#9b9b9b;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="9b9b9b", endColorstr="656565"); /* Pour IE seulement et mode gradient à linear */
+/*
+background: -moz-linear-gradient(top, rgba(240,183,161,1) 0%, rgba(140,51,16,1) 50%, rgba(117,34,1,1) 51%, rgba(191,110,78,1) 100%); 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(240,183,161,1)), color-stop(50%,rgba(140,51,16,1)), color-stop(51%,rgba(117,34,1,1)), color-stop(100%,rgba(191,110,78,1))); 
+background: -webkit-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: -o-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: -ms-linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+background: linear-gradient(top, rgba(240,183,161,1) 0%,rgba(140,51,16,1) 50%,rgba(117,34,1,1) 51%,rgba(191,110,78,1) 100%); 
+*/
+
+
+background: -moz-linear-gradient(top, #e2972d 0%, #d39f50 50%, #d48913 52%, #f2cea2 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e2972d), color-stop(50%,#d39f50), color-stop(52%,#d48913), color-stop(100%,#f2cea2));
+background: -webkit-linear-gradient(top, #e2972d 0%,#d39f50 50%,#d48913 52%,#f2cea2 100%);
+background: -o-linear-gradient(top, #e2972d 0%,#d39f50 50%,#d48913 52%,#f2cea2 100%);
+background: -ms-linear-gradient(top, #e2972d 0%,#d39f50 50%,#d48913 52%,#f2cea2 100%);
+background: linear-gradient(top, #e2972d 0%,#d39f50 50%,#d48913 52%,#f2cea2 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2972d', endColorstr='#f2cea2',GradientType=0 );
+
+
+/*
+background-image: -webkit-gradient(linear, left top, left bottom, from(#9b9b9b), to(#656565));
+background-image: -moz-linear-gradient(top center, #9b9b9b, #656565);
+background-image: -o-linear-gradient(top, #9b9b9b, #656565); /*uniquement en mode linear*/
+    
+}
+
+.bouton:hover {
+    
+    font-family: Arial;
+    font-size: 16px;
+    
+    color:#ffffff;
+    
+    background: -webkit-linear-gradient(top, rgba(252,234,187,1) 0%,rgba(252,205,77,1) 50%,rgba(248,181,0,1) 51%,rgba(251,223,147,1) 100%);
+
+
+}
+
+a {
+    color : #458BA9;
+}
+
+
+html {
+    
+    background-attachment:fixed , fixed;
+    
+     color : #474230;
+     
+     font-family: Calibri;
+    
+/*
+background-image: url("ressource/motif_transparent2.png") ,-moz-linear-gradient(top, rgba(212,137,19,1) 0%, rgba(254,182,69,1) 97%, rgba(150,105,42,1) 100%); 
+background-image: url("ressource/motif_transparent2.png") ,-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(212,137,19,1)), color-stop(97%,rgba(254,182,69,1)), color-stop(100%,rgba(150,105,42,1))); 
+background-image: url("ressource/motif_transparent2.png") ,-webkit-linear-gradient(top, rgba(212,137,19,1) 0%,rgba(254,182,69,1) 97%,rgba(150,105,42,1) 100%); 
+background-image: url("ressource/motif_transparent2.png") ,-o-linear-gradient(top, rgba(212,137,19,1) 0%,rgba(254,182,69,1) 97%,rgba(150,105,42,1) 100%); 
+    
+    */
+   background-image: -webkit-linear-gradient(bottom, rgba(145,139,130,1) 0px ,rgba(107,83,51,1) 31px,rgba(131,118,95,1) 32px,rgba(155,153,139,0) 32px) , url("ressource/motif_transparent2.png") , -webkit-radial-gradient(center, ellipse cover, rgba(212,137,19,1) 52%,rgba(163,128,102,1) 100%);
+    
+    
+}
+
+/* rendu paper */
+.paper, .main, nav , header .bandeau {
+    
+    background:#FBF0E1;
+    /*
+    background-image: url("ressource/elluminure.png") , -moz-radial-gradient(center, ellipse cover, rgba(188,171,124,0) 0%, rgba(188,171,124,0) 61%, rgba(188,171,124,1) 100%), url("ressource/paper_texture.jpg") ;
+    background-image: url("ressource/elluminure.png") , -webkit-radial-gradient(center, ellipse cover, rgba(188,171,124,0) 0%,rgba(188,171,124,0) 61%,rgba(188,171,124,1) 100%), url("ressource/paper_texture.jpg") ;
+    */
+    background-image: -webkit-radial-gradient(center, ellipse cover, rgba(251,240,225,0) 0%,rgba(225,202,163,0) 47%,rgba(196,160,94,0.73) 100%) , url("ressource/elluminure.png") ,  url("ressource/paper_texture.jpg") ;
+    
+    background-size: auto , auto , cover;
+    background-position: center , -10px 10px  , center;
+    background-repeat: no-repeat;
+    
+    /* box-shadow:  0px 0px 40px 10px rgba(0,0,0,0.5); */
+    
+    box-shadow:  20px 10px 35px 0px rgba(0,0,0,0.5), -20px 10px 35px 0px rgba(0,0,0,0.5);
+    
+    padding: 16px;
+}
+
+.main {
+    position :absolute;
+   
+    
+   
+    
+    left:300px;
+    right : 20px;
+    /*border-radius: 10px 10px 0 0;*/
+    
+    
+    padding-bottom: 50px;
+    
+    margin: auto;
+    
+    max-width: 1000px;
+    min-width: 600px;
+    
+    min-height: 100%;
+}
+
+nav{
+    
+    background-size: cover , 100px 100px, cover ;
+    background-position: center , -10px 2px  , center;
+    
+    position :absolute;
+    
+    margin-top: 50px;
+    
+    left:10px;
+    max-width: 200px;
+    min-width: 200px;
+    border-radius: 0px 10px 10px 0;
+    
+}
+
+nav .case {
+    
+    
+    border-bottom: dotted 2px #458BA9;
+    
+    padding-bottom: 15px;
+    
+    margin-top: 30px;
+    
+}
+
+nav .case .element {
+    
+    margin:auto;
+    text-align: center;
+    display: inline-block;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    
+    vertical-align: top;
+    
+}
+
+nav .case .element img {
+    height: 80px;
+    width: 80px;
+    
+    
+    border: 5px solid #fff;
+    -moz-box-shadow: 0px 0px 12px #555;
+    -webkit-box-shadow: 0px 0px 12px #555;
+    box-shadow: 0px 0px 12px #555;
+    
+}
+
+
+
+
+
+/*
+
+    header relative
+
+*/
+
+header .bandeau {
+    
+    width : 100%;
+    height : 210px;
+    
+    left : 0px;
+    
+    margin : 0px;
+    
+    margin-top: 20px;
+    margin-bottom: 2px;
+    padding : 0px;
+    
+    
+    z-index : 999;
+    
+    /* background-image: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%) , url("ressource/paper_texture.jpg")  ; */
+    
+    background-image: -webkit-radial-gradient(center, ellipse cover, rgba(251,240,225,0) 0%,rgba(225,202,163,0) 47%,rgba(196,160,94,0.73) 100%) ,  -webkit-linear-gradient(top, rgba(251,240,225,0) 0%,rgba(193,177,155,0) 20%,rgba(107,83,51,0.43) 50%,rgba(131,118,95,0.44) 51%,rgba(155,153,139,0.35) 52%,rgba(155,153,139,0) 56%) , url("ressource/paper_texture.jpg")  ;
+    
+    
+    background-position: 0px 0px ,0px 0px , center ;
+    background-size: auto , auto , cover;
+    background-repeat: no-repeat;
+    
+    box-shadow:  0px 0px 40px 10px rgba(0,0,0,0.5);
+   
+}
+
+header .bandeau img {
+    
+    margin : auto;
+    
+    max-height: 900px;
+    max-width: 900px;
+    
+    height: 180px;
+    width: 900px;
+    
+    
+    border: 0px solid #fff;
+   
+    box-shadow: 0px 0px 10px #555;
+    
+    
+}
+
+header .container {
+    
+    text-align: center;
+    
+    border-top:dashed #458BA9 5px;
+    
+    border-bottom:dashed #458BA9 5px;
+    
+    position:relative;
+    top:10px;
+    
+    margin-top:20px;
+    height :150px;
+    width : 75%;
+    
+    margin:auto;
+}
+
+header .bandeau_bot {
+    
+    position : absolute;
+    
+    width : 100%;
+    height : 50px;
+    
+    left : 0px;
+    top : 260px;
+    
+    z-index : -999;
+    
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(125,185,232,1) 19%,rgba(69,139,169,1) 97%);
+    
+    box-shadow:  0px 0px 40px 10px rgba(0,0,0,0.5);
+
+}
+
