@@ -84,14 +84,15 @@ leftArrow( borderSize=2px, arrowSize=20px )
     .work-main
         
         display inline-block
-        /*
+        
         display flex
         flex-direction row
-        flex-flow space-between
+        
         align-items stretch
+
         align-content stretch
         flex-wrap nowrap
-        */
+        
         white-space nowrap
         width 100%
         overflow hidden
@@ -100,12 +101,10 @@ leftArrow( borderSize=2px, arrowSize=20px )
 
 
 nav
-    vertical-align top
     min-width miniatureSize + 10px
     max-width 20%
     display inline-block
     background-color #ccc
-    height 100%
 
     &:before
         content ''
@@ -114,7 +113,7 @@ nav
     display inline-block
     width 0
     /* height is fixed with js */
-    background-color #ccc
+    background-color #aaa
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
     vertical-align top
     transition width 800ms ease-in-out
@@ -134,10 +133,13 @@ nav
 
 
 .illu-displayed 
+    /*
     .work-illu-panel
         width 70%
+    */
     .work-content-wrapper
         width 50px
+
 
 .work-illu.work-illu-secondary
     width  miniatureSize

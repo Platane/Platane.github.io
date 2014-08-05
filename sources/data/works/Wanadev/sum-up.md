@@ -8,7 +8,7 @@ My daily work is a mix of 3d geometry, WebGL and large architecture design.
 
  * I made the __furniture configurator__ which allows to edit a furniture by grabbing streching a side.
 
- * I improve the performance on picking, using a __octree__ structure to perfom spacial queries.
+ * I improve the performance on picking, using a __octree__ structure to perfom quick spacial queries.
 
  * I re-work the __magnetism__ component to make it more stable and flexible. This componant is responsible of validating the object position when the user move them. 
 

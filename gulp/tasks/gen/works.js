@@ -22,8 +22,8 @@ var prepareData = function( data ){
             w['illustration-second'].push( w['screenShots'][i] );
 
 
-        w['rank'] = w['coolness'] * w['weight']
-        w['rank'] = Math.random() * 100
+        w['rank'] = Math.sqrt( w['coolness'] * w['weight'] ) *10
+        //w['rank'] = Math.random() * 100
 
         w['height'] = Math.max( Math.min( Math.sqrt( (0.6+Math.random()*0.8) * w['rank'] )*1.2 , 10 ) , 4 )*45
 
