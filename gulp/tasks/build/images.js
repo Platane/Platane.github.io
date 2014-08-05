@@ -4,7 +4,7 @@ var   gulp = require('gulp')
 
 
 gulp.task('build.images', function() {
-  return gulp.src( '../sources/**/*.{jpeg,jpg,png}')
+  return gulp.src( '../sources/**/*.{jpeg,jpg,png,gif}')
     .pipe(gulp.dest('../build/'));
 
   /*

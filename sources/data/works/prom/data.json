@@ -2,15 +2,13 @@
 	"title" : "UML diagram creator",
 	"date" : "2013",
 	"screenShots" : [
-		"deconstruction-burst3.png",
-		"deconstruction-burst.png",
-		"deconstruction-burst2.png",
-		"deconstruction-burst4.png",
-		"deconstruction-burst5.png",
-		"deconstruction-intro.png"
+		"prom2.png",
+		"prom.png",
+		"prom-grab1.gif",
+		"prom-grab2.gif"
 
 	],
-	"coolness" : 2,
+	"coolness" : 1,
 	"weight" : 5,
 	"tags" : [
 		"Js",

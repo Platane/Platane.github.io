@@ -10,7 +10,18 @@
 	],
 	"coolness" : 8,
 	"weight" : 4,
-	"links" : {
-		"page" : "/demos/goblin-gramar/launch.html"
-	}
+	"tags" : [
+		"Js",
+		"game",
+		"canvas",
+		"academic project",
+		"graphism"
+	],
+	"links" : [
+		{
+			"url" : "/demos/goblin-gramar/launch.html",
+			"label" : "play",
+			"type" : "page"
+		}
+	]
 }
