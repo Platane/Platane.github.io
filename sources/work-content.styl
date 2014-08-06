@@ -77,13 +77,7 @@ leftArrow( borderSize=2px, arrowSize=20px )
         */
  
 
-    .work-content-wrapper
-        width 80%
-        display inline-block
-        transition width 1000ms
-
-        &.dragged
-            transition none
+    
 
     .work-main
         
@@ -97,7 +91,6 @@ leftArrow( borderSize=2px, arrowSize=20px )
         align-content stretch
         flex-wrap nowrap
         
-        white-space nowrap
         width 100%
         overflow hidden
 
@@ -107,26 +100,20 @@ leftArrow( borderSize=2px, arrowSize=20px )
 nav
     min-width miniatureSize + 10px
     max-width 20%
-    display inline-block
-    background-color #ccc
+    background-color #eee
+
+    display flex
+    flex-direction column
+    flex-wrap nowrap
+    justify-content space-between
+    align-items stretch
 
     &:before
         content ''
 
 .work-illu-panel
-    display inline-block
-    width 0
-    /* height is fixed with js */
-    background-color #aaa
+    background-color #fff
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
-    vertical-align top
-    /* transition width 800ms ease-in-out */
-    overflow hidden
-
-    flex-grow 1
-
-    &.dragged
-        transition none
 
 .work-illu-primar.work-illu
     height 100%
@@ -137,12 +124,20 @@ nav
         background-position center
 
 
+.work-content-wrapper
+    width 80%
+    display inline-block
+    transition width 1000ms
+    overflow hidden
+    &.dragged
+        transition none
+
+.work-illu-panel-wrapper
+    flex-grow 1
+    overflow hidden
+    width 0
 
 .illu-displayed 
-    /*
-    .work-illu-panel
-        width 70%
-    */
     .work-content-wrapper
         width 50px
 
