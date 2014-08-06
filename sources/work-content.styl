@@ -80,6 +80,10 @@ leftArrow( borderSize=2px, arrowSize=20px )
     .work-content-wrapper
         width 80%
         display inline-block
+        transition width 1000ms
+
+        &.dragged
+            transition none
 
     .work-main
         
@@ -116,8 +120,10 @@ nav
     background-color #aaa
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
     vertical-align top
-    transition width 800ms ease-in-out
+    /* transition width 800ms ease-in-out */
     overflow hidden
+
+    flex-grow 1
 
     &.dragged
         transition none

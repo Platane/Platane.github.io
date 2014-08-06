@@ -9,7 +9,6 @@ var contentIllustrationActions = (function(){
 	var _preparePanel = function( main ){
 		var content = main.querySelector('.work-content'),
 			panel = main.querySelector('.work-illu-panel'),
-			nav = main.querySelector('nav'),
 			primarIllu = panel.querySelector('.work-illu')
 
 		var contentWidth = content.offsetWidth,
@@ -19,47 +18,51 @@ var contentIllustrationActions = (function(){
 
 		// set as fixed
 		content.style.width = contentWidth+'px'
-		primarIllu.style.width = panel.style.width = panelWidth+'px'
+		primarIllu.style.width = panelWidth+'px'
 		panel.style.height = mainHeight+'px'
 	}
 	var _finishPanel = function( main ){
 		var content = main.querySelector('.work-content'),
 			panel = main.querySelector('.work-illu-panel'),
-			nav = main.querySelector('nav'),
-			primarIllu = panel.querySelector('.work-illu')
+			primarIllu = panel.querySelector('.work-illu'),
+			wrapper = main.querySelector('.work-content-wrapper')
 
 		//unfix
-		content.style.width = panel.style.height = panel.style.width = primarIllu.style.width = ''
+		wrapper.style.width = content.style.width = panel.style.height = panel.style.width = primarIllu.style.width = ''
 	}
 	
 	var openIlluPanel = function( main ){
 		
-		var content = main.querySelector('.work-content')
+		var content = main.querySelector('.work-content'),
+			wrapper = main.querySelector('.work-content-wrapper')
 
 		_preparePanel( main )
 
 		dom.addClass( main , 'illu-displayed' )
 
+		// in case the wrapper width is fixed
+		wrapper.style.width = ''
 
 		// clear stuff
-		dom.unbind( main , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' )
+		dom.unbind( wrapper , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' )
 
 		// prepare close action
 		// sorry for the set timeout
+		dom.unbind( content , 'click.close' )
 		window.setTimeout( 
 			function(){
 				dom.bind( content , 'click.close' , function(){
 					closeIlluPanel( main )
 				})
 			}
-			,0
+			,100
 		)
 	}
 
 	var closeIlluPanel = function( main ){
 
 		var content = main.querySelector('.work-content'),
-			panel = main.querySelector('.work-illu-panel')
+			wrapper = main.querySelector('.work-content-wrapper')
 
 		dom.removeClass( main , 'illu-displayed' )
 
@@ -67,14 +70,14 @@ var contentIllustrationActions = (function(){
 		dom.unbind( content , 'click.close' )
 
 
-		panel.style.width = ''
+		wrapper.style.width = ''
 
 		// clear stuff on animation end
-		dom.bind( main , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' , function(){
+		dom.bind( wrapper , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' , function(){
 			// TODO
 			_finishPanel( main )
 
-			dom.unbind( main , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' )
+			dom.unbind( wrapper , 'transitionEnd.clear-after-out-anim webkitTransitionEnd.clear-after-out-anim' )
 		})
 	}
 
@@ -117,50 +120,53 @@ var contentIllustrationActions = (function(){
 	for(var i=contents.length;i--;)
 		dom.bind( contents[i] , 'mousedown.drag' , function( e ){
 				
-
-
 			// grab elements
 			var content = this,
 				main = dom.getParent( content , 'work-main'),
 				panel = main.querySelector('.work-illu-panel'),
-				illu = panel.querySelector('.work-illu')
+				illu = panel.querySelector('.work-illu'),
+				wrapper = main.querySelector('.work-content-wrapper')
 
 			// compute the grab
 			var xMouseStart = e.pageX,
-				xPanelStart = dom.getWidth( panel )
+				wContentStart = dom.getWidth( wrapper )
 
 			// prepare the panel ( set the value to animate ), but leave the panel with the same width
 			_preparePanel( main )
-			panel.style.width = Math.max( 5, xPanelStart )
+			wrapper.style.width = wContentStart +'px'
 
 			//
-			dom.addClass( content , 'dragged')
+			dom.addClass( wrapper , 'dragged')
 			dom.addClass( panel , 'dragged')
+
+
+			// will detect simple click from draging
+			var startTime = new Date().getTime()
 
 			//
 			dom.bind( window , 'mousemove.dragging' , function(e){
 				var x = e.pageX
-				panel.style.width = Math.max( 0 , xPanelStart - ( xMouseStart - x ))+'px'
+				wrapper.style.width = Math.max( 0 , wContentStart + ( xMouseStart - x ))+'px'
 			})
 			dom.bind( window , 'mouseup.dragging' , function(e){
-				
+
 				//
-				dom.removeClass( content , 'dragged')
+				dom.removeClass( wrapper , 'dragged')
 				dom.removeClass( panel , 'dragged')
-
-				// if the width is large enougth, open up ; else close
-				if( dom.getWidth( panel ) > dom.getWidth( illu )*0.5 )
-					openIlluPanel( main )
-				else{
-					panel.style.width = ''
-					closeIlluPanel( main )
-				}
-				
-
 
 				// 
 				dom.unbind( window , 'mouseup.dragging' )
 				dom.unbind( window , 'mousemove.dragging' )
+
+				// its a click
+				if( new Date().getTime() - startTime < 300 )
+					return
+
+				// if the width is large enougth, open up ; else close
+				if( dom.getWidth( wrapper ) < dom.getWidth( illu )*0.5 )
+					openIlluPanel( main )
+				else
+					closeIlluPanel( main )
 			})
 		})
 })()
