@@ -2,11 +2,26 @@
 	"title" : "Grammar Shooter",
 	"date" : "2013",
 	"screenShots" : [
-		"anglais-fire.png",
-		"anglais-face-roll.png",
-		"anglais-orbital-stricke.png",
-		"anglais-intro.png",
-		"anglais-score.png"
+		{
+			"url" : "anglais-fire.png",
+			"caption" : ""
+		},
+		{
+			"url" : "anglais-face-roll.png",
+			"caption" : "Trigger awesome bonus mod !"
+		},
+		{
+			"url" : "anglais-orbital-stricke.png",
+			"caption" : "The microsoft clipboard may be help you this time"
+		},
+		{
+			"url" : "anglais-intro.png",
+			"caption" : "The animated introduction"
+		},
+		{
+			"url" : "anglais-score.png",
+			"caption" : "Your final score"
+		}
 	],
 	"coolness" : 8,
 	"weight" : 4,

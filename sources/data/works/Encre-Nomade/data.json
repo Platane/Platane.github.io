@@ -2,12 +2,41 @@
 	"title" : "Interactive Story Book",
 	"date" : "2012",
 	"screenShots" : [
-		"encr-dialogue.png",
-		"encr-accrochage.png",
-		"encr-interface.png",
-		"encr-jeu-max.png",
-		"encr-jeu-toit.png"
+		{
+			"url" : "encr-dialogue.png",
+			"caption" : "Lines are printed on screen as you read"
+		},
+		{
+			"url" : "encr-accrochage.png",
+			"caption" : "Easily align items"
+		},
+		{
+			"url" : "encr-interface.png",
+			"caption" : "The editor interface"
+		},
+		{
+			"url" : "encr-jeu-max.png",
+			"caption" : "A runner game I wrote"
+		},
+		{
+			"url" : "encr-jeu-toit.png",
+			"caption" : "A runner game I wrote"
+		}
 	],
 	"coolness" : 3,
-	"weight" : 2
+	"weight" : 2,
+	"tags" : [
+		"Js",
+		"game",
+		"html5",
+		"book",
+		"job"
+	],
+	"links" : [
+		{
+			"url" : "http://vimeo.com/45118526",
+			"label" : "video interview about the product",
+			"type" : "video"
+		}
+	]
 }
