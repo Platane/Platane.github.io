@@ -76,8 +76,13 @@ var contentIllustrationActions = (function(){
 		})
 	}
 
-	var changeIllu = function( current , url , noTransition ){
-		current.style.backgroundImage = 'url('+url+')'
+	var changeIllu = function( main , url , caption , noTransition ){
+		
+		var primarIllu = main.querySelector('.work-illu-primar div'),
+			captionSpan = main.querySelector('.work-illu-caption')
+
+		primarIllu.style.backgroundImage = 'url('+url+')'
+		captionSpan.innerHTML = caption ||''
 	}
 
 	
@@ -86,8 +91,7 @@ var contentIllustrationActions = (function(){
 		dom.bind( miniatures[i] , 'click.emphase-illu' , function( e ){
 			
 			// grab the main element
-			var main = dom.getParent( this , 'work-main' ),
-				primarIllu = main.querySelector('.work-illu-primar div')
+			var main = dom.getParent( this , 'work-main' )
 
 
 			// is the panel already opened?
@@ -96,14 +100,14 @@ var contentIllustrationActions = (function(){
 				openIlluPanel( main )
 
 				// change immediatly
-				changeIllu( primarIllu , this.getAttribute( 'data-image' ) , true )
+				changeIllu( main , this.getAttribute( 'data-image' ) , this.getAttribute( 'data-caption' ) , true )
 			}
 			else
 			{
 				// yes, just set the picture
 
 				// change the image if different
-				changeIllu( primarIllu , this.getAttribute( 'data-image' )  )
+				changeIllu( main , this.getAttribute( 'data-image' ) , this.getAttribute( 'data-caption' ) )
 
 			}
 		})

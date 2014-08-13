@@ -16,11 +16,15 @@ var prepareData = function( data ){
         w['sum-up'] = markdown.toHTML( w['sum-up'] )
         w['shrink-sum-up'] = markdown.toHTML( shrink )
 
-        w['illustration-main'] = w['screenShots'][0]
         w['illustration-second'] = []
-        for(var i=0;i<w['screenShots'].length;i++)
-            w['illustration-second'].push( w['screenShots'][i] );
+        for(var i=0;i<w['screenShots'].length;i++){
+            if( typeof w['screenShots'][i] === 'string' )
+                w['illustration-second'].push( {'url' : w['screenShots'][i] } );
+            else
+                w['illustration-second'].push( w['screenShots'][i] );
+        }
 
+        w['illustration-main'] = w['illustration-second'][0]
 
         w['rank'] = Math.sqrt( w['coolness'] * w['weight'] ) *10
         //w['rank'] = Math.random() * 100

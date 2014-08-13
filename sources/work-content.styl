@@ -94,6 +94,8 @@ leftArrow( borderSize=2px, arrowSize=20px )
         width 100%
         overflow hidden
 
+        user-select none
+
         min-height 420px
 
 
@@ -113,15 +115,29 @@ nav
 
 .work-illu-panel
     background-color #fff
+    position absolute
+    top 0
+    bottom 0
+    display flex
+    align-items center
+    
+    flex-direction column
+    padding 5px
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
 
 .work-illu-primar.work-illu
+    
     height 100%
-    padding 5px
+
+
     div
         background-size contain
         background-repeat no-repeat
         background-position center
+
+.work-illu-caption
+    
+    flex 0 1 35px
 
 
 .work-content-wrapper
@@ -136,6 +152,7 @@ nav
     flex-grow 1
     overflow hidden
     width 0
+    position relative
 
 .illu-displayed 
     .work-content-wrapper

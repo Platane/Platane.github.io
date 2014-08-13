@@ -12,7 +12,7 @@
 
 			<header>
 				<div class="work-illu work-illu-main work-illu-skewed" >
-					<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+					<div style="background-image:url('assets/works-illustrations/{{illustration-main.url}}');"></div>
 				</div>
 			</header>
 			
@@ -33,7 +33,7 @@
 
 						<div class="work-illu-secondary-group">
 							{{#illustration-second}}
-								<div data-image="assets/works-illustrations/{{.}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{.}}');"></div>
+								<div data-image="assets/works-illustrations/{{url}}" data-caption="{{caption}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{url}}');"></div>
 							{{/illustration-second}}
 						</div>
 
@@ -45,9 +45,9 @@
 				</nav><div class="work-illu-panel-wrapper">
 					<section class="work-illu-panel">
 						<div class="work-illu work-illu-primar" >
-							<div style="background-image:url('assets/works-illustrations/{{illustration-main}}');"></div>
+							<div></div>
 						</div>
-						<div class="work-illu-caption">Hi guyz</div>
+						<div class="work-illu-caption"></div>
 					</section>
 				</div><div class="work-content-wrapper">
 				<section class="work-content work-content-long">
