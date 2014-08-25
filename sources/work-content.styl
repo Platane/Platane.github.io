@@ -1,29 +1,6 @@
 
 miniatureSize = 60px
 
-leftArrow( borderSize=2px, arrowSize=20px )
-        
-    position relative
-    border-right solid borderSize
-
-    &:before
-    &:after
-        content ''
-        position absolute
-        border-top solid arrowSize transparent
-        border-bottom solid arrowSize transparent
-        border-left solid arrowSize
-        position absolute
-        width 1px
-        height 1px
-        right (- (arrowSize+borderSize ))
-        top 20%
-        transition border 300ms , right 300ms , top 300ms
-
-    &:after
-        border-left-color #fff
-        right (- (arrowSize ))
-
 
 
 .grid-tile-large 
@@ -99,10 +76,15 @@ leftArrow( borderSize=2px, arrowSize=20px )
         min-height 420px
 
 
-nav
+.work-nav
     min-width miniatureSize + 10px
     max-width 20%
-    background-color #eee
+    background-color #efefef
+    flex-grow 999999
+
+    padding-bottom 28px
+    padding-top 18px
+
 
     display flex
     flex-direction column
@@ -110,11 +92,7 @@ nav
     justify-content space-between
     align-items stretch
 
-    &:before
-        content ''
-
 .work-illu-panel
-    background-color #fff
     position absolute
     top 0
     bottom 0
@@ -137,14 +115,19 @@ nav
 
 .work-illu-caption
     
-    flex 0 1 35px
+    flex 0 1 1.4em
+    font-size 0.9em
+    font-style italic
+    font-family "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif
 
 
 .work-content-wrapper
     width 80%
+    max-width 80%
     display inline-block
-    transition width 1000ms
+    transition width 1000ms ease
     overflow hidden
+    cursor pointer
     &.dragged
         transition none
 
@@ -166,6 +149,7 @@ nav
     background-size cover
     background-position center
     background-color #ccc
+    cursor pointer
 
 .work-illu-secondary-group
     display flex
@@ -173,7 +157,6 @@ nav
     justify-content flex-start
     flex-direction row
     flex-wrap wrap
-    white-space normal
 
 
 .work-content-long
@@ -183,3 +166,24 @@ nav
     font-family "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif
     font-size 23px
 
+.link
+    
+    margin-left 18px
+    height 2em
+    a
+        height 1.2em
+        display inline-block
+        border-bottom solid 1px #888
+        color #888
+        text-decoration none
+        font-family helvetica,Geneva,Verdana,sans-serif
+
+        
+
+        &:hover
+            color #000
+            border-bottom-color #333
+            border-bottom-width 2px
+            height 1.4em
+
+            transition height 230ms ease

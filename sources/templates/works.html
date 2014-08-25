@@ -27,21 +27,21 @@
 
 			<section class="work-main">
 
-				<nav style="border-color:{{darkColor}};">
-						
-						<!-- <div class="arrow" style="border-color:{{darkColor}};"></div>-->
+				<nav class="work-nav" style="border-color:{{darkColor}};">
 
-						<div class="work-illu-secondary-group">
+						<ul class="work-illu-secondary-group">
 							{{#illustration-second}}
-								<div data-image="assets/works-illustrations/{{url}}" data-caption="{{caption}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{url}}');"></div>
+								<li data-image="assets/works-illustrations/{{url}}" data-caption="{{caption}}" alt="{{caption}}" class="work-illu work-illu-secondary" style="background-image:url('assets/works-illustrations/{{url}}');"></li>
 							{{/illustration-second}}
-						</div>
+						</ul>
 
-						<section class="work-links">
+						<ul class="work-links">
 						{{#links}}
-							<a class="link {{#type}}link-{{type}}{{/type}}" href="{{url}}">{{label}}</a>
+							<li class="link {{#type}}link-{{type}}{{/type}}">
+								<a href="{{url}}">{{label}}</a>
+							</li>
 						{{/links}}
-						</section>
+						</ul>
 				</nav><div class="work-illu-panel-wrapper">
 					<section class="work-illu-panel">
 						<div class="work-illu work-illu-primar" >

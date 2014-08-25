@@ -9,32 +9,28 @@ var contentIllustrationActions = (function(){
 	var _preparePanel = function( main ){
 		var content = main.querySelector('.work-content'),
 			panel = main.querySelector('.work-illu-panel'),
-			panelWrapper = panel.querySelector('.work-illu-panel-wrapper'),
-			contentWrapper = main.querySelector('.work-content-wrapper')
+			nav = main.querySelector('.work-nav')
 
 		var contentWidth = content.offsetWidth,
 			mainWidth = main.offsetWidth,
-			mainHeight = main.offsetHeight,
-			panelWidth = mainWidth * 0.70
+			navWidth = nav.offsetWidth,
+			panelWidth = mainWidth - navWidth - 50 
 
 		// set as fixed
 		content.style.width = contentWidth+'px'
 		panel.style.width = panelWidth+'px'
-		/* panel.style.height = mainHeight+'px' */
 	}
 	var _finishPanel = function( main ){
 		var content = main.querySelector('.work-content'),
 			panel = main.querySelector('.work-illu-panel')
 			
-
 		//unfix
 		content.style.width = panel.style.width = ''
 	}
 	
 	var openIlluPanel = function( main ){
 		
-		var content = main.querySelector('.work-content'),
-			contentWrapper = main.querySelector('.work-content-wrapper')
+		var contentWrapper = main.querySelector('.work-content-wrapper')
 
 		_preparePanel( main )
 
@@ -58,8 +54,7 @@ var contentIllustrationActions = (function(){
 
 	var closeIlluPanel = function( main ){
 
-		var content = main.querySelector('.work-content'),
-			contentWrapper = main.querySelector('.work-content-wrapper')
+		var contentWrapper = main.querySelector('.work-content-wrapper')
 
 		dom.removeClass( main , 'illu-displayed' )
 
@@ -87,7 +82,7 @@ var contentIllustrationActions = (function(){
 
 	
 	var miniatures = document.querySelectorAll( '.work-illu.work-illu-secondary' )
-	for(var i=miniatures.length;i--;)
+	for(var i=miniatures.length;i--;){
 		dom.bind( miniatures[i] , 'click.emphase-illu' , function( e ){
 			
 			// grab the main element
@@ -112,7 +107,9 @@ var contentIllustrationActions = (function(){
 			}
 		})
 
-
+		// set the illu for the first time
+		changeIllu( dom.getParent( miniatures[i] , 'work-main' ) , miniatures[i].getAttribute( 'data-image' ) , miniatures[i].getAttribute( 'data-caption' ) , true )
+	}
 
 	
 	var contents = document.querySelectorAll( '.work-content-wrapper' )
