@@ -1,0 +1,327 @@
+{
+	"options" : {
+
+		
+		"formatDate" : "fr",
+
+		
+		"theme" : "atlantic",
+
+		
+		"i18n" : {
+			"experiences" : "experiences",
+			"skills" : "skills",
+			"training" : "training",
+			"hobbies" : "hobbies"
+		}
+	},
+
+	"header" : {
+		"name" : "Arthur Brongniart",
+		"birthDate" : "03/01/1991",
+		"mail" : "arthur@arthur-brongniart.fr",
+		"phone" : "(+33)6 98 68 67 44",
+
+		"ext" : {
+			"linkedin" : "http://www.linkedin.com/pub/arthur-brongniart/65/2b/ab8",
+			"github" : "https://github.com/Platane"
+		},
+
+		"portefolio@" : "http://arthur-brongniart.fr/",
+		"portefolio" : "arthur-brongniart.fr",
+		"bio" : "I like where the web is going, I wish to be part of the incoming changes."
+	},
+
+	"xp" : [
+
+		{
+			"title" : "Online UML diagram editor",
+			"localisation" : "Nancy",
+			"at" : "Prometheus",
+			"at@" : "https://prometheuscomputing.com/",
+			"from" : "01/10/2013",
+			"to" : "01/03/2014",
+
+			"subject" : "An academic project, my team and I conduct a project for an external company.",
+			"info" : "The web app is based on AngularJs, uses websokect to ensure the collaboration between users." 
+
+		},
+
+		{
+			"title" : "Project management web app",
+			"localisation" : "Nancy",
+			"at" : "VersysMind",
+			"at@" : "http://www.versusmind.eu/",
+			"from" : "01/04/2013",
+			"to" : "30/09/2013",
+
+			"subject" : "As a trainee",
+			"info" :  "I Implemented new features, optimized JS performances, put a lot of efforts on ergonomic aspects."
+		},
+
+		{
+			"title" : "Html5 Turing engine game",
+			"localisation" : "Nancy",
+			"at" : "INRIA",
+			"at@" : "http://inriamecsci.github.io/#!/grains/Turing-2D",
+			"from" : "01/11/2012",
+			"to" : "01/04/2013",
+
+			"subject" : "As employe of my school Junior Company, I developed a game which exposes the research of the team on the 2D Turing Engine.",
+			"info" : "Lots of interactivity, performance was a critical issue." 
+
+		},
+
+		{
+			"title" : "Historical map editor web app",
+			"localisation" : "Nancy",
+			"at" : "CVCE",
+			"at@" : "http://www.cvce.eu/",
+			"from" : "01/10/2012",
+			"to" : "01/03/2013",
+
+			"subject" : "An academic project, we made an ambitious prototype of a map editor.",
+			"info" : "Store the map's atomic components in a mongoDB, arrange them into a map and style them with a css - like language. The app is based on backbone and uses Leaflet." 
+
+		},
+
+		{
+			"title" : "Interactive stories editor",
+			"localisation" : "Lille",
+			"at" : "Encre Nomade",
+			"from" : "01/06/2012",
+			"to" : "01/09/2012",
+
+			"subject" : "As a trainee, I improved the editor of the html5 based stories.",
+			"info" : "I proposed and added new features, prototyped a game engine." 
+
+		}
+	],
+
+	"training" : [
+
+		{
+			"title" : "Engineer student",
+			"sub title" : "computer science school, software engineering section.",
+			"at" : "Esial",
+			"localisation" : "Nancy",
+			"from" : "01/09/2010",
+			"to" : "01/09/2014"
+		},
+
+		{
+			"title" : "Intensive training course",
+			"sub title" : "preparing for french \"Grandes Ecoles\", Math and Physic section, computer science option.",
+			"at" : "Henri Wallon",
+			"localisation" : "Valenciennes",
+			"from" : "01/09/2008",
+			"to" : "01/09/2010"
+		}
+	],
+
+	"literal skills" : [
+		{ 
+			"subsection" : "IT skills",
+			"s" : [
+				{
+					"title" : "Web langages",
+					"subject" : "Solid experiences with html / Js through several decisive projects."
+				},
+
+				{
+					"title" : "Other langages",
+					"subject" : "Python, Node, Java, C, php",
+					"info" : "Validated in various academic projects."
+				}
+			]
+		},
+
+		{ 
+			"subsection" : "Languages",
+			"s" : [
+				{
+					"title" : "English",
+					"subject" : "Advanced level",
+					"info" : "TOEIC graduated with a 915 score."
+				},
+				{
+					"title" : "French",
+					"subject" : "Native language"
+				}
+			]
+		},
+
+		{ 
+			"subsection" : "Organisation",
+			"s" : [
+				{
+					"title" : "",
+					"subject" : "Sensibilized to organisation methods:",
+					"info" :  "SCRUM, Xp"
+				}
+			]
+		}
+
+	],
+
+	"hobbies" : [
+		{ 
+			"subsection" : "Video game",
+			"s":[
+				{
+					"title" : "Play them",
+					"subject" : "I feel like a changement since technology is no longer a criteria and everybody can make  something out of his idea, I like this."
+				},
+				{
+					"title" : "Make them",
+					"subject" : "I did some game jam events and some personal projects."
+				}	
+			]
+		},
+		{ 
+			"subsection" : "Drawing",
+			"s":[]
+		}
+	],
+
+	"skills" : [
+		{
+			"tag" : "JavaScript",
+			"power" : 8,
+			"relevance" : 10
+		},
+
+		{
+			"tag" : "html",
+			"power" : 8,
+			"relevance" : 10
+		},
+
+		{
+			"tag" : "css",
+			"power" : 8,
+			"relevance" : 7
+		},
+
+		{
+			"tag" : "sass",
+			"power" : 6,
+			"relevance" : 3
+		},
+
+		{
+			"tag" : "python",
+			"power" : 6,
+			"relevance" : 8
+		},
+
+		{
+			"tag" : "Java",
+			"power" : 6,
+			"relevance" : 7
+		},
+
+		{
+			"tag" : "Math & Phy",
+			"power" : 7,
+			"relevance" : 8
+		},
+
+		{
+			"tag" : "Angular",
+			"power" : 6,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "backbone",
+			"power" : 8,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "jQuery",
+			"power" : 9,
+			"relevance" : 5
+		},
+
+		{
+			"tag" : "node",
+			"power" : 6,
+			"relevance" : 5
+		},
+
+		{
+			"tag" : "Algorithm",
+			"power" : 7,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "Design",
+			"power" : 7,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "Pencil drawing",
+			"power" : 6,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "Git",
+			"power" : 5,
+			"relevance" : 5
+		},
+
+		{
+			"tag" : "Flash",
+			"power" : 7,
+			"relevance" : 3
+		},
+
+		{
+			"tag" : "Ergonomy",
+			"power" : 6,
+			"relevance" : 3
+		},
+
+		{
+			"tag" : "ThreeJs",
+			"power" : 6,
+			"relevance" : 5
+		},
+
+		{
+			"tag" : "WebGL",
+			"power" : 4,
+			"relevance" : 6
+		},
+
+		{
+			"tag" : "Grunt",
+			"power" : 6,
+			"relevance" : 2
+		},
+
+		{
+			"tag" : "Requirejs",
+			"power" : 6,
+			"relevance" : 2
+		},
+
+		{
+			"tag" : "Heroku",
+			"power" : 4,
+			"relevance" : 3
+		},
+
+		{
+			"tag" : "App Engine",
+			"power" : 5,
+			"relevance" : 3
+		}
+	]
+
+}

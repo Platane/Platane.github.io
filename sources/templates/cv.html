@@ -1,0 +1,207 @@
+<html>
+<link rel="stylesheet" href="cv.css" ></link>
+
+<body version="{{build}}">
+
+<div class="cv">
+		<header class="header" data-z="-30">
+		{{#header}}
+			<div id="contact" class="card brick">
+				<span class="name">{{firstName}} {{lastName}}</span>
+				<span class="age">{{age}} years old</span>
+
+				{{#mail}}
+				<span>
+					<span class="icon icon-mail"></span>
+					<a class="mail" href="mailto:{{mail}}">{{mail}}</a>
+				</span>
+				{{/mail}}
+
+				
+				{{#portefolio}}
+				<span>
+					<span class="icon icon-portefolio"></span>
+					<a class="portefolio" href="{{portefolio@}}">{{portefolio}}</a>
+				</span>
+				{{/portefolio}}
+
+				{{#phone}}
+				<span>
+					<span class="icon icon-phone"></span>
+					<span class="phone">{{phone}}</span>
+				</span>
+				{{/phone}}
+			</div>
+			<div id="illu" class="quote brick">{{bio}}</div>
+		{{/header}}
+		</header>
+
+		<section id="training" class="training-section brick" data-z="40">
+			<h1 class="section-label">Training</h1>
+			<div class="section-content">
+				<ul class="list">
+					{{#training}}
+					<li class="training">
+						<span class="title">{{title}}</span>
+						<span>&nbsp;at&nbsp;</span>
+						<span class="at" href="{{@at}}">{{at}}</span>
+						<span>&nbsp;in&nbsp;</span>
+						<span class="localisation">{{localisation}}</span>
+						<span class="when">{{{when}}}</span>
+						<div class="info">{{sub title}}</div>
+					</li>
+					{{/training}}
+				</ul>
+			</div>
+		</section>
+
+
+		<section id="exp" class="xp-section brick" data-z="-20">
+			<h1 class="section-label">Experiences</h1>
+			<div class="section-content">
+				<ul class="list">
+					{{#xp}}
+					<li class="xp">
+						<span class="title">{{title}}</span>
+						<span>&nbsp;in&nbsp;</span>
+						<a class="at" href="{{at@}}">{{at}}</a>
+						<span class="when">{{{when}}}</span>
+						<div>
+							<span class="subject">{{subject}}</span>
+							<span class="info">{{info}}</span>
+						</div>
+					</li>
+					{{/xp}}
+				</ul>
+			</div>
+		</section>
+
+
+		<section id="skill" class="skills-section brick" data-z="10">
+			<h1 class="section-label">Skills</h1>
+			<div class="section-content">
+				{{{skillCloud}}}
+				<ul class="list">
+					{{#literal skills}}
+
+					<li class="subsection subsection-1">
+						<span class="subsection-label">{{subsection}}</span>
+						<ul>
+							{{#s}}
+							<li class="skill">
+								<span class="title">{{title}}</span>
+								<span class="subject">{{subject}}</span>
+								<span class="info">{{info}}</span>
+							</li>
+							{{/s}}
+						</ul>
+					</li>
+					{{/literal skills}}
+				</ul>
+			</div>
+		</section>
+
+
+		<section id="hobby" class="hobbies-section brick" data-z="-30">
+			<h1 class="section-label">Hobbies</h1>
+			<div class="section-content">
+				<ul class="list">
+					{{#hobbies}}
+
+					<li class="subsection subsection-1">
+						<span class="subsection-label">{{subsection}}</span>
+						<ul>
+							{{#s}}
+							<li class="skill">
+								<span class="title">{{title}}</span>
+								<span class="subject">{{subject}}</span>
+								<span class="info">{{info}}</span>
+							</li>
+							{{/s}}
+						</ul>
+					</li>
+					{{/hobbies}}
+				</ul>
+			</div>
+		</section>
+</div>
+
+
+
+
+
+
+
+<style>
+#UI{
+	position : fixed;
+	bottom : 5px;
+	right : 50px;
+}
+@media print{
+	#UI{
+		display: none;
+	}
+}
+
+</style>
+
+
+
+<div id="UI" class="UI">
+	<input type="checkbox"></input> printable
+</div>
+
+<script>
+
+var ui = document.getElementById("UI");
+ui.querySelector('input').addEventListener('change',function(e){
+
+	var cv = document.querySelector('.cv')
+
+	if( this.checked ){
+
+		//add class
+		cv.className += " printable"
+
+
+		// scale
+		var w = cv.offsetWidth,
+			h = cv.offsetHeight
+
+		var ratio = 21 / 29.7
+		var ratio = 21 / 27
+
+		if( h > w / ratio ){
+
+			var s = (w / ratio) / h
+
+			var transform = 'translate( 0 , ' + ( - h * ( 1 - s )/2 )  + 'px)  scale(' +  s  + ')'
+
+			cv.style.webkitTransform = cv.style.transform = transform
+		}
+
+	}else{	
+
+		// remove class
+		var s=""
+		for(var i=cv.classList.length;i--;)
+			if( cv.classList[i] != "printable" )
+				s+=" "+cv.classList[i]
+		cv.className = s
+
+
+		// unscale
+		cv.style.webkitTransform = cv.style.transform = ''
+	}
+
+	
+},false)
+
+
+</script>
+
+
+</body>
+</html>
+

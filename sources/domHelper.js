@@ -47,7 +47,7 @@ var DomHelper = new (function(){
 		}
 
 		this.hasClass = function( el , c ){
-			return el.className.indexOf(c)>=0
+			return el.classList.contains(c)
 		}
 		this.addClass = function( el , c ){
 			el.className += ' '+c

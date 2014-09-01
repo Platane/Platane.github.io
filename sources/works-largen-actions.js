@@ -19,8 +19,8 @@ var worksActions = (function(){
 		opened = tile
 
 		//bind close actions
-		dom.bind( document , 'click.out-side-tile' , function( e ){
-			if( dom.hasClass( e.target , 'tile' ) || dom.getParent( e.target , 'tile' ) )
+		dom.bind( document , 'click.outside-tile' , function( e ){
+			if( dom.hasClass( e.target , 'work' ) || dom.getParent( e.target , 'work' ) )
 				return
 			closeWork();
 		})
@@ -34,7 +34,7 @@ var worksActions = (function(){
 	
 		gridLayout.update();
 
-		dom.unbind( document , 'click.out-side-tile' );
+		dom.unbind( document , 'click.outside-tile' );
 
 		opened = null;
 	}
@@ -43,8 +43,9 @@ var worksActions = (function(){
 	var DOMworks = document.querySelectorAll('.work');
 	for(var i=DOMworks.length;i--;)
 
-		dom.bind( DOMworks[i] , 'click.open' ,function(){
-			openWork( dom.getParent( this , 'tile' ) )
+		dom.bind( DOMworks[i] , 'click.open' ,function( e ){
+			openWork( dom.getParent( this , 'grid-tile' ) )
+			e.stopPropagation()
 		})
 
 	return {
