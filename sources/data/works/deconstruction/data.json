@@ -22,9 +22,9 @@
 	],
 	"links" : [
 		{
-			"url" : "https://prometheuscomputing.com/",
-			"label" : "prometheus computing",
-			"type" : "partner"
+			"url" : "/demos/deconstruction/deconstruction.html",
+			"label" : "play it",
+			"type" : "page"
 		}
 	]
 }

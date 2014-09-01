@@ -3,24 +3,20 @@
 	"date" : "2013",
 	"screenShots" : [
 		{
-			"url" : "encr-dialogue.png",
-			"caption" : "Lines are printed on screen as you read"
+			"url" : "turing-zoom.jpg",
+			"caption" : ""
 		},
 		{
-			"url" : "encr-accrochage.png",
-			"caption" : "Easily align items"
+			"url" : "turing-overView2.png",
+			"caption" : ""
 		},
 		{
-			"url" : "encr-interface.png",
-			"caption" : "The editor interface"
+			"url" : "turing-editing.png",
+			"caption" : "Use the palette to draw the algorithm"
 		},
 		{
-			"url" : "encr-jeu-max.png",
-			"caption" : "A runner game I wrote"
-		},
-		{
-			"url" : "encr-jeu-toit.png",
-			"caption" : "A runner game I wrote"
+			"url" : "turing-run.png",
+			"caption" : "The engine running"
 		}
 	],
 	"coolness" : 4,
@@ -34,23 +30,18 @@
 	"links" : [
 
 		{
-			"url" : "http://vimeo.com/45118526",
+			"url" : "http://inriamecsci.github.io/grains/Turing-2D/index.html",
 			"label" : "play it",
 			"type" : "page"
 		},
 		{
-			"url" : "http://vimeo.com/45118526",
+			"url" : "https://github.com/InriaMecsci/Turing-2D",
 			"label" : "github",
 			"type" : "sources"
 		},
 		{
-			"url" : "http://vimeo.com/45118526",
-			"label" : "the marvellous team",
-			"type" : "partner"
-		},
-		{
-			"url" : "http://vimeo.com/45118526",
-			"label" : "ludum dare",
+			"url" : "http://www.inria.fr/",
+			"label" : "inria.fr",
 			"type" : "partner"
 		}
 	]

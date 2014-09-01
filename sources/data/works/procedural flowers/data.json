@@ -1,0 +1,39 @@
+{
+	"title" : "Procedural Flower",
+	"date" : "2012",
+	"screenShots" : [
+		{
+			"url" : "flow-liseron.png",
+			"caption" : ""
+		},
+		{
+			"url" : "flow-ashes.png",
+			"caption" : ""
+		},
+		{
+			"url" : "flow-submarine.png",
+			"caption" : ""
+		}
+
+	],
+	"coolness" : 7,
+	"weight" : 3,
+	"tags" : [
+		"Js",
+		"Canvas",
+		"procedural",
+		"personal project"
+	],
+	"links" : [
+		{
+			"url" : "http://www.chromeexperiments.com/detail/procedural-flower",
+			"label" : "play it",
+			"type" : "page"
+		},
+		{
+			"url" : "https://github.com/Platane/Procedural-Flower",
+			"label" : "github",
+			"type" : "source"
+		}
+	]
+}

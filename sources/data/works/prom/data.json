@@ -2,11 +2,22 @@
 	"title" : "UML diagram creator",
 	"date" : "2013",
 	"screenShots" : [
-		"prom2.png",
-		"prom.png",
-		"prom-grab1.gif",
-		"prom-grab2.gif"
-
+		{
+			"url" : "prom2.png",
+			"caption" : ""
+		},
+		{
+			"url" : "prom.png",
+			"caption" : ""
+		},
+		{
+			"url" : "prom-grab1.gif",
+			"caption" : "moving a class"
+		},
+		{
+			"url" : "prom-grab2.gif",
+			"caption" : "moving a link"
+		}
 	],
 	"coolness" : 1,
 	"weight" : 5,
@@ -19,9 +30,9 @@
 	],
 	"links" : [
 		{
-			"url" : "http://lisa-et-arthur-mangent.appspot.com/",
-			"label" : "deconstruction",
-			"type" : "page"
+			"url" : "https://prometheuscomputing.com/",
+			"label" : "prometheus computing",
+			"type" : "partner"
 		}
 	]
 }
