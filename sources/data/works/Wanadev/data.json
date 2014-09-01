@@ -1,6 +1,10 @@
 {
 	"title" : "Wanaplan",
 	"date" : "2014",
+
+	"from" : "01/04/2014",
+	"to" : "..",
+
 	"screenShots" : [
 		"wana3D.png",
 		"wana2D.png"

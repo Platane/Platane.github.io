@@ -1,6 +1,10 @@
 {
 	"title" : "Procedural Flower",
 	"date" : "2012",
+
+	"from" : "01/09/2012",
+	"to" : "01/01/2013",
+
 	"screenShots" : [
 		{
 			"url" : "flow-liseron.png",

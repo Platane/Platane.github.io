@@ -1,6 +1,10 @@
 {
 	"title" : "2D Turing Engine",
 	"date" : "2013",
+
+	"from" : "01/11/2012",
+	"to" : "01/03/2013",
+
 	"screenShots" : [
 		{
 			"url" : "turing-zoom.jpg",

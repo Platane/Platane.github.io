@@ -1,6 +1,10 @@
 {
 	"title" : "The marvellous sushi maker",
 	"date" : "2014",
+
+	"from" : "25/04/2014",
+	"to" : "28/04/2014",
+
 	"screenShots" : [
 		{
 			"url" : "sushi-main.png",

@@ -5,7 +5,12 @@ var   gulp = require('gulp')
     , htmlmin = require('gulp-html-minifier')
     , Color = require('color')
 
-
+var parseDate = function( s ){
+    if( s == '..' )
+        return new Date()
+    var m = s.split('/')
+    return  new Date( parseInt( m[2] ) , parseInt( m[1] )-1 , parseInt( m[0] ) )
+}
 var prepareData = function( data ){
         
     data=JSON.parse( data )
@@ -26,10 +31,12 @@ var prepareData = function( data ){
 
         w['illustration-main'] = w['illustration-second'][0]
 
-        w['rank'] = Math.sqrt( w['coolness'] * w['weight'] ) *10
-        //w['rank'] = Math.random() * 100
 
-        w['height'] = Math.max( Math.min( Math.sqrt( (0.6+Math.random()*0.8) * w['rank'] )*1.2 , 10 ) , 4 )*45
+        var weight = Math.sqrt( w['coolness'] * 1.5 * w['weight'] ) *10
+        w['rank'] = - parseDate( w['to'] || '01/01/2012' ).getTime()
+
+       
+        w['height'] = Math.max( Math.min( Math.sqrt( (0.4+Math.random()*0.8) * weight )*1.4 , 12 ) , 4 )*45
 
         w['id'] = w['title'].split(' ').join('-')
 

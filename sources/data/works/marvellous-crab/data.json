@@ -1,6 +1,10 @@
 {
 	"title" : "The marvellous crab",
 	"date" : "2014",
+
+	"from" : "24/01/2014",
+	"to" : "26/01/2014",
+
 	"screenShots" : [
 		{
 			"url" : "crab-fat.png",
