@@ -9,6 +9,7 @@
   },
   
   "devDependencies": {
+  	"lwip" : "*",
     "color" : "*",
     "highlight" : "*",
     "serve" : "*",
@@ -16,7 +17,6 @@
     "stylus" : "0.45.0",
     "jeet" : "*",
     "nib" : "*",
-    "stream" : "*",
     "promise" : "*",
     "vinyl" : "*",
     "mustache" : "*",

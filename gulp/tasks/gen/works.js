@@ -33,7 +33,7 @@ var prepareData = function( data ){
 
 
         var weight = Math.sqrt( w['coolness'] * 1.5 * w['weight'] ) *10
-        w['rank'] = - parseDate( w['to'] || '01/01/2012' ).getTime()
+        w['rank'] = parseDate( w['to'] || '01/01/2012' ).getTime()
 
        
         w['height'] = Math.max( Math.min( Math.sqrt( (0.4+Math.random()*0.8) * weight )*1.4 , 12 ) , 4 )*45
@@ -52,14 +52,15 @@ var prepareData = function( data ){
 
         return w
     })
-    /*
+    
     .sort(function(a,b){
         return a.rank < b.rank ? 1 : -1
     });
-    */
+    /*
     .sort(function(a,b){
         return Math.random() < 0.5 ? 1 : -1
     });
+    */
     return data
 }
 

@@ -1,9 +1,9 @@
 <html>
-<link rel="stylesheet" href="cv.css" ></link>
+<link rel="stylesheet" href="resume.css" ></link>
 
 <body version="{{build}}">
 
-<div class="cv">
+<div class="resume">
 		<header class="header" data-z="-30">
 		{{#header}}
 			<div id="contact" class="card brick">
@@ -157,17 +157,17 @@
 var ui = document.getElementById("UI");
 ui.querySelector('input').addEventListener('change',function(e){
 
-	var cv = document.querySelector('.cv')
+	var resume = document.querySelector('.resume')
 
 	if( this.checked ){
 
 		//add class
-		cv.className += " printable"
+		resume.className += " printable"
 
 
 		// scale
-		var w = cv.offsetWidth,
-			h = cv.offsetHeight
+		var w = resume.offsetWidth,
+			h = resume.offsetHeight
 
 		var ratio = 21 / 29.7
 		var ratio = 21 / 27
@@ -178,21 +178,21 @@ ui.querySelector('input').addEventListener('change',function(e){
 
 			var transform = 'translate( 0 , ' + ( - h * ( 1 - s )/2 )  + 'px)  scale(' +  s  + ')'
 
-			cv.style.webkitTransform = cv.style.transform = transform
+			resume.style.webkitTransform = resume.style.transform = transform
 		}
 
 	}else{	
 
 		// remove class
 		var s=""
-		for(var i=cv.classList.length;i--;)
-			if( cv.classList[i] != "printable" )
-				s+=" "+cv.classList[i]
-		cv.className = s
+		for(var i=resume.classList.length;i--;)
+			if( resume.classList[i] != "printable" )
+				s+=" "+resume.classList[i]
+		resume.className = s
 
 
 		// unscale
-		cv.style.webkitTransform = cv.style.transform = ''
+		resume.style.webkitTransform = resume.style.transform = ''
 	}
 
 	

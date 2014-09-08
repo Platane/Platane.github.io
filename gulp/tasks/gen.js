@@ -3,4 +3,4 @@ var   gulpq = require('gulp-queue')
 
 requireDir('./gen');
 
-gulpq.task( 'gen', [ 'gen.works' , 'gen.articles' , 'gen.cv' ] );
+gulpq.task( 'gen', [ 'gen.works' , 'gen.articles' , 'gen.resume' ] );

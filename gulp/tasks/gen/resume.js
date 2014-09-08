@@ -90,11 +90,11 @@ var prepareData = function( data ){
     return data
 }
 
-gulp.task('gen.cv', function() {
+gulp.task('gen.resume', function() {
     
-    templating( '../sources/templates/cv.html' , '../build/data/cv.json' , prepareData )
+    templating( '../sources/templates/resume.html' , '../build/data/resume.json' , prepareData )
     .pipe( htmlmin() )
-    .pipe( rename('cv.html') )
+    .pipe( rename('resume.html') )
     .pipe( gulp.dest('../build/') )
 
 });

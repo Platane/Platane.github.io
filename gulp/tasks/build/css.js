@@ -8,7 +8,7 @@ var   gulp = require('gulp')
 
 gulp.task('build.css', function() {
   //gulp.src('../sources/**/*.styl')
-  return gulp.src( [ '../sources/home.styl' , '../sources/article-style.styl' , '../sources/works.styl' , '../sources/cv.styl' ] )
+  return gulp.src( [ '../sources/home.styl' , '../sources/article-style.styl' , '../sources/works.styl' , '../sources/resume.styl' ] )
     .pipe(stylus({
         errors: true,
         compress: true,
