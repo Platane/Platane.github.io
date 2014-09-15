@@ -6,10 +6,22 @@
 	"to" : "01/04/2013",
 
 	"screenShots" : [
-		"drakkar-edit2.png",
-		"drakkar-edit.png",
-		"drakkar-mcss.png",
-		"drakkar-search.png"
+		{
+			"url" : "drakkar-edit2.png",
+			"caption" : "Compose your map here"
+		},
+		{
+			"url" : "drakkar-edit.png",
+			"caption" : "Grab countries's boundaries from the DB"
+		},
+		{
+			"url" : "drakkar-mcss.png",
+			"caption" : "Use the css-like language to style the map"
+		},
+		{
+			"url" : "drakkar-search.png",
+			"caption" : "Define the viewport"
+		}
 	],
 	"coolness" : 5,
 	"weight" : 4,
@@ -18,10 +30,6 @@
 			"url" : "http://www.cvce.eu/",
 			"label" : "cvce",
 			"type" : "partner"
-		},
-		{
-			"url" : "http://www.cvce.eu/",
-			"label" : "cvce2"
 		}
 	]
 }

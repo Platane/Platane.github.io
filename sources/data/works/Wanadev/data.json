@@ -6,8 +6,26 @@
 	"to" : "..",
 
 	"screenShots" : [
-		"wana3D.png",
-		"wana2D.png"
+		{
+			"url" : "wana-inside.jpg",
+			"caption" : "Inside a house"
+		},
+		{
+			"url" : "wana-reshape.png",
+			"caption" : "I made the tool to set the size of a furniture"
+		},
+		{
+			"url" : "wana-deplacement.png",
+			"caption" : ""
+		},
+		{
+			"url" : "wana3D.png",
+			"caption" : ""
+		},
+		{
+			"url" : "wana2D.png",
+			"caption" : "2D editor, draw the walls here"
+		}
 	],
 	"coolness" : 5,
 	"weight" : 6,
