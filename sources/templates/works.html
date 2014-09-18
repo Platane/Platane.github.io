@@ -8,11 +8,10 @@
 
 	{{#works}}
 	<li id="{{id}}" class="grid-tile work-wrap">
-		<article id="{{id}}" class="work" data-from="{{from}}" data-to="{{to}}" data-rank="{{rank}}" style="height:{{height}}px;/*border-color:{{darkColor}};*/border-color:rgb(57, 121, 27);">
+		<article id="{{id}}" class="work" data-from="{{from}}" data-to="{{to}}" data-rank="{{rank}}" style="height:{{height}}px;border-color:rgb(57, 121, 27);">
 
 			<header>
 				<div class="work-illu work-illu-main work-illu-skewed" >
-					<!--<div style="background-image:url('assets/works-illustrations/{{illustration-main.url}}');"></div>-->
 					<div style="background-image:-webkit-radial-gradient(65% 50%,ellipse cover,rgba(61, 61, 61, 0) 61%,rgba(61, 61, 61, 1) 120%),url('assets/works-illustrations/{{illustration-main.url}}');"></div>
 				</div>
 			</header>
@@ -28,7 +27,7 @@
 
 			<section class="work-main">
 
-				<nav class="work-nav" style="border-color:{{darkColor}};">
+				<nav class="work-nav">
 
 						<ul class="work-illu-secondary-group">
 							{{#illustration-second}}

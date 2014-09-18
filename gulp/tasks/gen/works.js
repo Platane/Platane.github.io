@@ -3,7 +3,6 @@ var   gulp = require('gulp')
     , templating = require('./templating')
     , markdown = require('markdown').markdown
     , htmlmin = require('gulp-html-minifier')
-    , Color = require('color')
 
 var parseDate = function( s ){
     if( s == '..' )
@@ -39,16 +38,6 @@ var prepareData = function( data ){
         w['height'] = Math.max( Math.min( Math.sqrt( (0.4+Math.random()*0.8) * weight )*1.4 , 12 ) , 4 )*45
 
         w['id'] = w['title'].split(' ').join('-')
-
-        var color = Color().rgb( Math.random()*255 , Math.random()*255 , Math.random()*255 )
-        w['color'] = color.rgbString()
-        w['darkColor'] = color.clone().darken(0.5).rgbString()
-
-        var lightColor = color.clone()
-        lightColor.lightness(90)
-        //lightColor.whiteness(0.9)
-
-        w['lightColor'] = lightColor.rgbString()
 
         return w
     })

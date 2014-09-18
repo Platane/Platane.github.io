@@ -5,13 +5,9 @@
   "license": "MIT",
 
   "dependencies": {
-    "gl-matrix" : "2.x"
   },
   
   "devDependencies": {
-  	"lwip" : "*",
-    "color" : "*",
-    "highlight" : "*",
     "serve" : "*",
     "require-dir" : "*",
     "stylus" : "0.45.0",
@@ -19,6 +15,7 @@
     "nib" : "*",
     "promise" : "*",
     "vinyl" : "*",
+    "event-stream" : "*",
     "mustache" : "*",
     "markdown" : "*",
     "gulp-minify-css" : "*",
@@ -30,7 +27,8 @@
     "gulp-watch" : "*",
     "gulp-connect" : "*",
     "gulp-livereload" : "*",
-    "gulp-image-resize" : "*"
+    "gulp-image-resize" : "*",
+    "gulp" : "*"
   },
   "engines": {
     "node": ">=0.8.0"
