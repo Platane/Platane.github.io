@@ -1,0 +1,53 @@
+{
+	"title" : "The marvellous sushi maker",
+	"date" : "2014",
+
+	"from" : "25/04/2014",
+	"to" : "28/04/2014",
+
+	"screenShots" : [
+		{
+			"url" : "sushi-main.png",
+			"caption" : ""
+		},
+		{
+			"url" : "sushi-splash.png",
+			"caption" : "cool intro screen"
+		}
+	],
+	"coolness" : 7,
+	"weight" : 1,
+	"tags" : [
+		"Js",
+		"game",
+		"html5",
+		"ludum dare",
+		"team",
+		"72h",
+		"game jam",
+		"marvellous team"
+	],
+	"links" : [
+
+		{
+			"url" : "http://themarvellousteam.github.io/The-Marvellous-Sushimaker/",
+			"label" : "play it",
+			"type" : "page"
+		},
+		{
+			"url" : "https://github.com/TheMarvellousTeam/The-Marvellous-Sushimaker",
+			"label" : "github",
+			"type" : "sources"
+		},
+		{
+			"url" : "https://github.com/TheMarvellousTeam",
+			"label" : "the marvellous team",
+			"type" : "team"
+		},
+		{
+			"url" : "http://www.ludumdare.com/",
+			"label" : "ludum dare",
+			"type" : "partner"
+		}
+	]
+}

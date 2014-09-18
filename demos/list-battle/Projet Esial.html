@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://localhost:8080/Projet_pg_web/index.jsp?page=edit&liste=Burgers -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+       <title> Projet Esial </title>
+        <link rel="stylesheet" href="./style.css">
+	
+        
+	
+        <link href="./Projet Esial_files/agrandirImage.css" rel="stylesheet" type="text/css" media="screen">
+	
+        <title>JSP Page</title>
+	
+    <style type="text/css"></style></head>
+	
+    <body style="cursor: default;">     
+	
+         
+	
+        
+	
+        
+	
+        
+	
+        
+	
+        
+	
+        <header>
+	
+            
+	
+           
+<div class="bandeau">
+    <a href="http://localhost:8080/Projet_pg_web/index.jsp?page=index">
+        <div class="container"><img src="./Projet Esial_files/glasses.jpeg"></div>
+    </a>
+<div>
+
+
+<div class="bandeau_bot">
+<div>
+ 
+	
+            
+	
+        </div></div></div></div></header>
+	
+        
+	
+       <nav>
+	
+        
+
+
+
+
+
+<div class="case">
+
+
+
+
+
+
+
+
+     <script type="text/javascript">
+            
+            /*
+             * appeler en lieu et place du submit du form
+             * on utilise Ajax pour ne pas recharger la page
+             */
+			 /*
+            function declencheAuthentification(){
+            
+                var xhr = new XMLHttpRequest();
+                
+                var login = document.getElementById("log_log").value;
+                var pass = document.getElementById("log_pass").value;
+                var autoConnect =  document.getElementById('auto_connect').checked;
+                
+                document.getElementById("log_log").value = "";
+                document.getElementById("log_pass").value = "";
+                   
+                
+                xhr.onreadystatechange = function() {
+                        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+                                traitementAuthentification(xhr.responseText);
+                        }
+                };
+                
+                //alert( "connexion.do?login="+encodeURIComponent(login)+"&pass="+encodeURIComponent(pass) );
+                
+                xhr.open("GET", "connexion.do?login="+encodeURIComponent(login)+"&pass="+encodeURIComponent(pass)+"&autoConnect="+((autoConnect)?("y"):("n")), true);
+                xhr.send(null);
+                
+                document.getElementById("log_commentaire").innerText = "authentification ...";
+                
+                document.getElementById("log_submit").style.display="none";
+                
+                function traitementAuthentification( rep ){
+                    if( rep == "failed" ){
+                        document.getElementById("log_commentaire").innerText = "authentification failed";
+                        document.getElementById("log_submit").style.display="inline";
+                    }else {
+                        document.getElementById("log_panel").innerText = "connecté as "+login;
+                        
+                        location.reload() ; 
+                        
+                    }
+                }
+            }
+            
+            function deconnection() {
+                
+                // creation de l'objet 
+                var xhr = new XMLHttpRequest(); 
+                
+               // affectation de l'evenement retour
+                xhr.onreadystatechange = function() {
+                        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+                                traitementAuthentification( xhr.responseText );
+                        }
+                        function traitementAuthentification( rep ){
+                            location.reload() ; 
+                        }
+                };
+                
+                // chargement de la page disconnexion.do
+                // totu en restant sur celle ci
+                // on obtiendra le code html de la page en parametre " xhr.responseText "
+                xhr.open("GET", "disconnexion.do", true);
+                xhr.send(null);
+                
+            }
+            */
+            
+        </script>
+        
+        <!-- block log  -->
+        <div id="log_panel">
+        
+             <input id="log_log" type="text" name="login" value=""> 
+             <input id="log_pass" type="password" name="pass" value=""> 
+             Connection automatique <input type="checkbox" id="auto_connect" value="Y">
+             <input id="log_submit" type="submit" name="valider" onclick="declencheAuthentification();"><br>
+             <input type="submit" value="s&#39;enregistrer" onclick="declencheEnregistrer();">
+             
+             <div id="log_tool_formulaire_add" class="popUpPanel" style="display:none;">
+                 
+
+<input id="addUser_log" type="text" name="login"> 
+<input id="addUser_pass" type="password" name="pass"> 
+<div id="addUser_commentaire">    </div>     
+<input id="addUser_submit" class="bouton" type="submit" name="valider" onclick="declencheAddUser();">
+
+
+
+
+
+                 <input type="submit" style="position:absolute;right:0px;top:0px;" name="droit" value="x" onclick="document.getElementById(&#39;log_tool_formulaire_add&#39;).style.display =&#39;none&#39;;">
+             </div>
+             
+             <div id="log_commentaire"></div>
+             
+             
+             <script type="text/javascript">
+                 
+                 function declencheEnregistrer(){
+                     
+                     if( document.getElementById("log_tool_formulaire_add").style.display == "inline-block" ){
+                         
+                         
+                         document.getElementById("log_tool_formulaire_add").style.display = "none";
+                         
+                     } else {
+                         document.getElementById("log_tool_formulaire_add").style.display = "inline-block";
+                     }
+                     
+                 }
+             
+             </script>
+             
+        
+        </div>
+
+ 
+</div>
+
+
+        
+
+       
+
+<div class="case">            
+<input type="text" id="recherche_text" name="research" value=""><input type="submit" id="recherche_submit" value="recherche" onclick="recherche();">
+<div id="recherche_commentaire"></div>
+<div id="recherche_resultat"></div>
+
+
+
+
+<ul>
+    <li><a href="http://localhost:8080/Projet_pg_web/index.jsp?page=index"> Index </a></li>
+
+<li><a href="http://localhost:8080/Projet_pg_web/index.jsp?page=vote&liste=Burgers"> Voter </a></li>
+
+</ul>
+</div>  
+
+<div class="case">            
+
+
+
+
+
+    
+        quick vote
+        <p>
+        </p><h3 id="mini_vote_name">Burgers</h3><i>  par <span id="mini_vote_proprietaire">marvin</span></i>
+        
+         <div style="margin:auto; text-align: center;">
+            
+            
+        </div>
+        
+         <div id="source_element_mini_liste_random" style="display:none; white-space:nowrap;"><liste name="Burgers" proprietaire="marvin" vote="4" creation="2012-09-13"></liste></div>
+         <div id="source_element_mini" style="display:none;"><element img_source="image_stock/Burgers/BigMac.jpeg" label="BigMac" elo="1463"></element>  <element img_source="image_stock/Burgers/Double_Whooper.jpeg" label="Double_Whooper" elo="1476"></element> </div>
+        
+          <div class="selection_vote_mini">
+            <div id="selection_vote_1_mini" class="element"><img src="./Projet Esial_files/BigMac.jpeg"><br><h5>BigMac</h5></div>
+            <div id="selection_vote_2_mini" class="element"><img src="./Projet Esial_files/Double_Whooper.jpeg"><br><h5>Double_Whooper</h5></div>
+        </div>  
+        <div id="vote_element_commentaire_mini"> </div>
+</div>  
+
+
+
+
+ 
+	
+        </nav>
+	
+       
+	
+        <div class="main">
+	
+                   
+	
+            
+	
+            
+
+
+
+
+
+
+  
+
+    
+        
+        <div style="margin:auto; text-align: center;">
+            
+            <h3>Burgers</h3><i>  par marvin</i>
+                
+            <input type="image" title="voter" src="./Projet Esial_files/icone_vote.png" class="bouton" onclick="goToVotePape();">
+            
+        
+        </div>
+        
+       
+    
+    
+     
+     
+      <div style="display: none;" id="source_element"><elements>
+<element img_source="image_stock/Burgers/BigTasty.jpeg" label="BigTasty" elo="1543"></element> 
+<element img_source="image_stock/Burgers/MacChicken.jpeg" label="MacChicken" elo="1387"></element> 
+<element img_source="image_stock/Burgers/Long_Bacon.jpeg" label="Long_Bacon" elo="1588"></element> 
+<element img_source="image_stock/Burgers/Double_Whooper.jpeg" label="Double_Whooper" elo="1476"></element> 
+<element img_source="image_stock/Burgers/BigMac.jpeg" label="BigMac" elo="1463"></element> 
+</elements><graphe>5|0|0|1|1|4|6|0|4|5|0|2|1|0|0|0|3|0|6|0|1|2|0|5|2|0</graphe></div>
+      <div style="display: none;" id="source_element_temporel"><elements><element img_source="image_stock/Burgers/BigTasty.jpeg" label="BigTasty" elo="1543"><po elo="1543" date="2012-09-13:18:39:28"></po>
+<po elo="1536" date="2012-09-13:18:39:21"></po>
+<po elo="1529" date="2012-09-13:18:39:20"></po>
+<po elo="1522" date="2012-09-13:18:39:18"></po>
+<po elo="1515" date="2012-09-13:18:39:08"></po>
+<po elo="1523" date="2012-09-13:18:39:03"></po>
+<po elo="1516" date="2012-09-13:18:39:02"></po>
+<po elo="1509" date="2012-09-13:18:39:01"></po>
+<po elo="1517" date="2012-09-13:18:38:25"></po>
+<po elo="1525" date="2012-09-13:18:38:11"></po>
+<po elo="1533" date="2012-09-13:18:38:09"></po>
+<po elo="1526" date="2012-09-13:18:28:23"></po>
+<po elo="1519" date="2012-09-13:18:15:59"></po>
+<po elo="1527" date="2012-09-13:18:15:20"></po>
+<po elo="1520" date="2012-09-13:18:15:18"></po>
+<po elo="1528" date="2012-09-13:18:15:12"></po>
+<po elo="1521" date="2012-09-13:18:15:10"></po>
+<po elo="1514" date="2012-09-13:18:15:06"></po>
+<po elo="1507" date="2012-09-13:18:14:54"></po>
+<po elo="1502" date="2012-09-12:20:00:00"></po>
+</element> <element img_source="image_stock/Burgers/MacChicken.jpeg" label="MacChicken" elo="1387"><po elo="1387" date="2012-09-13:19:02:09"></po>
+<po elo="1380" date="2012-09-13:18:39:33"></po>
+<po elo="1388" date="2012-09-13:18:39:28"></po>
+<po elo="1396" date="2012-09-13:18:39:23"></po>
+<po elo="1404" date="2012-09-13:18:39:21"></po>
+<po elo="1412" date="2012-09-13:18:39:19"></po>
+<po elo="1420" date="2012-09-13:18:39:14"></po>
+<po elo="1428" date="2012-09-13:18:39:12"></po>
+<po elo="1436" date="2012-09-13:18:39:11"></po>
+<po elo="1444" date="2012-09-13:18:39:10"></po>
+<po elo="1452" date="2012-09-13:18:39:02"></po>
+<po elo="1460" date="2012-09-13:18:38:09"></po>
+<po elo="1468" date="2012-09-13:18:15:22"></po>
+<po elo="1476" date="2012-09-13:18:15:20"></po>
+<po elo="1484" date="2012-09-13:18:15:19"></po>
+<po elo="1492" date="2012-09-13:18:15:12"></po>
+<po elo="1523" date="2012-09-12:21:00:00"></po>
+<po elo="1492" date="2012-09-12:20:00:00"></po>
+</element> <element img_source="image_stock/Burgers/Long_Bacon.jpeg" label="Long_Bacon" elo="1588"><po elo="1588" date="2012-09-13:19:02:09"></po>
+<po elo="1596" date="2012-09-13:19:02:06"></po>
+<po elo="1589" date="2012-09-13:18:39:33"></po>
+<po elo="1582" date="2012-09-13:18:39:26"></po>
+<po elo="1575" date="2012-09-13:18:39:23"></po>
+<po elo="1568" date="2012-09-13:18:39:22"></po>
+<po elo="1561" date="2012-09-13:18:39:20"></po>
+<po elo="1569" date="2012-09-13:18:39:19"></po>
+<po elo="1562" date="2012-09-13:18:39:18"></po>
+<po elo="1570" date="2012-09-13:18:39:16"></po>
+<po elo="1563" date="2012-09-13:18:39:15"></po>
+<po elo="1556" date="2012-09-13:18:39:13"></po>
+<po elo="1549" date="2012-09-13:18:39:05"></po>
+<po elo="1542" date="2012-09-13:18:39:01"></po>
+<po elo="1535" date="2012-09-13:18:38:21"></po>
+<po elo="1528" date="2012-09-13:18:28:21"></po>
+<po elo="1521" date="2012-09-13:18:15:22"></po>
+<po elo="1514" date="2012-09-13:18:15:15"></po>
+<po elo="1507" date="2012-09-13:18:14:57"></po>
+<po elo="1520" date="2012-09-12:21:00:00"></po>
+</element> <element img_source="image_stock/Burgers/Double_Whooper.jpeg" label="Double_Whooper" elo="1476"><po elo="1476" date="2012-09-13:19:02:06"></po>
+<po elo="1484" date="2012-09-13:18:39:25"></po>
+<po elo="1477" date="2012-09-13:18:39:16"></po>
+<po elo="1485" date="2012-09-13:18:39:14"></po>
+<po elo="1478" date="2012-09-13:18:39:13"></po>
+<po elo="1486" date="2012-09-13:18:39:12"></po>
+<po elo="1479" date="2012-09-13:18:39:11"></po>
+<po elo="1472" date="2012-09-13:18:39:10"></po>
+<po elo="1465" date="2012-09-13:18:39:06"></po>
+<po elo="1473" date="2012-09-13:18:38:25"></po>
+<po elo="1466" date="2012-09-13:18:38:21"></po>
+<po elo="1474" date="2012-09-13:18:28:23"></po>
+<po elo="1482" date="2012-09-13:18:28:21"></po>
+<po elo="1490" date="2012-09-13:18:15:19"></po>
+<po elo="1483" date="2012-09-13:18:15:15"></po>
+<po elo="1491" date="2012-09-13:18:15:10"></po>
+<po elo="1499" date="2012-09-13:18:15:06"></po>
+<po elo="1507" date="2012-09-13:18:14:56"></po>
+</element> <element img_source="image_stock/Burgers/BigMac.jpeg" label="BigMac" elo="1463"><po elo="1463" date="2012-09-13:18:39:26"></po>
+<po elo="1471" date="2012-09-13:18:39:25"></po>
+<po elo="1479" date="2012-09-13:18:39:22"></po>
+<po elo="1487" date="2012-09-13:18:39:15"></po>
+<po elo="1495" date="2012-09-13:18:39:08"></po>
+<po elo="1488" date="2012-09-13:18:39:06"></po>
+<po elo="1481" date="2012-09-13:18:39:05"></po>
+<po elo="1489" date="2012-09-13:18:39:03"></po>
+<po elo="1497" date="2012-09-13:18:38:11"></po>
+<po elo="1490" date="2012-09-13:18:15:59"></po>
+<po elo="1483" date="2012-09-13:18:15:18"></po>
+<po elo="1476" date="2012-09-13:18:14:57"></po>
+<po elo="1484" date="2012-09-13:18:14:56"></po>
+<po elo="1492" date="2012-09-13:18:14:54"></po>
+</element> </elements></div>
+     
+      <div>
+       <div id="kineticContainerElement" style="width:200px;	height : 400px; display:inline-block; border:dashed #458BA9 5px; padding: 5px; border-radius: 10px;">
+	   <!--
+	   <div style="position: relative; display: inline-block; width: 200px; height: 400px;" class="kineticjs-content">
+	   <canvas style="position: absolute; display: none;" class="kineticjs-buffer-layer" width="200" height="400"></canvas>
+	   <canvas style="position: absolute; display: none;" class="kineticjs-path-layer" width="200" height="400"></canvas>
+	   <canvas style="position: absolute;" width="200" height="400"></canvas><canvas style="position: absolute;" width="200" height="400"></canvas>
+	   <canvas style="position: absolute;" width="200" height="400"></canvas><canvas style="position: absolute;" width="200" height="400"></canvas>
+	   <canvas style="position: absolute;" width="200" height="400"></canvas><canvas style="position: absolute;" width="200" height="400"></canvas>
+	   </div>
+	   -->
+	   </div>
+     
+        
+        <!-- edition de l'element -->
+        <div id="edit_element_container" class="infoElement" style="display: inline-block;">
+                
+                
+                <div id="edit_element_image_container" style="img_container"><img src="./Projet Esial_files/BigTasty.jpeg"></div>
+                
+                <div id="edit_element_label" style="img_container"><h2>BigTasty</h2></div>
+                
+                <div id="edit_element_elo" style="img_container"><h2>1543</h2></div>
+                
+                
+       </div>
+       
+     </div>
+       
+       <p>
+       </p><div id="kineticContainerTemporel" style="postion:absolute; margin-left: auto;  display:inline-block; ">
+	   <!--
+		<div style="position: relative; display: inline-block; width: 700px; height: 600px;" class="kineticjs-content">
+		<canvas style="position: absolute; display: none;" class="kineticjs-buffer-layer" width="700" height="600"></canvas>
+		<canvas style="position: absolute; display: none;" class="kineticjs-path-layer" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		<canvas style="position: absolute;" width="700" height="600"></canvas>
+		</div>
+		-->
+	</div>
+       
+       <p>
+       
+       </p><div>   
+            <div id="kineticContainerGraphe" style="postion:absolute;   display:inline-block; ">
+			<!--
+			<div style="position: relative; display: inline-block; width: 800px; height: 600px;" class="kineticjs-content">
+			<canvas style="position: absolute; display: none;" class="kineticjs-buffer-layer" width="800" height="600"></canvas>
+			<canvas style="position: absolute; display: none;" class="kineticjs-path-layer" width="800" height="600"></canvas>
+			<canvas style="position: absolute;" width="800" height="600"></canvas><canvas style="position: absolute;" width="800" height="600"></canvas>
+			<canvas style="position: absolute;" width="800" height="600"></canvas><canvas style="position: absolute;" width="800" height="600"></canvas>
+			<canvas style="position: absolute;" width="800" height="600"></canvas><canvas style="position: absolute;" width="800" height="600"></canvas>
+			<canvas style="position: absolute;" width="800" height="600"></canvas><canvas style="position: absolute;" width="800" height="600"></canvas>
+			</div>
+			-->
+			</div>
+
+            <div>
+                <input border="0" class="bouton" title="circle" src="./Projet Esial_files/icone_circle.png" type="image" align="middle" onclick="graphe.user.cicle();">
+                <input border="0" class="bouton" title="phy" src="./Projet Esial_files/icone_phy.png" type="image" align="middle" onclick="graphe.user.switch_phy();">
+            </div>
+       </div>
+       
+       
+       
+       
+     <script type="text/javascript" src="./Projet Esial_files/Operateur.js"></script>
+     <script type="text/javascript" src="./Projet Esial_files/kinetic-v3.9.4.js"></script>
+     <script type="text/javascript" src="./Projet Esial_files/proc_caroussel.js"></script>
+     <script type="text/javascript" src="./Projet Esial_files/proc_evolution_temporelle.js"></script>
+     <script type="text/javascript" src="./Projet Esial_files/proc_graphe.js"></script>
+     <script type="text/javascript">
+            
+            var carrous;
+            var graphe;
+            var tempo;
+            
+            var currentElement = null;
+            
+            function goToVotePape(){
+                
+                var location=("index.jsp?page=vote&liste=Burgers");
+                this.location.href = location;
+                
+               
+            }
+            
+            function refreshListe(){
+                var xhr = new XMLHttpRequest(); 
+                xhr.onreadystatechange = function() {
+                        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+                                traitement(xhr.responseText);
+                        }
+                };
+                
+                xhr.open("GET", "getListe?liste="+encodeURIComponent( "Burgers" ), true);
+                xhr.send(null);
+                function traitement( rep ){
+                  
+                  document.getElementById("source_element").innerHTML = rep;  
+                   
+                  var ex_lbl = "";
+                  if( document.getElementById("edit_element_label").children.length > 0 )
+                        ex_lbl = document.getElementById("edit_element_label").children[0].innerHTML;
+                   
+                  carrous.recharge();
+                  carrous.goToFrame(0);
+                  carrous.goToLabel( ex_lbl ); 
+                     
+                  graphe.user.recharge();
+                  
+                }
+            }
+            
+            function refreshListeTemporelle(){
+                var xhr = new XMLHttpRequest(); 
+                xhr.onreadystatechange = function() {
+                        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+                                traitement(xhr.responseText);
+                        }
+                };
+                
+                xhr.open("GET", "getEvolutionTemporelle?liste="+encodeURIComponent( "Burgers" ), true);
+                xhr.send(null);
+                
+                function traitement( rep ){
+                  
+                  document.getElementById("source_element_temporel").innerHTML = "<elements>"+rep+"</elements>";  
+                  try{
+                  
+                  
+                  var ex_lbl = "";
+                  if( document.getElementById("edit_element_label").children.length > 0 )
+                        ex_lbl = document.getElementById("edit_element_label").children[0].innerHTML;
+                   
+                  tempo.recharge();
+                  
+                  tempo.goToLabel( ex_lbl ); 
+                  
+                   }catch( e ){ alert(e); }
+                }
+            }
+            
+            function changeFocus(  label ){
+                
+                var children = document.getElementById("source_element").getElementsByTagName("elements")[0].children;
+          
+                var node;
+
+
+                for( var i = 0 ; i < children.length ; i ++ )
+                    if( children[ i ].getAttribute( "label") == label )
+                        node = children[ i ];
+
+                var img = "<img src="+ node.getAttribute("img_source") +" />";
+
+                document.getElementById("edit_element_image_container").innerHTML = img;
+
+                document.getElementById("edit_element_container").style.display = "inline-block";
+
+                document.getElementById("edit_element_label").innerHTML = "<h2>"+node.getAttribute("label")+"</h2>";
+
+                document.getElementById("edit_element_elo").innerHTML = "<h2>"+node.getAttribute("elo")+"</h2>";
+                
+                tempo.goToLabel( label );
+                
+                currentElement = label;
+            }
+            
+            
+            // on met en place le carrousel
+            
+           var stage = new Kinetic.Stage({
+			  container: "kineticContainerElement",
+			  width: 200,
+			  height: 400
+			});
+			
+          carrous = new caroussel( stage  , "source_element"  );
+		
+		
+           // on ajoute les callBack sur les evenements focus
+                
+          carrous.callBack.changeFocusO = this;
+          carrous.callBack.changeFocusCB = function( i , label  ){ 
+             changeFocus(  label );
+          }
+          carrous.callBack.noFocusO = this;
+          carrous.callBack.noFocusCB = function(   ){ 
+               document.getElementById("edit_element_container").style.display = "none";
+          }
+                
+        // on demande une mise a jour de l'objet elements'
+        // refreshListe();
+        // refreshListeTemporelle();
+         
+         
+         //on met en place l'analyser de graphe
+         var stage = new Kinetic.Stage({
+			  container: "kineticContainerGraphe",
+			  width: 800,
+			  height: 600
+			});
+                        try {
+         graphe = new procedure_graphe ( stage  );
+         
+         graphe.callBack.changeFocusCB = function( i , label  ){ 
+             changeFocus(  label );
+             carrous.goToLabel( label );
+          }
+         graphe.callBack.changeFocusO = this;
+         
+                        }catch( e ){ alert(e); }
+                        
+        // on met en place le graphe d'evolution temporelle
+        var stage = new Kinetic.Stage({
+			  container: "kineticContainerTemporel",
+			  width: 700,
+			  height: 600
+			});
+                      
+        tempo = new procedure_evolution_temporelle ( stage , "source_element_temporel" );      
+       
+		//static call
+			carrous.recharge();
+            carrous.goToLabel( "BigTasty" );
+            
+			graphe.user.recharge();
+			
+			tempo.recharge();
+			tempo.goToLabel( "BigTasty" );
+		
+        </script>
+       
+        
+ 
+        
+        
+        
+        
+        
+        
+         
+	
+            
+	
+            
+	
+            
+	
+        </div>
+	
+            
+	
+        <footer>
+	
+            
+	
+            <div></div> 
+	
+            
+	
+        </footer>
+	
+            
+	
+    
+	
+</body></html>

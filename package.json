@@ -1,0 +1,37 @@
+{
+  "name": "platane-me",
+  "version": "1.0.0",
+  "author": "Platane <me@platane.me>",
+  "license": "MIT",
+
+  "dependencies": {
+  },
+  
+  "devDependencies": {
+    "serve" : "*",
+    "require-dir" : "*",
+    "stylus" : "0.45.0",
+    "jeet" : "*",
+    "nib" : "*",
+    "promise" : "*",
+    "vinyl" : "*",
+    "event-stream" : "*",
+    "mustache" : "*",
+    "markdown" : "*",
+    "gulp-minify-css" : "*",
+    "gulp-html-minifier" : "*",
+    "gulp-stylus" : "1.0.0",
+    "gulp-rename" : "*",
+    "gulp-concat" : "*",
+    "gulp-clean" : "*",
+    "gulp-watch" : "*",
+    "gulp-connect" : "*",
+    "gulp-livereload" : "*",
+    "gulp-image-resize" : "*",
+    "gulp" : "*"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+
+}

@@ -1,0 +1,46 @@
+{
+	"title" : "Wanaplan",
+	"date" : "2014",
+
+	"from" : "01/04/2014",
+	"to" : "..",
+
+	"screenShots" : [
+		{
+			"url" : "wana-inside.jpg",
+			"caption" : "Inside a house"
+		},
+		{
+			"url" : "wana-reshape.png",
+			"caption" : "I made the tool to set the size of a furniture"
+		},
+		{
+			"url" : "wana-deplacement.png",
+			"caption" : ""
+		},
+		{
+			"url" : "wana3D.png",
+			"caption" : ""
+		},
+		{
+			"url" : "wana2D.png",
+			"caption" : "2D editor, draw the walls here"
+		}
+	],
+	"coolness" : 5,
+	"weight" : 6,
+	"tags" : [
+		"Js",
+		"WebGl",
+		"Achitecture",
+		"BabylonJs",
+		"job"
+	],
+	"links" : [
+		{
+			"url" : "http://wanaplan.com/",
+			"label" : "Wanaplan",
+			"type" : "page"
+		}
+	]
+}

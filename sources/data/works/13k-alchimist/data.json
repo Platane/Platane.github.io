@@ -1,0 +1,45 @@
+{
+	"title" : "13k alchimist",
+	"date" : "2014",
+
+	"from" : "26/08/2014",
+	"to" : "12/09/2014",
+
+	"screenShots" : [
+		{
+			"url" : "13kAlchemist-global.png",
+			"caption" : ""
+		},
+		{
+			"url" : "13kAlchemist-big.png",
+			"caption" : "pew pew pew!"
+		}
+	],
+	"coolness" : 4,
+	"weight" : 1,
+	"tags" : [
+		"Js",
+		"size limit",
+		"contest",
+		"13kjs",
+		"alchimist",
+		"four elements"
+	],
+	"links" : [
+		{
+			"url" : "http://platane.github.io/13k-alchemist-defence/sources/app.html",
+			"label" : "play it",
+			"type" : "page"
+		},
+		{
+			"url" : "https://github.com/Platane/13k-alchemist-defence",
+			"label" : "GitHub",
+			"type" : "page"
+		},
+		{
+			"url" : "http://js13kgames.com/entries/alchemist-defence",
+			"label" : "js13kgames",
+			"type" : "partner"
+		}
+	]
+}

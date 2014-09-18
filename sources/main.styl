@@ -1,0 +1,65 @@
+
+@import 'jeet'
+@import 'nib'
+
+body 
+    margin 0
+
+*
+    box-sizing border-box
+
+.button
+    display inline-block
+    border-radius 5px
+    border solid 3px #333
+    min-width  40px
+    min-height  40px
+    background-color red
+
+    margin 14px
+
+    &.button-big
+        min-width : 80px
+        min-height : 80px
+
+
+/* mixin */
+forestBackground()
+   background-image  radial-gradient( 65% 50%, ellipse cover , rgba(243,244,232,0) 0%, rgba(186,191,132,0.8) 120% )    ,     linear-gradient( -65deg , rgba(243,244,232,0.7) 30% , rgba(243,244,232,0) 70% ) ,    linear-gradient( left , rgba(232,234,208,1) 10% , rgba(243,244,232,0) 50% )   , url("assets/images/fond.png")    ,   radial-gradient( 65% 50%, ellipse cover, rgba(243,244,232,0.6) 0%, rgba(232,234,208,0.8) 100% )      
+   background-attachment fixed
+
+
+leftArrow( borderSize=2px, arrowSize=20px )
+        
+    position relative
+    border-right solid borderSize
+
+    &:before
+    &:after
+        content ''
+        position absolute
+        border-top solid arrowSize transparent
+        border-bottom solid arrowSize transparent
+        border-left solid arrowSize
+        position absolute
+        width 1px
+        height 1px
+        right (- (arrowSize+borderSize ))
+        top 20%
+        transition border 300ms , right 300ms , top 300ms
+
+    &:after
+        border-left-color #fff
+        right (- (arrowSize ))
+
+
+
+
+
+
+/* reset css */
+ul
+    list-style-type none
+    -webkit-padding-start 0
+    -webkit-margin-start 0
+    -webkit-margin-end 0

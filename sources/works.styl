@@ -1,0 +1,78 @@
+@import 'main'
+@import 'const'
+@import 'work-content'
+@import 'work-illu'
+@import 'md'
+
+body
+    forestBackground()
+
+
+workBackColor = #FFF
+
+ul.grid
+    position relative
+    list-style none
+    padding 0
+
+
+    li.grid-tile
+        margin 0
+        padding 22px
+        padding-bottom 24px
+        position absolute
+        width 33.3%
+
+        &.grid-animated
+            will-change transform -webkit-transform -moz-transform
+            transition transform 600ms ease-in-out 0ms, top 600ms ease-in-out 0ms, left 600ms ease-in-out 0ms
+
+        &.grid-tile-large
+            /*transition width 100ms ease-in-out 500ms*/
+            width 100%
+
+@media screen and (max-width: 1080px)
+    ul.grid li.grid-tile
+        width 50%
+
+@media screen and (max-width: 640px)
+    ul.grid li.grid-tile
+        width 100%
+
+.work-list
+    center(   1150px   ,   50px   )
+
+.work
+    cursor pointer
+    display block
+    position relative
+    width 100%
+
+    center( 380px )
+    background workBackColor
+
+    border-bottom solid 12px pulseGreen
+ 
+    
+
+.grid-tile-large
+    .work
+        max-width none
+        height auto !important
+        cursor default
+
+
+
+.work-main
+    display none
+    
+
+.work-content
+    padding 10px
+    white-space normal
+
+
+.work-content-shrinked
+    height  35%
+    overflow hidden
+    

@@ -1,0 +1,53 @@
+{
+	"title" : "The marvellous crab",
+	"date" : "2014",
+
+	"from" : "24/01/2014",
+	"to" : "26/01/2014",
+
+	"screenShots" : [
+		{
+			"url" : "crab-fat.png",
+			"caption" : "his epileptic dance still make me laugh hard!"
+		},
+		{
+			"url" : "crab-trip.jpg",
+			"caption" : "three levels"
+		},
+		{
+			"url" : "crab-one-lvel.png",
+			"caption" : "the first level"
+		}
+	],
+	"coolness" : 5,
+	"weight" : 1,
+	"tags" : [
+		"Java",
+		"libGDX",
+		"game",
+		"global game jam",
+		"nancy",
+		"team",
+		"48h",
+		"game jam",
+		"marvellous team"
+	],
+	"links" : [
+
+		{
+			"url" : "https://github.com/TheMarvellousTeam/The-Marvellous-Crab",
+			"label" : "github",
+			"type" : "sources"
+		},
+		{
+			"url" : "https://github.com/TheMarvellousTeam",
+			"label" : "the marvellous team",
+			"type" : "team"
+		},
+		{
+			"url" : "http://globalgamejam.org/",
+			"label" : "global game jam",
+			"type" : "partner"
+		}
+	]
+}

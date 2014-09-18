@@ -1,0 +1,778 @@
+
+html{
+
+background-image : 	-webkit-radial-gradient( 65% 50%, ellipse cover , rgba(243,244,232,0) 0%, rgba(186,191,132,0.8) 120% ) ,
+						-webkit-linear-gradient( -65deg ,  rgba(243,244,232,0.7) 30% , rgba(243,244,232,0) 70% )  ,
+						-webkit-linear-gradient( left ,  rgba(232,234,208,1) 10% , rgba(243,244,232,0) 50% )  ,
+						url("ressource/fond2.png")   ,
+						-webkit-radial-gradient( 65% 50%, ellipse cover, rgba(243,244,232,0.8) 0%, rgba(232,234,208,0.8) 100% ) ;
+						
+						
+background-image : 	radial-gradient( 65% 50%, ellipse cover , rgba(243,244,232,0) 0%, rgba(186,191,132,0.8) 120% ) ,
+					linear-gradient( -65deg ,  rgba(243,244,232,0.7) 30% , rgba(243,244,232,0) 70% )  ,
+					linear-gradient( left ,  rgba(232,234,208,1) 10% , rgba(243,244,232,0) 50% )  ,
+					url("ressource/fond2.png")   ,
+					radial-gradient( 65% 50%, ellipse cover, rgba(243,244,232,0.8) 0%, rgba(232,234,208,0.8) 100% ) ;
+					
+background-image : 	-moz-radial-gradient( 65% 50%, ellipse cover , rgba(243,244,232,0) 0%, rgba(186,191,132,0.8) 120% ) ,
+					-moz-linear-gradient( -65deg ,  rgba(243,244,232,0.7) 30% , rgba(243,244,232,0) 70% )  ,
+					-moz-linear-gradient( left ,  rgba(232,234,208,1) 10% , rgba(243,244,232,0) 50% )  ,
+					url("ressource/fond2.png")   ,
+					-moz-radial-gradient( 65% 50%, ellipse cover, rgba(243,244,232,0.8) 0%, rgba(232,234,208,0.8) 100% ) ;
+						
+background-repeat :  no-repeat ,  no-repeat , no-repeat , repeat , no-repeat ;	
+background-attachment: fixed ;
+
+font-family : Calibri;
+font-size : 1em;
+color : #333333;
+margin : 0;
+}
+body{
+margin:10px;
+}
+
+.thanks{
+	font-family : Calibri;
+	font-size : 1em;
+	color : #333;
+	text-align : left;
+	max-width : 800px;
+	position : absolute;
+	right : 0;
+	font-style:italic;
+	margin-top:50px;
+	margin-bottom:50px;
+	opacity : 0;
+	-webkit-transition-property : opacity;
+	-webkit-transition-duration : 6s;
+	-webkit-transition-timing-function : ease-in-out;
+	-webkit-transition-delay: 2s;
+
+	transition-property : opacity; 
+	transition-duration : 6s;
+	transition-timing-function : ease-in-out;
+	transition-delay: 2s;
+	
+	-moz-transition-property : opacity;
+	-moz-transition-duration : 6s;
+	-moz-transition-timing-function : ease-in-out;
+	-moz-transition-delay: 2s;
+	
+}
+.thanks.visible{
+	opacity : 1;
+}
+.thanks a{
+	text-decoration:none;
+	color : #777;
+	
+	-webkit-transition-property : color , text-shadow;
+	-webkit-transition-duration : 0.4s;
+	-webkit-transition-timing-function : ease;
+
+	transition-property : color , text-shadow; 
+	transition-duration : 0.4s;
+	transition-timing-function : ease;
+		
+	-moz-transition-property : color , text-shadow;
+	-moz-transition-duration : 0.4s;
+	-moz-transition-timing-function : ease;
+	
+	text-shadow : 0 0px 1px #777;
+}
+.thanks a:hover{
+	color : #eee;
+	text-shadow : 0 0.5px 10px #777;
+}
+
+#muteBn{
+	background-image: url("ressource/mute-icon.png");
+	background-repeat : no-repeat;
+	background-size : auto;
+	background-position : center center;
+	height : 30px;
+	width : 30px;
+	vertical-align:middle;
+	cursor: pointer;
+	
+	 -webkit-transition: background-position 0.2s linear;
+     -moz-transition: background-position 0.2s linear;
+       -o-transition: background-position 0.2s linear;
+          transition: background-position 0.2s linear;
+}
+#muteBn:hover {
+  background-position: center -5px;
+}
+#muteBn:active {
+	background-size : 20px 20px;
+	background-position : center center;
+	-webkit-transition: none;
+     -moz-transition: none;
+       -o-transition: none;
+          transition: none;
+}
+#volumeControl {
+	vertical-align:middle;
+	cursor: pointer;
+}
+#volumeControlPanel{
+	position : relative;
+	left : 60%;
+	margin-top : 20px;
+	height : 30px;
+	width : 200px;
+}
+
+#fonzie{
+	position : absolute;
+	left : 10%;
+	top: 100%;
+	-webkit-transition-property : top;
+	-webkit-transition-duration : 3s;
+	-webkit-transition-timing-function : ease;
+
+	transition-property : position; 
+	transition-duration : 3s;
+	transition-timing-function : ease;
+		
+	-moz-transition-property : position;
+	-moz-transition-duration : 3s;
+	-moz-transition-timing-function : ease;
+	
+	 -webkit-transform-origin: 50% 80%;
+	 transform-origin: 50% 80%;
+	 -moz-transform-origin: 50% 80%;
+	 
+	 -webkit-animation: rotationFonzie 1s infinite;
+	 animation: rotationFonzie 1s infinite;
+	 -moz-animation: rotationFonzie 1s infinite;
+}
+#fonzie.visible{
+	top : 5%;
+}
+#fonzie:hover{
+	-webkit-animation: none;
+}
+@-webkit-keyframes rotationFonzie {
+    0% {
+        -webkit-transform : rotate( 0deg );
+    }
+	15% {
+        -webkit-transform : rotate( 4deg );
+    }
+	30% {
+		-webkit-transform : rotate( -2deg );
+    }
+	45% {
+        -webkit-transform : rotate( 4deg );
+    }
+	60% {
+		-webkit-transform : rotate( 0deg );
+    }
+}
+@keyframes rotationFonzie {
+    0% {
+        transform : rotate( 0deg );
+    }
+	15% {
+        transform : rotate( 4deg );
+    }
+	30% {
+		transform : rotate( -2deg );
+    }
+	45% {
+        transform : rotate( 4deg );
+    }
+	60% {
+		transform : rotate( 0deg );
+    }
+}
+@-moz-keyframes rotationFonzie {
+    0% {
+        -moz-transform : rotate( 0deg );
+    }
+	15% {
+        -moz-transform : rotate( 4deg );
+    }
+	30% {
+		-moz-transform : rotate( -2deg );
+    }
+	45% {
+       -moz-transform : rotate( 4deg );
+    }
+	60% {
+		-moz-transform : rotate( 0deg );
+    }
+}
+
+
+
+
+
+
+
+/* animation intro */
+.textFrame{
+ width : 800px;
+}
+
+.textFrame.frame1{
+	-webkit-animation: textAppear 1s linear;
+	-moz-animation: textAppear 1s linear;
+	animation: textAppear 1s linear;
+}
+#sub2,
+#caisse2{
+	-webkit-transform : scale( -1 , 1 );
+	-moz-transform : scale( -1 , 1 );
+	transform : scale( -1 , 1 );
+}
+#canap.frame2{
+	-webkit-animation: canapFrame2 0.5s ease;
+	-moz-animation: canapFrame2 0.5s ease;
+	animation: canapFrame2 0.5s ease;
+}
+#sitting.frame2{
+
+	-webkit-animation: sittingFrame2 0.5s ease;
+	-moz-animation: sittingFrame2 0.5s ease;
+	animation: sittingFrame2 0.5s ease;
+}
+
+#caisse1.frame3,
+#caisse2.frame4
+{
+	-webkit-animation: caisseFrame3 0.5s linear;
+	-moz-animation: caisseFrame3 0.5s linear;
+	animation: caisseFrame3 0.5s linear;
+}
+
+#sub1
+{
+	-webkit-animation: subTrembling1 0.8s infinite;
+	-moz-animation: subTrembling1 0.8s infinite;
+	animation: subTrembling1 0.8s infinite;
+}
+#sub2
+{
+	-webkit-animation: subTrembling2 0.6s infinite;
+	-moz-animation: subTrembling2 0.6s infinite;
+	animation: subTrembling2 0.6s infinite;
+}
+#sub1.frame3
+{
+	-webkit-animation: subTrembling1 0.6s infinite , caisseFrame3 0.5s linear;
+	-moz-animation: subTrembling1 0.6s infinite , caisseFrame3 0.5s linear;
+	animation: subTrembling1 0.6s infinite , caisseFrame3 0.5s linear;
+}
+#sub2.frame4
+{
+	-webkit-animation: subTrembling2 0.6s infinite , caisseFrame3 0.5s linear;
+	-moz-animation: subTrembling2 0.6s infinite , caisseFrame3 0.5s linear;
+	animation: subTrembling2 0.6s infinite , caisseFrame3 0.5s linear;
+}
+
+#sitting-on.frame3
+{
+	-webkit-animation: jumping 0.6s infinite;
+	-moz-animation: jumping 0.6s infinite;
+	animation: jumping 0.6s infinite;
+}
+#sitting-on.frame4
+{
+	-webkit-animation: hightJumping 0.6s infinite;
+	-moz-animation: hightJumping 0.6s infinite;
+	animation: hightJumping 0.6s infinite;
+}
+
+#sitting-on.frame2,
+#sitting-on.frame5
+{
+	-webkit-animation: rotationTic 0.8s infinite;
+	-moz-animation: rotationTic 0.8s infinite;
+	animation: rotationTic 0.8s infinite;
+}
+
+#sitting-on.frame2:hover,
+#sitting-on.frame3:hover,
+#sitting-on.frame4:hover,
+#sitting-on.frame5:hover
+{
+	-webkit-animation: none;
+	-moz-animation: none;
+	animation: none;
+}
+
+.textFrame.frame2{
+	-webkit-animation: textAppear 5s linear;
+	-moz-animation: textAppear 5s linear;
+	animation: textAppear 5s linear;
+}
+
+.textFrame.frame3{
+	-webkit-animation: textAppear 8s linear;
+	-moz-animation: textAppear 8s linear;
+	animation: textAppear 8s linear;
+}
+
+.textFrame.frame4{
+	-webkit-animation: textAppear 8s linear;
+	-moz-animation: textAppear 8s linear;
+	animation: textAppear 8s linear;
+}
+
+.textFrame.frame5{
+	-webkit-animation: textAppear 8s linear;
+	-moz-animation: textAppear 8s linear;
+	animation: textAppear 8s linear;
+}
+
+
+@-webkit-keyframes jumping {
+    0% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+	25% {
+        top : 210px;
+		-webkit-transform : rotate( 1deg );
+    }
+	50% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+	75% {
+        top : 210px;
+		-webkit-transform : rotate( -1deg );
+    }
+	100% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+}
+@-webkit-keyframes hightJumping {
+    0% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+	25% {
+        top : 230px;
+		-webkit-transform : rotate( 5deg );
+    }
+	50% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+	75% {
+        top : 230px;
+		-webkit-transform : rotate( -5deg );
+    }
+	100% {
+        top : 200px;
+		-webkit-transform : rotate( 0deg );
+    }
+}
+
+@-webkit-keyframes caisseFrame3 {
+    0% {
+        top : 0px;
+    }
+	50% {
+        top : 200px;
+    }
+	65% {
+        top : 170px;
+    }
+	80% {
+        top : 200px;
+    }
+	90% {
+        top : 185px;
+    }
+	100% {
+        top : 200px;
+    }
+}
+@-webkit-keyframes subTrembling1 {
+    0% {
+        -webkit-transform : scale( 1 , 1 );
+    }
+	15% {
+        -webkit-transform : scale( 1.05 , 1.05 );
+    }
+	25% {
+        -webkit-transform : scale( 0.85 , 0.85 );
+    }
+	35% {
+        -webkit-transform : scale( 1.05 , 1.05 );
+    }
+	100% {
+        -webkit-transform : scale( 1 , 1 );
+    }
+}
+@-webkit-keyframes subTrembling2 {
+    0% {
+        -webkit-transform : scale( -1 , 1 );
+    }
+	15% {
+        -webkit-transform : scale( -1.05 , 1.05 );
+    }
+	25% {
+        -webkit-transform : scale( -0.85 , 0.85 );
+    }
+	35% {
+        -webkit-transform : scale( -1.05 , 1.05 );
+    }
+	100% {
+        -webkit-transform : scale( -1 , 1 );
+    }
+}
+
+@-webkit-keyframes canapFrame2 {
+    0% {
+        top : 2000px;
+    }
+	100% {
+        top : 250px;
+    }
+}
+@-webkit-keyframes sittingFrame2 {
+    0% {
+        top : 200px;
+    }
+	65% {
+        top : 0px;
+    }
+	100% {
+        top : 230px;
+    }
+}
+@-webkit-keyframes rotationTic {
+	0% {
+        -webkit-transform : rotate( 0deg );
+    }
+	15% {
+        -webkit-transform : rotate( 1.2deg );
+    }
+	30% {
+		-webkit-transform : rotate( -0.5deg );
+    }
+	45% {
+        -webkit-transform : rotate( 1.2deg );
+    }
+	60% {
+		-webkit-transform : rotate( 0deg );
+    }
+}
+
+@-webkit-keyframes textAppear {
+    0% {
+       opacity : 0;
+    }
+	20% {
+       opacity : 1;
+    }
+	
+}
+
+
+@-moz-keyframes jumping {
+    0% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+	25% {
+        top : 210px;
+		-moz-transform : rotate( 1deg );
+    }
+	50% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+	75% {
+        top : 210px;
+		-moz-transform : rotate( -1deg );
+    }
+	100% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+}
+@-moz-keyframes hightJumping {
+    0% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+	25% {
+        top : 230px;
+		-moz-transform : rotate( 5deg );
+    }
+	50% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+	75% {
+        top : 230px;
+		-moz-transform : rotate( -5deg );
+    }
+	100% {
+        top : 200px;
+		-moz-transform : rotate( 0deg );
+    }
+}
+
+@-moz-keyframes caisseFrame3 {
+    0% {
+        top : 0px;
+    }
+	50% {
+        top : 200px;
+    }
+	65% {
+        top : 170px;
+    }
+	80% {
+        top : 200px;
+    }
+	90% {
+        top : 185px;
+    }
+	100% {
+        top : 200px;
+    }
+}
+@-moz-keyframes subTrembling1 {
+    0% {
+        -moz-transform : scale( 1 , 1 );
+    }
+	15% {
+        -moz-transform : scale( 1.05 , 1.05 );
+    }
+	25% {
+        -moz-transform : scale( 0.85 , 0.85 );
+    }
+	35% {
+        -moz-transform : scale( 1.05 , 1.05 );
+    }
+	100% {
+        -moz-transform : scale( 1 , 1 );
+    }
+}
+@-moz-keyframes subTrembling2 {
+    0% {
+        -moz-transform : scale( -1 , 1 );
+    }
+	15% {
+        -moz-transform : scale( -1.05 , 1.05 );
+    }
+	25% {
+        -moz-transform : scale( -0.85 , 0.85 );
+    }
+	35% {
+        -moz-transform : scale( -1.05 , 1.05 );
+    }
+	100% {
+        -moz-transform : scale( -1 , 1 );
+    }
+}
+
+@-moz-keyframes canapFrame2 {
+    0% {
+        top : 2000px;
+    }
+	100% {
+        top : 250px;
+    }
+}
+@-moz-keyframes sittingFrame2 {
+    0% {
+        top : 200px;
+    }
+	65% {
+        top : 0px;
+    }
+	100% {
+        top : 230px;
+    }
+}
+@-moz-keyframes rotationTic {
+	0% {
+        -moz-transform : rotate( 0deg );
+    }
+	15% {
+        -moz-transform : rotate( 1.2deg );
+    }
+	30% {
+		-moz-transform : rotate( -0.5deg );
+    }
+	45% {
+        -moz-transform : rotate( 1.2deg );
+    }
+	60% {
+		-moz-transform : rotate( 0deg );
+    }
+}
+
+@-moz-keyframes textAppear {
+    0% {
+       opacity : 0;
+    }
+	20% {
+       opacity : 1;
+    }
+	
+}
+
+
+
+
+
+
+
+@keyframes jumping {
+    0% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+	25% {
+        top : 210px;
+		transform : rotate( 1deg );
+    }
+	50% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+	75% {
+        top : 210px;
+		transform : rotate( -1deg );
+    }
+	100% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+}
+@keyframes hightJumping {
+    0% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+	25% {
+        top : 230px;
+		transform : rotate( 5deg );
+    }
+	50% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+	75% {
+        top : 230px;
+		transform : rotate( -5deg );
+    }
+	100% {
+        top : 200px;
+		transform : rotate( 0deg );
+    }
+}
+
+@keyframes caisseFrame3 {
+    0% {
+        top : 0px;
+    }
+	50% {
+        top : 200px;
+    }
+	65% {
+        top : 170px;
+    }
+	80% {
+        top : 200px;
+    }
+	90% {
+        top : 185px;
+    }
+	100% {
+        top : 200px;
+    }
+}
+@keyframes subTrembling1 {
+    0% {
+        transform : scale( 1 , 1 );
+    }
+	15% {
+        transform : scale( 1.05 , 1.05 );
+    }
+	25% {
+        transform : scale( 0.85 , 0.85 );
+    }
+	35% {
+        transform : scale( 1.05 , 1.05 );
+    }
+	100% {
+        transform : scale( 1 , 1 );
+    }
+}
+@keyframes subTrembling2 {
+    0% {
+        transform : scale( -1 , 1 );
+    }
+	15% {
+        transform : scale( -1.05 , 1.05 );
+    }
+	25% {
+        transform : scale( -0.85 , 0.85 );
+    }
+	35% {
+        transform : scale( -1.05 , 1.05 );
+    }
+	100% {
+        transform : scale( -1 , 1 );
+    }
+}
+
+@keyframes canapFrame2 {
+    0% {
+        top : 2000px;
+    }
+	100% {
+        top : 250px;
+    }
+}
+@keyframes sittingFrame2 {
+    0% {
+        top : 200px;
+    }
+	65% {
+        top : 0px;
+    }
+	100% {
+        top : 230px;
+    }
+}
+@keyframes rotationTic {
+	0% {
+        transform : rotate( 0deg );
+    }
+	15% {
+        transform : rotate( 1.2deg );
+    }
+	30% {
+		transform : rotate( -0.5deg );
+    }
+	45% {
+        transform : rotate( 1.2deg );
+    }
+	60% {
+		transform : rotate( 0deg );
+    }
+}
+
+@keyframes textAppear {
+    0% {
+       opacity : 0;
+    }
+	20% {
+       opacity : 1;
+    }
+	
+}

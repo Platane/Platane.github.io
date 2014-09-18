@@ -1,0 +1,125 @@
+	<html>
+	<body>
+	
+	<!-- style CSS -->
+	 <style type="text/css">
+			@font-face {
+				font-family: 'OrotundHeavy';
+				src: url('./Font/kit/Orotund-webfont.eot');
+				src: url('./Font/kit/Orotund-webfont.eot?#iefix') format('embedded-opentype'),
+					 url('./Font/kit/Orotund-webfont.woff') format('woff'),
+					 url('./Font/kit/Orotund-webfont.ttf') format('truetype'),
+					 url('./Font/kit/Orotund-webfont.svg#OrotundHeavy') format('svg');
+				font-weight: normal;
+				font-style: normal;
+
+			}
+			@font-face {
+				font-family: 'EatyourfaceRegular';
+				src: url('./Font/kit/eat-webfont.eot');
+				src: url('./Font/kit/eat-webfont.eot?#iefix') format('embedded-opentype'),
+					 url('./Font/kit/eat-webfont.woff') format('woff'),
+					 url('./Font/kit/eat-webfont.ttf') format('truetype'),
+					 url('./Font/kit/eat-webfont.svg#EatyourfaceRegular') format('svg');
+				font-weight: normal;
+				font-style: normal;
+
+			}
+			.block_texte_narration
+			{
+				position:relative;
+				left:0px;
+				top:0px;
+				width:400px;
+				z-index: 999;
+				font-family: 'OrotundHeavy';
+				font-size: 22px;
+				color: White;
+				text-shadow: 0px 0px 10px #AAAAAA;
+				
+				
+			}
+			.block_kinetic_container
+			{
+			
+				/* position:absolute; */
+				width : 1000px;
+				height : 700px;
+				
+				margin : auto;
+				vertical-align : middle;
+			}
+			body{
+				background-color: black;
+			}
+			
+			.clear_instruct {
+				margin-left : 20px;
+				margin-top : 22px;
+				font-size: 14px;
+				font-family: Arial;
+			
+			}
+			
+	</style>
+	
+	<!-- on va récupérer les valeurs des champs cachés -->
+	<div style="display: none;" >
+		<div  id = "texte_frame_one" >
+			<span class="lettrine">L</span>ieutenant Steve, keeper of the grammar, proud of the chapter, you are summoned. 
+			<p>The forge world  <i>Cassandre</i> is about to fall.
+			<p>You will be sent to the battlefield as soon as you receive this order. 
+		</div>
+		<div  id = "texte_frame_two" >
+			<span class="lettrine">W</span>e got a goblin issue over here.
+			<p>Those ones are all we always fought against: their grammar is heretic and their orthographe a insult against the holy dictionary.
+			<p>Thousand of them are reported to be converging by the hill. We need you to hold this hill.
+			<p>Each goblin will come shouting a sentence in their primitive dialect. You will have to teach them how to properly communicate, but they understand one only way. 
+		</div>		
+		<div  id = "texte_frame_three" >
+			<b><span class="lettrine">B</span>ullet !</b> Warm and loud that's how they love them. 
+			<p>With the divine furry and assisted by your holy bolter, you will have to correct them by <b>typing it on your keyboard.</b> Make it quick or you will be over numbered.
+			<p>Remember that your bolter has not unlimited ammo. You will need to <b>reload</b> it by pressing the requested key when the indication to do so pops up.
+			
+			<div class="clear_instruct">-Type on your keyboard the correct form of the sentence.<br>-Backward key is enable.<br>-Press * or ! when you need to reload.</div>
+			
+		</div>
+		<div  id = "texte_frame_four" >
+			<span class="lettrine">O</span>urs technopriests have retrieve an elder artifact, a box of clipboard. They seem to have developed psycher abilities.
+			<p>The crusader mother ship will stay on low orbital. So you can at anytime request an orbital strike of clipboard filled shell by <b>pressing the key 1</b>. This will help you to detect weakness in your opponent.
+			
+			<div class="clear_instruct">-Pressing 1 release an usefull help</div>
+		</div>
+		<div  id = "texte_frame_five" >
+		<span class="lettrine">D</span>o not forget to put your faith in the divine Grammar.
+		<p>In the darkests moments, implore his name, he may be clement enough to guide you and apply his will by yourself.
+		<p>By <b>pressing the key 2</b>, you let him use you as an instrument of his rage. Do not think of what you are typing, just let him control your shots.
+		
+		<div class="clear_instruct">-Pressing 2 granted you temporary buff<br>-Each bonus can be reload by pressing the respective key.</div>
+	</div>
+	</div>
+	
+	<div class ="block_kinetic_container" > 
+		<div id="kineticContainer" > </div>
+		<!-- on va deplacer ce champ de texte pour la naration du début -->
+		<div id="texte_narration" class ="block_texte_narration" > </div>
+	</div>
+	
+	<script type="text/javascript" src="./class/kinetic-v3.8.2.js"></script> 
+	<script type="text/javascript" src="./class/Operateur.js"></script>
+	<script type="text/javascript" src="./class/MouseEvent.js"></script>
+	<script type="text/javascript" src="./class/genericLiquidBarre.js"></script>
+	<script type="text/javascript" src="./Bibliotheque.js"></script>
+	<script type="text/javascript" src="./procedure.js"></script>
+	<script type="text/javascript" src="./procedureIntro.js"></script>
+	
+	<script type="text/javascript">
+		
+		
+		var stage = new Kinetic.Stage("kineticContainer", 1000, 700);
+		var pr = new procedureIntro( stage  );
+	</script>
+	
+	
+	</body>
+	</html>

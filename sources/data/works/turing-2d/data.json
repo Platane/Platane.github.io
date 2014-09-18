@@ -1,0 +1,52 @@
+{
+	"title" : "2D Turing Engine",
+	"date" : "2013",
+
+	"from" : "01/11/2012",
+	"to" : "01/03/2013",
+
+	"screenShots" : [
+		{
+			"url" : "turing-zoom.jpg",
+			"caption" : ""
+		},
+		{
+			"url" : "turing-overView2.png",
+			"caption" : ""
+		},
+		{
+			"url" : "turing-editing.png",
+			"caption" : "Use the palette to draw the algorithm"
+		},
+		{
+			"url" : "turing-run.png",
+			"caption" : "The engine running"
+		}
+	],
+	"coolness" : 4,
+	"weight" : 4,
+	"tags" : [
+		"Js",
+		"game",
+		"html5",
+		"job"
+	],
+	"links" : [
+
+		{
+			"url" : "http://inriamecsci.github.io/grains/Turing-2D/index.html",
+			"label" : "play it",
+			"type" : "page"
+		},
+		{
+			"url" : "https://github.com/InriaMecsci/Turing-2D",
+			"label" : "github",
+			"type" : "sources"
+		},
+		{
+			"url" : "http://www.inria.fr/",
+			"label" : "inria.fr",
+			"type" : "partner"
+		}
+	]
+}

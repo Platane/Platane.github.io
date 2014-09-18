@@ -1,0 +1,15 @@
+
+*.sublime-project
+*.sublime-workspace
+
+build
+dist
+!gulp/tasks/build
+
+.tmp
+.sass-cache
+node_modules
+!gulp/node_modules
+
+bower_components
+npm-debug.log

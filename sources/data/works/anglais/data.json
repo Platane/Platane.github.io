@@ -1,0 +1,46 @@
+{
+	"title" : "Grammar Shooter",
+	"date" : "2013",
+
+	"from" : "01/02/2013",
+	"to" : "01/04/2013",
+
+	"screenShots" : [
+		{
+			"url" : "anglais-fire.png",
+			"caption" : ""
+		},
+		{
+			"url" : "anglais-face-roll.png",
+			"caption" : "Trigger awesome bonus mod !"
+		},
+		{
+			"url" : "anglais-orbital-stricke.png",
+			"caption" : "The microsoft clipboard may be help you this time"
+		},
+		{
+			"url" : "anglais-intro.png",
+			"caption" : "The animated introduction"
+		},
+		{
+			"url" : "anglais-score.png",
+			"caption" : "Your final score"
+		}
+	],
+	"coolness" : 8,
+	"weight" : 4,
+	"tags" : [
+		"Js",
+		"game",
+		"canvas",
+		"academic project",
+		"graphism"
+	],
+	"links" : [
+		{
+			"url" : "/demos/goblin-gramar/launch.html",
+			"label" : "play",
+			"type" : "page"
+		}
+	]
+}
