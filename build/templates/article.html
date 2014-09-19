@@ -1,0 +1,31 @@
+<html>
+<head>
+	<title>{{title}}</title>
+	<link rel="stylesheet" href="../article-style.css" ></link>
+</head>
+<article>
+	<header> 
+		<div class="article-ban" style="background-image:url('/build/data/articles/{{& dir}}/assets/background.jpg')"></div>
+		<div class="article-ban-overlay"></div>
+		<span class="article-title">
+			<a href="{{url}}">{{title}}</a>
+		</span>
+		<span class="article-date">the {{date}}</span>
+	</header>
+	<div class="article-body">
+		<section class="article-content markdowned">
+			{{{content-md}}}
+		</section>
+		<nav>
+			{{#previous}}
+			<a href="{{url}}"><-- {{title}}</a>
+			{{/previous}}
+			{{#next}}
+			<a href="{{url}}">--> {{title}}</a>
+			{{/next}}
+		</nav>
+		<footer>
+		</footer>
+	</div>
+</article>
+</html>
