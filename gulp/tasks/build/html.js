@@ -7,3 +7,8 @@ gulp.task('build.html', function() {
   	.pipe(htmlmin())
     .pipe(gulp.dest('../build/'));
 });
+
+gulp.task('build.html-indexHtml', function() {
+  return gulp.src('../build/index.html')
+    .pipe(gulp.dest('../'));
+});
