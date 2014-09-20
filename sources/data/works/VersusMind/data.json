@@ -7,19 +7,19 @@
 
 	"screenShots" : [
 		{
-			"url" : "vmp-main.png",
+			"url" : "vmp-main.jpg",
 			"caption" : ""
 		},
 		{
-			"url" : "vmp-chardinJs.png",
+			"url" : "vmp-chardinJs.jpg",
 			"caption" : "Elegant help mod, powered by chardinJs"
 		},
 		{
-			"url" : "vmp-final.png",
+			"url" : "vmp-final.jpg",
 			"caption" : "On the right, the panel I worked on"
 		},
 		{
-			"url" : "vmp-intro.png",
+			"url" : "vmp-intro.jpg",
 			"caption" : "Take a tour of the app features"
 		}
 	],

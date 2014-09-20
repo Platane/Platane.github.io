@@ -7,19 +7,19 @@
 
 	"screenShots" : [
 		{
-			"url" : "drakkar-edit2.png",
+			"url" : "drakkar-edit2.jpg",
 			"caption" : "Compose your map here"
 		},
 		{
-			"url" : "drakkar-edit.png",
+			"url" : "drakkar-edit.jpg",
 			"caption" : "Grab countries's boundaries from the DB"
 		},
 		{
-			"url" : "drakkar-mcss.png",
+			"url" : "drakkar-mcss.jpg",
 			"caption" : "Use the css-like language to style the map"
 		},
 		{
-			"url" : "drakkar-search.png",
+			"url" : "drakkar-search.jpg",
 			"caption" : "Define the viewport"
 		}
 	],

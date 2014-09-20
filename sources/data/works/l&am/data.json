@@ -6,9 +6,18 @@
 	"to" : "01/09/2013",
 
 	"screenShots" : [
-		"lisa-main.jpg",
-		"lisa-main2.jpg",
-		"lisa-open.jpg"
+		{
+			"url" : "lisa-main.jpg",
+			"caption" : "it looks delicious"
+		},
+		{
+			"url" : "lisa-main2.jpg",
+			"caption" : "this was not as good as it looks"
+		},
+		{
+			"url" : "lisa-open.jpg",
+			"caption" : "featuring cool CSS effects"
+		}
 	],
 	"coolness" : 7,
 	"weight" : 3,
