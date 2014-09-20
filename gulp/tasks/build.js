@@ -12,4 +12,18 @@ gulp.task('build.clean', function () {
     .pipe(clean({force:true}) )
 })
 
-gulpq.task('build', ['build.html' , 'build.css' , 'build.images' , 'build.js' , 'build.works' , 'build.articles' , 'build.resume' ],['build.articles-index' , 'build.html-indexHtml']  );
+gulpq.task( 'build', 
+	[  'build.html'
+	 , 'build.css'
+	 , 'build.works-illustration'
+	 , 'build.works-illustration-gif'
+	 , 'build.works-illustration-thumbnails'
+	 , 'build.image-assets'
+	 , 'build.js'
+	 , 'build.works'
+	 , 'build.articles'
+	 , 'build.resume'
+	],
+	[  'build.articles-index'
+	 , 'build.html-indexHtml'
+	]);
