@@ -1,3 +1,11 @@
+
+*.sublime-project
+*.sublime-workspace
+
+build
+dist
+!gulp/tasks/build
+
 .tmp
 .sass-cache
 node_modules
@@ -6,4 +14,8 @@ node_modules
 bower_components
 npm-debug.log
 
-.gitignore
+index.html
+!sources/index.html
+!sources/**/index.html
+!gulp/**/index.html
+!demo/**/index.html
