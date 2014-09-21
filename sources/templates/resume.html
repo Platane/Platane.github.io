@@ -32,7 +32,8 @@
 				</span>
 				{{/phone}}
 			</div>
-			<div id="illu" class="quote brick">{{bio}}</div>
+			<div id="quote" class="quote brick">{{bio}}</div>
+			<div id="illu" class="avatar brick"></div>
 		{{/header}}
 		</header>
 
@@ -135,8 +136,14 @@
 <style>
 #UI{
 	position : fixed;
-	bottom : 5px;
-	right : 50px;
+	top : 10%;
+	right : 5px;
+	background: rgba(200,200,200,0.5);
+	padding : 5px;
+	z-index: 100;
+}
+#UI ul{
+	padding-left: 0;
 }
 @media print{
 	#UI{
@@ -149,23 +156,43 @@
 
 
 <div id="UI" class="UI">
-	<input type="checkbox"></input> printable
+	<form>
+		<ul>
+			<li data->
+				<input type="radio" name="style" value="cool" checked="checked"></input> cool
+			</li>
+			<li>
+				<input type="radio" name="style" value="classy"></input> classy
+			</li>
+			<li>
+				<input type="radio" name="style" value="printable"></input> printable classy
+			</li>
+		</ul>
 </div>
 
 <script>
 
-var ui = document.getElementById("UI");
-ui.querySelector('input').addEventListener('change',function(e){
+var ui = document.getElementById("UI")
 
-	var resume = document.querySelector('.resume')
+var resume = document.querySelector('.resume')
+var body = document.getElementsByTagName('body')[0]
 
-	if( this.checked ){
+var prepare = {
+	cool : function(){
+		body.className = 'cool'
 
+		resume.querySelector('.quote.brick').className = 'quote brick hidden'
+		resume.querySelector('.avatar.brick').className = 'avatar brick'
+	},
+	classy : function(){
+		resume.className = 'resume'
+	},
+	printable : function(){
 		//add class
 		resume.className += " printable"
 
 
-		// scale
+		// force scale in order to fit in one page
 		var w = resume.offsetWidth,
 			h = resume.offsetHeight
 
@@ -180,23 +207,39 @@ ui.querySelector('input').addEventListener('change',function(e){
 
 			resume.style.webkitTransform = resume.style.transform = transform
 		}
+	},
+}
+var finish = {
+	cool : function(){
+		body.className = ''
 
-	}else{	
-
+		resume.querySelector('.quote.brick').className = 'quote brick'
+		resume.querySelector('.avatar.brick').className = 'avatar brick hidden'
+	},
+	classy : function(){
+		resume.className = 'resume'
+	},
+	printable : function(){
 		// remove class
-		var s=""
-		for(var i=resume.classList.length;i--;)
-			if( resume.classList[i] != "printable" )
-				s+=" "+resume.classList[i]
-		resume.className = s
-
+		resume.className = 'resume'
 
 		// unscale
 		resume.style.webkitTransform = resume.style.transform = ''
-	}
+	},
+}
 
-	
-},false)
+var previous = "cool"
+var is = ui.querySelectorAll('input')
+for(var i=is.length;i--;)
+	is[i].addEventListener('change',function(e){
+
+		finish[ previous ]()
+
+		prepare[ previous = this.value ]()
+
+	},false)
+
+prepare.cool();
 
 
 </script>
