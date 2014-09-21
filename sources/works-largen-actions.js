@@ -24,6 +24,14 @@ var worksActions = (function(){
 				return
 			closeWork();
 		})
+
+		//for animations
+		// some css animation are triggered by the add of this class
+		
+		//reflow
+		tile.offsetWidth
+
+		dom.addClass( tile , 'grid-tile-large-opened')
 	}
 	var closeWork = function( tile ){
 
@@ -31,6 +39,7 @@ var worksActions = (function(){
 			return
 
 		dom.removeClass( opened , 'grid-tile-large')
+		dom.removeClass( opened , 'grid-tile-large-opened')
 	
 		gridLayout.update();
 
