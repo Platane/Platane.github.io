@@ -335,21 +335,36 @@ scope.launchAnimation = launch;
 
 window.onload = function(){
 	
+	var preload = deconstruction.preload( $( "#container" ) )
+	.then(function(){
+		preload = true
+	})
+	.then(null,function(e){
+		console.error(e.message,e.stack)
+	})
+
 	inithAnimation( $( "#container" ) );
-	launchAnimation( $( "#container" ) , { o : this , f : function(){
-		init( $( "#container" ) , $( "#structure" ) , { o : this , f:function(){
-			this.go(); 
-			
-			
+	launchAnimation( $( "#container" ) , { 
+		o : this ,
+		f : function(){
+
 			$("#sound_player_loop")[0].pause();
 			$("#sound_player_loop")[0].currentTime = 0;
 			
 			$("#sound_player")[0].play(); 
 			
 			$("body").css({ "cursor" : "auto" });
-		} 
-		} );
-	} } );
+
+			// launch
+			if( preload === true )
+				deconstruction.go()
+			else
+				preload.then(function(){
+					deconstruction.go()
+				})
+
+		}
+	});
 
 	$("#volumeControl").bind( "change" , function( e ){
 		$("#sound_player")[0].volume = parseInt( e.target.value ) / 100;
