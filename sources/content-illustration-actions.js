@@ -163,7 +163,15 @@ var contentIllustrationActions = (function(){
 					closeIlluPanel( main )
 			})
 		})
+	
 
+
+	// exposure
+	return {
+		open : openIlluPanel,
+		close : closeIlluPanel,
+		changeIllu : changeIllu
+	}
 })()
 
 

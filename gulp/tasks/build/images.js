@@ -113,11 +113,11 @@ gulp.task('build.works-illustration', function() {
         {
             
             resize : {
-                width : 720,
-                height : 600
+                width : 820,
+                height : 680
             },
             noProfile : true,
-            quality : 80,
+            quality : 90,
             format : 'jpg'
         }
         ))
