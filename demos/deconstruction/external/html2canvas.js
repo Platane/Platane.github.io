@@ -594,7 +594,16 @@ window.html2canvas.punycode = this.punycode;
 window.html2canvas.proxy = {};
 
 function renderDocument(document, options, windowWidth, windowHeight) {
-    return createWindowClone(document, document, windowWidth, windowHeight, options).then(function(container) {
+    return createWindowClone(document, document, windowWidth, windowHeight, options)
+    .then( function(x){
+    	//nasty hack
+    	return new Promise(function(resolve,reject){
+    		setTimeout(function(){
+    			resolve(x)
+    		},500)
+    	})
+    })
+    .then(function(container) {
         log("Document cloned");
         var selector = "[" + html2canvasNodeAttribute + "='true']";
         document.querySelector(selector).removeAttribute(html2canvasNodeAttribute);

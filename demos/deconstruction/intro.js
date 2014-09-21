@@ -378,4 +378,6 @@ window.onload = function(){
 	
 	$("#volumeControl")[0].value = 70;
 	$("#volumeControl").change();
+
+	$("#sound_player")[0].volume = $("#sound_player_loop")[0].volume = 0
 };

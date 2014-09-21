@@ -493,7 +493,7 @@ var deconstruction = (function( scope ){
 				ambient: 0xFFFFEF,
 				specular: 0x333333,
 				shininess : 180,
-				map : bump,
+				map : texture,
 				bumpMap: bump,
 				bumpScale: 0.25,
 				//metal: false,
@@ -1113,51 +1113,111 @@ var deconstruction = (function( scope ){
 
 		var extractResume = function(htmlString){
 
-			var parser = new DOMParser();
+			var shear = function( htmlString , skip ){
+
+				skip = skip || [
+					"script",
+					"title",
+					"style",
+					"meta",
+					"link"
+				]
+
+				var start=0,
+					end= 0
+
+				for( var i = 0 ; i < skip.length ; i ++ ){
+					
+					start=0
+
+					while( ( start = htmlString.indexOf( "<"+skip[ i ] , start ) ) != -1 ){
+						
+						var nextClosed = htmlString.indexOf( ">" , start)
+						
+						var nextAutoClosed = htmlString.indexOf( "/>" , start)
+						
+						if( nextAutoClosed > 0 && nextClosed == nextAutoClosed+1 ){
+							// tag < ... />
+							end = nextClosed+1;
+						} else {
+							end = htmlString.indexOf( "</"+skip[ i ]+">" , start );
+							if( end == -1 )
+								// can't fin the closing tag /!\
+								end = nextClosed+1;
+							else 
+								end += ("</"+skip[ i ]+">").length
+						}
+						
+						htmlString = htmlString.substring( 0 , start ) + htmlString.substring( end , htmlString.length );
+					}
+				}
+
+				return htmlString
+			}
 
 			htmlString = htmlString.replace(/\&nbsp;/g , ' ')
 			htmlString = htmlString.replace(/\&/g , 'a')
+			htmlString = shear( htmlString )
 
-			var doc = parser.parseFromString( htmlString ,"text/xml" );
+			// happend the string to a node
+			var container = document.createElement('div')
+			container.innerHTML = htmlString
 
-			return doc.querySelector( '.resume' )
+			return container.querySelector( '.resume' )
 		};
+
+		var promiseAllAsObject = function( set ){
+			return new Promise(function(resolve,reject){
+
+				var res = {};
+
+				for(var i in set )
+					(function(){
+						var label = i
+						set[ i ].then(function( data ){
+							res[ label ] = data
+
+							var finished=true
+							for(var i in set)
+								if( !res[i] )
+									finished=false
+
+							if(finished)
+								resolve( res )
+						},reject)
+					})()
+			})
+		}
 
 		var renderAllTextures = function( dom ){
 
 			// happend the dom to the document ( mandatory )
 			var container = document.createElement('div')
-			container.style.display = 'none'
+			//container.style.display = 'none'
 			container.appendChild(dom)
 
-			document.getElementsByTagName('body')[0].appendChild(container)
+			var body = document.getElementsByTagName('body')[0]
+			body.appendChild(container)
+
+			if( debug )
+				body.style.overflow = 'visible'
+
+			// forced reflow
+			container.offsetWidth
 
 			// grab the bricks
 			var bricks = dom.querySelectorAll('.brick')
 
 			// create the html2canvas promise
-			var promises = []
+			var promises = {}
 			var options = {}
+			
 			for(var i=bricks.length;i--;)
-				promises.push( html2canvas( bricks[i] , options ) )
+				promises[ bricks[i].getAttribute('id') ] = html2canvas( bricks[i] , options )
 
-			// merge all the promise
-			return Promise.all( promises )
-
-			// formate the result
-			.then( function( canvas ){
-				
-				// oh! and remove this
-				//document.removeChild(container)
-
-				// build the object
-				var textures = {}
-				
-				for(var i=bricks.length;i--;)
-					textures[ bricks[i].getAttribute('id') ] = canvas[i]
-
-				return textures
-			})
+			
+			// merge all the promises
+			return promiseAllAsObject( promises )
 		};
 
 		// grab the file which contains the structure of the resume
@@ -1181,6 +1241,9 @@ var deconstruction = (function( scope ){
 			for( var i in _textures )
 				textures[i] = _textures[i]
 
+			if( debug )
+				for( var i in textures )
+					document.getElementsByTagName('body')[0].appendChild(textures[i])
 		})
 		
 	};
