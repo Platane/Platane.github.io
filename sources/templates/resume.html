@@ -32,7 +32,7 @@
 				</span>
 				{{/phone}}
 			</div>
-			<div id="quote" class="quote brick">{{bio}}</div>
+			<div id="quote" class="quote hidden">{{bio}}</div>
 			<div id="illu" class="avatar brick"></div>
 		{{/header}}
 		</header>
@@ -170,8 +170,18 @@
 		</ul>
 </div>
 
-<script>
+<!-- fixed Fonzie -->
+<a class="fonzie" href="/demos/deconstruction/deconstruction.html" target="_blank">
+	<span>You think it's cool? <br>Click me if you want real fun</span>
+</a>
 
+
+<script type="text/javascript" src="domHelper.js"></script>
+<script type="text/javascript">
+
+var dom = DomHelper
+
+;(function(){
 var ui = document.getElementById("UI")
 
 var resume = document.querySelector('.resume')
@@ -181,11 +191,12 @@ var prepare = {
 	cool : function(){
 		body.className = 'cool'
 
-		resume.querySelector('.quote.brick').className = 'quote brick hidden'
-		resume.querySelector('.avatar.brick').className = 'avatar brick'
+		dom.addClass( body , 'cool' )
+		dom.addClass( resume.querySelector('.quote') , 'hidden' )
+		dom.removeClass( resume.querySelector('.avatar') , 'hidden' )
 	},
 	classy : function(){
-		resume.className = 'resume'
+
 	},
 	printable : function(){
 		//add class
@@ -211,13 +222,12 @@ var prepare = {
 }
 var finish = {
 	cool : function(){
-		body.className = ''
-
-		resume.querySelector('.quote.brick').className = 'quote brick'
-		resume.querySelector('.avatar.brick').className = 'avatar brick hidden'
+		dom.removeClass( body , 'cool' )
+		dom.removeClass( resume.querySelector('.quote') , 'hidden' )
+		dom.addClass( resume.querySelector('.avatar') , 'hidden' )
 	},
 	classy : function(){
-		resume.className = 'resume'
+
 	},
 	printable : function(){
 		// remove class
@@ -240,6 +250,34 @@ for(var i=is.length;i--;)
 	},false)
 
 prepare.cool();
+
+})()
+
+
+//////////////////
+//// Fonzie //////
+//////////////////
+;(function(){
+
+var fonzie = document.querySelector('.fonzie')
+
+fonzie.addEventListener('mouseenter',function(e){
+	fonzie.className = 'fonzie visible'
+},false)
+
+
+window.onscroll = function ( ) {
+	
+	if( document.getElementsByTagName('html')[0].offsetHeight - ( window.innerHeight + window.pageYOffset ) < 120 )
+		fonzie.className = 'fonzie visible'
+	else
+		if( dom.hasClass( fonzie , 'visible' ) )
+			fonzie.className = 'fonzie hidden'
+}
+
+window.onscroll()
+
+})()
 
 
 </script>
