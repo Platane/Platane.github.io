@@ -53,7 +53,11 @@ var DomHelper = new (function(){
 			el.className += ' '+c
 		}
 		this.removeClass = function( el , c ){
-			el.className = el.className.split( c ).join('')
+			var nc=""
+			for(var i=el.classList.length;i--; )
+				if( c != el.classList[i] )
+					nc += ' '+el.classList[i]
+			el.className = nc
 		}
 		this.getParent = function( el , c ){
 			while(true)

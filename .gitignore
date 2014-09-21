@@ -1,7 +1,3 @@
-
-*.sublime-project
-*.sublime-workspace
-
 .tmp
 .sass-cache
 node_modules
@@ -9,9 +5,3 @@ node_modules
 
 bower_components
 npm-debug.log
-
-index.html
-!sources/index.html
-!sources/**/index.html
-!gulp/**/index.html
-!demo/**/index.html
