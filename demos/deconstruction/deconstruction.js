@@ -84,7 +84,7 @@ var deconstruction = (function( scope ){
 		textureV_ : null,
 		init : function( poly , material , textureO , textureU , textureV ){
 			
-			var l = 0.8;
+			var l = 2;
 			
 			// search for the center of mass
 			var re = faceProjection( poly );
@@ -129,6 +129,7 @@ var deconstruction = (function( scope ){
 			
 			for( var i = 2 ; i < p.length ; i ++){
 				geometry.faces.push( new THREE.Face3( 0 , i-1 , i ) );
+				//geometry.faces.push( new THREE.Face3( 0 , i , i-1 ) );
 				
 				//compute the UVmapping
 				if( textureO && textureU && textureV ){
@@ -147,9 +148,9 @@ var deconstruction = (function( scope ){
 					};
 					
 					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
 						
 						] );
 				}
@@ -174,18 +175,30 @@ var deconstruction = (function( scope ){
 					};
 					
 					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
-						
+						new THREE.Vector2( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
+					
 						] );
 				}
 			}
+				
+			geometry.verticesNeedUpdate = true
+			geometry.elementsNeedUpdate = true
+			geometry.normalsNeedUpdate = true
+			geometry.buffersNeedUpdate = true
+			geometry.uvsNeedUpdate = true
+
+			geometry.computeFaceNormals()
+
+			//geometry.computeCentroids();
+			//geometry.computeFaceNormals();
 			
-			geometry.computeCentroids();
-			geometry.computeFaceNormals();
-			
+			//var geometry = new THREE.TorusGeometry( 50,10, 18, 56 );
+
 			var visual = new THREE.Mesh( geometry, material );
+
+			visual.updateMatrix();
 			
 			visual.castShadow = true;
 			visual.receiveShadow = true;
@@ -347,7 +360,7 @@ var deconstruction = (function( scope ){
 			// give implusion,
 			
 			// piston bluid
-			var rayon = 2;
+			var rayon = 3;
 			var nface = 4;
 			var sharpness = 0.6;
 			var pulse = 25;
@@ -373,10 +386,11 @@ var deconstruction = (function( scope ){
 			
 			force.normalize();
 			
-			force = force.mult( sharpness * rayon + 0.2 );
+			//force = force.mult( sharpness * rayon + 0.2 );
+			force = force.mult( 2 );
 			
 			var hardImpulser = new CANNON.RigidBody( 9 , shape );
-			hardImpulser.position = center.vadd( force.negate() );
+			hardImpulser.position = center.vadd( force.mult(-2) );
 			hardImpulser.velocity = force.mult( pulse );
 			
 			scene.world.add( hardImpulser );
@@ -397,7 +411,7 @@ var deconstruction = (function( scope ){
 			// plan to remove impulsion
 			(function(){
 				
-				var engineTimeRenaming = 750;
+				var engineTimeRenaming = 450;
 				var prevTime = new Date().getTime();
 				var visual = mesh;
 				var phy = hardImpulser;
@@ -491,15 +505,22 @@ var deconstruction = (function( scope ){
 
 			var material = new THREE.MeshPhongMaterial({ 
 				ambient: 0xFFFFEF,
+				//color: 0xdddddd,
 				specular: 0x333333,
-				shininess : 180,
+				shininess : 40,
 				map : texture,
 				bumpMap: bump,
-				bumpScale: 0.25,
+				bumpScale: 0.2,
 				//metal: false,
-				transparent : true
+
+				transparent : true,
+				opacity : 0.95,
+				shading: THREE.FlatShading
 			});
-			
+
+			//var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, metal: true } );
+
+
 			var body = Body.create( p , material , p[1] , p[2].vsub( p[1] ) , p[0].vsub( p[1] ) );
 			body.attach();
 			body.disableInteraction();
@@ -542,11 +563,13 @@ var deconstruction = (function( scope ){
 	var initScene = function( container , source ) {
 		
 		// Renderer
-		renderer = new THREE.WebGLRenderer({antialias: true});
+		renderer = new THREE.WebGLRenderer({
+			antialias: true,
+			alpha : true
+		});
 		renderer.setSize( container.width() , container.height() );
 		renderer.shadowMapEnabled = true;
-		renderer.shadowMapCullFrontFaces = false;
-		$( renderer.domElement ).appendTo( container );
+		container[0].appendChild( renderer.domElement );
 		
 		
 		// Scene
@@ -554,29 +577,41 @@ var deconstruction = (function( scope ){
 
 		// Light
 		
-		var light = new THREE.SpotLight( 0xffffff, 0.5, 0, Math.PI, 1 );
-		light.position.set( 500 , 1500 , 2000 );
-		light.target.position.set( 0, 0, 0 );
-		scene.add( light );
+		var dirLight = new THREE.SpotLight( 0xffffff, 0, 0, Math.PI , 1 );
+		dirLight.position.set( 500 , 1200 , 1500 );
+		dirLight.target.position.set( 0, 200, 0 );
+		scene.add( dirLight );
 
-		light.castShadow = true;
+		dirLight.castShadow = true;
 
-		light.shadowMapWidth = 2048;
-		light.shadowMapHeight = 2048;
+		dirLight.shadowMapWidth = 2048;
+		dirLight.shadowMapHeight = 2048;
 
 		var d = 50;
 
-		light.shadowCameraLeft = -d;
-		light.shadowCameraRight = d;
-		light.shadowCameraTop = d;
-		light.shadowCameraBottom = -d;
+		dirLight.shadowCameraLeft = -d;
+		dirLight.shadowCameraRight = d;
+		dirLight.shadowCameraTop = d;
+		dirLight.shadowCameraBottom = -d;
 
-		light.shadowCameraFar = 44500;
-		light.shadowCameraNear = 10;
-		light.shadowCameraFov = 50;
-		light.shadowBias = -0.0001;
-		light.shadowDarkness = 0.5;
+		dirLight.shadowCameraFar = 44500;
+		dirLight.shadowCameraNear = 10;
+		dirLight.shadowCameraFov = 50;
+		dirLight.shadowBias = -0.0001;
+		dirLight.shadowDarkness = 0.5;
 		
+
+		if( debug )
+			scene.add( new THREE.DirectionalLightHelper(dirLight, 50 ) );
+
+		var pointLight = new THREE.PointLight( 0xffffff, 0.5 , 0 );
+		pointLight.position.set( 500, 550, 500 );
+		scene.add( pointLight );
+		
+		if( debug )
+			scene.add( new THREE.PointLightHelper(pointLight, 50 ) );
+		
+
 
 		var ambient = new THREE.AmbientLight( 0x888888 );
 		scene.add( ambient );
@@ -592,7 +627,7 @@ var deconstruction = (function( scope ){
 		camera.position.set( 60, 50, 60 );
 		camera.lookAt( scene.position );
 		
-		
+
 		//phy
 		 // Create world
         var world = new CANNON.World();

@@ -1,0 +1,13 @@
+{
+  "name": "deconstruction",
+  "version": "1.1.0",
+  "author": "Platane <me@platane.me>",
+  "license": "MIT",
+
+  "dependencies": {
+    "three" : "*",
+    "html2canvas" : "https://github.com/niklasvh/html2canvas/tarball/master",
+    "cannon" : "*",
+    "jquery" : "1.8.2"
+  }
+}
