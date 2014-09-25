@@ -40,7 +40,7 @@ var deconstruction = (function( scope ){
 	
 	var faceProjection = function( face ){
 		
-		var t = face[ 0 ].copy();
+		var t = face[ 0 ].clone();
 		
 		var a = face[ 1 ].vsub( face[ 0 ] ),
 			b = face[ 2 ].vsub( face[ 0 ] );
@@ -58,7 +58,7 @@ var deconstruction = (function( scope ){
 		var P = new CANNON.Mat3( [ e.x , g.x , w.x ,  e.y , g.y , w.y ,  e.z , g.z , w.z  ] ); 
 		
 		// inversion
-		var P_ = P.inverse(); 
+		var P_ = P.reverse(); 
 		
 		// calcul the new poly
 		var face_ = new Array( face.length );
@@ -84,7 +84,7 @@ var deconstruction = (function( scope ){
 		textureV_ : null,
 		init : function( poly , material , textureO , textureU , textureV ){
 			
-			var l = 2;
+			var l = 1.2;
 			
 			// search for the center of mass
 			var re = faceProjection( poly );
@@ -191,10 +191,7 @@ var deconstruction = (function( scope ){
 
 			geometry.computeFaceNormals()
 
-			//geometry.computeCentroids();
-			//geometry.computeFaceNormals();
-			
-			//var geometry = new THREE.TorusGeometry( 50,10, 18, 56 );
+
 
 			var visual = new THREE.Mesh( geometry, material );
 
@@ -208,48 +205,35 @@ var deconstruction = (function( scope ){
 			// create the CANNON body
 			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) );
 			
+			// normal of the [ 0 1 ] edge DOT the [ 2 1 ] edge 
+			var sens = ( p[1].x - p[0].x )*( p[1].y - p[2].y ) - ( p[1].y - p[0].y )*( p[1].x - p[2].x ) > 0
+			var sens = ( re.face_[1].x - re.face_[0].x )*( re.face_[1].y - re.face_[2].y ) - ( re.face_[1].y - re.face_[0].y )*( re.face_[1].x - re.face_[2].x ) < 0
+
+
+
 			var points = [];
-			for( var i = 0 ;i < p.length ; i ++)
-				points.push( p[i].vadd( h ) );
-			for( var i = 0 ;i < p.length ; i ++)
-				points.push( p[i].vsub( h ) );
+			for( var i = 0 ;i < p.length ; i ++){
+				points[ i            ] = new CANNON.Vec3( p[i].x + h.x , p[i].y + h.y , p[i].z + h.z )
+				points[ i + p.length ] = new CANNON.Vec3( p[i].x - h.x , p[i].y - h.y , p[i].z - h.z )
+			}
+			
 				
 			var faces = [[],[]];
 			for( var i = 0 ;i < p.length ; i ++){
-				faces[ 0 ].push( i );
-				faces[ 1 ].push( i+p.length );
+				faces[ 0 ].push( i + p.length * (sens) )
+				faces[ 1 ].unshift( i + p.length * (sens) )
 			}
+			/*
 			for( var i = 0 ;i < p.length ; i ++)
 				faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
+			*/
 			
 			
-			
-			var normals = [];
-			for( var i = 0 ; i < faces.length ; i ++){
-				var a = points[ faces[i][ 1 ] ].vsub( points[ faces[i][ 0 ] ] ),
-					b = points[ faces[i][ 2 ] ].vsub( points[ faces[i][ 0 ] ] );
-					
-				var n = a.cross( b );
-				n.normalize();
-				
-				//sens
-				// as the polygone is convex, all the other point should be behind the plan, exept these which are on the plan
-				for( var j = 0 ; j < points.length ; j ++ ){
-					var c = points[ j ].vsub( points[ faces[i][ 0 ] ] );
-					var scal = n.dot( c );
-					if( Math.abs( scal ) > 0.00001 ){
-						if( scal > 0 )
-							n.negate();
-						break;
-					}
-				}
-				normals.push( new CANNON.Vec3( n.x , n.y , n.z ) );
-			}
-			
-			shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
+			shape = new CANNON.ConvexPolyhedron ( points , faces  );
 			this.mass = this.surfasicMass * area( p );
-			phy = new CANNON.RigidBody( this.mass,shape);
-			phy.position = cm.copy();
+			phy = new CANNON.Body( {mass:this.mass } );
+			phy.addShape( shape )
+			phy.position.set( cm );
 			
 			
 			this.visual = visual;
@@ -314,13 +298,18 @@ var deconstruction = (function( scope ){
 			this.detach();
 			
 			// real time position
-			var p = new Array( this.phy.shape.vertices.length/ 2 );
-			
-			for( var i = 0 ; i < p.length ; i ++ )
-				p[ i ] = this.phy.shape.vertices[ i ].vadd( this.phy.shape.vertices[ i + p.length ] ).mult( 0.5 );
-			
-			for( var i = 0 ; i < p.length ; i ++ )
-				p[ i ] = this.phy.quaternion.vmult( p[ i ] ).vadd( this.phy.position ) ;
+			this.phy.shapes[0].computeWorldVertices( this.phy.position , this.phy.quaternion )
+			var positions = this.phy.shapes[0].a.worldVertices
+
+			var l = positions.length/2
+			var p = []
+			for( var i=l;i--; )
+				p.push( new CANNON.Vec3(
+					( positions[i].x + positions[i+l].x )/2,
+					( positions[i].y + positions[i+l].y )/2,
+					( positions[i].z + positions[i+l].z )/2
+				))
+
 			
 			
 			var re = faceProjection( p );
@@ -344,9 +333,9 @@ var deconstruction = (function( scope ){
 				
 				var body =  Body.create( piece , this.visual.material , textureO , textureU , textureV );
 				
-				body.visual.castShadow = true;
-				body.visual.receiveShadow = true;
-				body.visual.useQuaternion = true;
+				//body.visual.castShadow = true;
+				//body.visual.receiveShadow = true;
+				//body.visual.useQuaternion = true;
 				
 				body.attach();
 				body.unableInteraction();
@@ -396,8 +385,8 @@ var deconstruction = (function( scope ){
 			scene.world.add( hardImpulser );
 			
 			// visual
-			var mesh;
 			if( debug ){
+				var mesh;
 				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
 				material.color.setRGB( Math.random() * 100 / 100, Math.random() * 100 / 100, Math.random() * 100 / 100 );
 				var sphere_geometry = new THREE.SphereGeometry( rayon * sharpness / ratioVisual  , 8 , 8 );
@@ -505,13 +494,12 @@ var deconstruction = (function( scope ){
 
 			var material = new THREE.MeshPhongMaterial({ 
 				ambient: 0xFFFFEF,
-				//color: 0xdddddd,
 				specular: 0x333333,
-				shininess : 40,
+				shininess : 28,
 				map : texture,
 				bumpMap: bump,
-				bumpScale: 0.2,
-				//metal: false,
+				bumpScale: 0.1,
+				metal: false,
 
 				transparent : true,
 				opacity : 0.95,
@@ -652,7 +640,8 @@ var deconstruction = (function( scope ){
 		scene.add( visualGround );
 		
 		var shapeGround = new CANNON.Plane ( new CANNON.Vec3( 0 , 1 , 0 ) );
-		phyGround = new CANNON.RigidBody(0,shapeGround);
+		phyGround = new CANNON.Body({mass:0});
+		phyGround.addShape( shapeGround )
 		phyGround.position.y = 0;
 		world.add( phyGround );
 
@@ -1085,21 +1074,21 @@ var deconstruction = (function( scope ){
 			camera.position.z = position.z;
 			
 			
-			var v = new THREE.Vector3().sub( view , position );
+			var v = (new THREE.Vector3()).subVectors( view , position );
 			
 			var n = v.length();
 			
 			var y = new THREE.Vector3( 0 , 1 , 0 );
 			var e = v.divideScalar( n );
-			var g = new THREE.Vector3().cross( e , y );
+			var g = new THREE.Vector3().crossVectors( e , y );
 			g.normalize();
 			
 			var tdecL = decL * Math.max( 0.5 , n * ratioVisual  / 50 ); 
 			
 			
 			var upPos = new THREE.Vector3().copy( position );
-			upPos.add( upPos , g.multiplyScalar(  posScreen.x * tdecL ) );
-			upPos.add( upPos , y.multiplyScalar(  posScreen.y * tdecL ) );
+			upPos.addVectors( upPos , g.multiplyScalar(  posScreen.x * tdecL ) );
+			upPos.addVectors( upPos , y.multiplyScalar(  posScreen.y * tdecL ) );
 			
 			
 			camera.position.x = upPos.x;
@@ -1282,7 +1271,7 @@ var deconstruction = (function( scope ){
 		})
 		
 	};
-	var go = function(){
+	var init = function(){
 
 		// compute the ratio container/world
 		initRatio( container , structure );
@@ -1295,6 +1284,9 @@ var deconstruction = (function( scope ){
 		// init the bodies ( need )
 		initStructure( container , structure , textures );
 
+	};
+	var go = function(){
+
 		lastTime = new Date().getTime();
 		requestAnimFrame(main);
 	};
@@ -1302,6 +1294,7 @@ var deconstruction = (function( scope ){
 	return {
 		preload : preload,
 		go : go,
+		init : init,
 		camera : camera
 	}
 			

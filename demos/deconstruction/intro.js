@@ -348,6 +348,17 @@ window.onload = function(){
 		o : this ,
 		f : function(){
 
+			var start = function(){
+				deconstruction.init()
+
+				$("#sound_player_loop")[0].pause();
+				$("#sound_player_loop")[0].currentTime = 0;
+			
+				$("#sound_player")[0].play(); 
+
+				deconstruction.go()
+			}
+
 			$("#sound_player_loop")[0].pause();
 			$("#sound_player_loop")[0].currentTime = 0;
 			
@@ -357,11 +368,9 @@ window.onload = function(){
 
 			// launch
 			if( preload === true )
-				deconstruction.go()
+				start()
 			else
-				preload.then(function(){
-					deconstruction.go()
-				})
+				preload.then(start)
 
 		}
 	});
