@@ -205,29 +205,11 @@ var deconstruction = (function( scope ){
 			// create the CANNON body
 			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) );
 			
-			// normal of the [ 0 1 ] edge DOT the [ 2 1 ] edge 
-			var sens = ( re.face_[1].x - re.face_[0].x )*( re.face_[1].y - re.face_[2].y ) - ( re.face_[1].y - re.face_[0].y )*( re.face_[1].x - re.face_[2].x ) < 0
-
-
-
-			var points = [];
-			for( var i = 0 ;i < p.length ; i ++){
-				points[ i            ] = new CANNON.Vec3( p[i].x + h.x , p[i].y + h.y , p[i].z + h.z )
-				points[ i + p.length ] = new CANNON.Vec3( p[i].x - h.x , p[i].y - h.y , p[i].z - h.z )
-			}
 			
-				
-			var faces = [[],[]];
-			for( var i = 0 ;i < p.length ; i ++){
-				faces[ 0 ].push( i + p.length * (sens) )
-				faces[ 1 ].unshift( i + p.length * (!sens) )
-			}
+
+
+
 			
-			for( var i = 0 ;i < p.length ; i ++)
-				if( !sens )
-					faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
-				else
-					faces.push( [ (i+1)%p.length , (i+1)%p.length + p.length , i + p.length , i ] );
 			
 			
 			
@@ -242,6 +224,44 @@ var deconstruction = (function( scope ){
 			this.phy = phy;
 			
 		},
+
+		_buildPhy : function( points  ){
+
+			var l = 2
+
+			var re = faceProjection( points )
+
+			// horizontal vector
+			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) )
+
+			// normal of the [ 0 1 ] edge DOT the [ 2 1 ] edge 
+			var sens = ( re.face_[1].x - re.face_[0].x )*( re.face_[1].y - re.face_[2].y ) - ( re.face_[1].y - re.face_[0].y )*( re.face_[1].x - re.face_[2].x ) < 0
+
+
+			var points = [];
+			var center = new CANNON.Vec3(0,0,0)
+			for( var i = 0 ;i < p.length ; i ++){
+				points[ i            ] = new CANNON.Vec3( p[i].x + h.x , p[i].y + h.y , p[i].z + h.z )
+				points[ i + p.length ] = new CANNON.Vec3( p[i].x - h.x , p[i].y - h.y , p[i].z - h.z )
+
+				center.vadd( p[i] )
+			}
+			
+
+				
+			var faces = [[],[]];
+			for( var i = 0 ;i < p.length ; i ++){
+				faces[ 0 ].push( i + p.length * (sens) )
+				faces[ 1 ].unshift( i + p.length * (!sens) )
+			}
+			
+			for( var i = 0 ;i < p.length ; i ++)
+				if( !sens )
+					faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
+				else
+					faces.push( [ (i+1)%p.length , (i+1)%p.length + p.length , i + p.length , i ] );
+		},
+
 		attach : function(){
 			this.detach();
 			scene.add( this.visual );
