@@ -206,7 +206,6 @@ var deconstruction = (function( scope ){
 			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) );
 			
 			// normal of the [ 0 1 ] edge DOT the [ 2 1 ] edge 
-			var sens = ( p[1].x - p[0].x )*( p[1].y - p[2].y ) - ( p[1].y - p[0].y )*( p[1].x - p[2].x ) > 0
 			var sens = ( re.face_[1].x - re.face_[0].x )*( re.face_[1].y - re.face_[2].y ) - ( re.face_[1].y - re.face_[0].y )*( re.face_[1].x - re.face_[2].x ) < 0
 
 
@@ -221,19 +220,22 @@ var deconstruction = (function( scope ){
 			var faces = [[],[]];
 			for( var i = 0 ;i < p.length ; i ++){
 				faces[ 0 ].push( i + p.length * (sens) )
-				faces[ 1 ].unshift( i + p.length * (sens) )
+				faces[ 1 ].unshift( i + p.length * (!sens) )
 			}
-			/*
+			
 			for( var i = 0 ;i < p.length ; i ++)
-				faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
-			*/
+				if( !sens )
+					faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
+				else
+					faces.push( [ (i+1)%p.length , (i+1)%p.length + p.length , i + p.length , i ] );
+			
 			
 			
 			shape = new CANNON.ConvexPolyhedron ( points , faces  );
 			this.mass = this.surfasicMass * area( p );
 			phy = new CANNON.Body( {mass:this.mass } );
 			phy.addShape( shape )
-			phy.position.set( cm );
+			phy.position.copy( cm );
 			
 			
 			this.visual = visual;
@@ -299,7 +301,7 @@ var deconstruction = (function( scope ){
 			
 			// real time position
 			this.phy.shapes[0].computeWorldVertices( this.phy.position , this.phy.quaternion )
-			var positions = this.phy.shapes[0].a.worldVertices
+			var positions = this.phy.shapes[0].worldVertices
 
 			var l = positions.length/2
 			var p = []
@@ -349,13 +351,11 @@ var deconstruction = (function( scope ){
 			// give implusion,
 			
 			// piston bluid
-			var rayon = 3;
-			var nface = 4;
-			var sharpness = 0.6;
+			var radius = 3;
 			var pulse = 25;
 			var up = 0.5;
 			
-			
+			/*
 			var points = [];
 			var faces = [];
 			points.push( re.P.vmult( new CANNON.Vec3( 0, 0 , sharpness * rayon ) ) );
@@ -366,19 +366,21 @@ var deconstruction = (function( scope ){
 				faces.push( [ 0 , i+1 , i ] );
 			}
 			faces.push( [ 0 , 1 , nface ] );
-			
-			var normals = this._computeNormals( points , faces );
-			
-			var shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
+			*/
+
+
+			var mass = 5, radius = 1.3;
+            sphereShape = new CANNON.Sphere(radius);
+            hardImpulser = new CANNON.Body({ mass: 10 });
+            hardImpulser.addShape(sphereShape);
+                
+            hardImpulser.linearDamping = 0.9;
+            
 			
 			var force = re.P.vmult( new CANNON.Vec3( 0, 0 , 1 ) );
-			
 			force.normalize();
-			
-			//force = force.mult( sharpness * rayon + 0.2 );
 			force = force.mult( 2 );
 			
-			var hardImpulser = new CANNON.RigidBody( 9 , shape );
 			hardImpulser.position = center.vadd( force.mult(-2) );
 			hardImpulser.velocity = force.mult( pulse );
 			
@@ -679,6 +681,8 @@ var deconstruction = (function( scope ){
 			visual.position.x = phy.position.x / ratioVisual;
 			visual.position.y = phy.position.y / ratioVisual;
 			visual.position.z = phy.position.z / ratioVisual;
+
+			
 			
 		}
 	};
