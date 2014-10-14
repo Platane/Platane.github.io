@@ -19,8 +19,7 @@
 	"header" : {
 		"name" : "Arthur Brongniart",
 		"birthDate" : "03/01/1991",
-		"mail" : "arthur@arthur-brongniart.fr",
-		"phone" : "(+33)6 98 68 67 44",
+		
 
 		"ext" : {
 			"linkedin" : "http://www.linkedin.com/pub/arthur-brongniart/65/2b/ab8",
