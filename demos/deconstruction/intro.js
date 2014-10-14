@@ -375,6 +375,7 @@ window.onload = function(){
 		}
 	});
 
+
 	$("#volumeControl").bind( "change" , function( e ){
 		$("#sound_player")[0].volume = parseInt( e.target.value ) / 100;
 		$("#sound_player_loop")[0].volume = parseInt( e.target.value ) / 100;
@@ -388,5 +389,5 @@ window.onload = function(){
 	$("#volumeControl")[0].value = 70;
 	$("#volumeControl").change();
 
-	$("#sound_player")[0].volume = $("#sound_player_loop")[0].volume = 0
+	//$("#sound_player")[0].volume = $("#sound_player_loop")[0].volume = 0
 };

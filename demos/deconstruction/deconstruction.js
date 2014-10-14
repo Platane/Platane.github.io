@@ -1,4 +1,5 @@
-
+/* global THREE, CANNON */
+/* global centerOfMass, burst, area */
 
 window['requestAnimFrame'] = (function(){
   return  window.requestAnimationFrame       || 
@@ -40,7 +41,7 @@ var deconstruction = (function( scope ){
 	
 	var faceProjection = function( face ){
 		
-		var t = face[ 0 ].clone();
+		var t = face[ 0 ].copy();
 		
 		var a = face[ 1 ].vsub( face[ 0 ] ),
 			b = face[ 2 ].vsub( face[ 0 ] );
@@ -58,7 +59,7 @@ var deconstruction = (function( scope ){
 		var P = new CANNON.Mat3( [ e.x , g.x , w.x ,  e.y , g.y , w.y ,  e.z , g.z , w.z  ] ); 
 		
 		// inversion
-		var P_ = P.reverse(); 
+		var P_ = P.inverse(); 
 		
 		// calcul the new poly
 		var face_ = new Array( face.length );
@@ -205,63 +206,54 @@ var deconstruction = (function( scope ){
 			// create the CANNON body
 			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) );
 			
+			var points = [];
+			for( var i = 0 ;i < p.length ; i ++)
+				points.push( p[i].vadd( h ) );
+			for( var i = 0 ;i < p.length ; i ++)
+				points.push( p[i].vsub( h ) );
+				
+			var faces = [[],[]];
+			for( var i = 0 ;i < p.length ; i ++){
+				faces[ 0 ].push( i );
+				faces[ 1 ].push( i+p.length );
+			}
+			for( var i = 0 ;i < p.length ; i ++)
+				faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
 			
-
-
-
 			
 			
+			var normals = [];
+			for( var i = 0 ; i < faces.length ; i ++){
+				var a = points[ faces[i][ 1 ] ].vsub( points[ faces[i][ 0 ] ] ),
+					b = points[ faces[i][ 2 ] ].vsub( points[ faces[i][ 0 ] ] );
+					
+				var n = a.cross( b );
+				n.normalize();
+				
+				//sens
+				// as the polygone is convex, all the other point should be behind the plan, exept these which are on the plan
+				for( var j = 0 ; j < points.length ; j ++ ){
+					var c = points[ j ].vsub( points[ faces[i][ 0 ] ] );
+					var scal = n.dot( c );
+					if( Math.abs( scal ) > 0.00001 ){
+						if( scal > 0 )
+							n.negate();
+						break;
+					}
+				}
+				normals.push( new CANNON.Vec3( n.x , n.y , n.z ) );
+			}
 			
-			
-			shape = new CANNON.ConvexPolyhedron ( points , faces  );
+			var shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
 			this.mass = this.surfasicMass * area( p );
-			phy = new CANNON.Body( {mass:this.mass } );
-			phy.addShape( shape )
-			phy.position.copy( cm );
+			var phy = new CANNON.RigidBody( this.mass,shape);
+			phy.position = cm.copy();
 			
 			
 			this.visual = visual;
 			this.phy = phy;
 			
 		},
-
-		_buildPhy : function( points  ){
-
-			var l = 2
-
-			var re = faceProjection( points )
-
-			// horizontal vector
-			var h = re.P.vmult( new CANNON.Vec3( 0 , 0 , l*0.5 ) )
-
-			// normal of the [ 0 1 ] edge DOT the [ 2 1 ] edge 
-			var sens = ( re.face_[1].x - re.face_[0].x )*( re.face_[1].y - re.face_[2].y ) - ( re.face_[1].y - re.face_[0].y )*( re.face_[1].x - re.face_[2].x ) < 0
-
-
-			var points = [];
-			var center = new CANNON.Vec3(0,0,0)
-			for( var i = 0 ;i < p.length ; i ++){
-				points[ i            ] = new CANNON.Vec3( p[i].x + h.x , p[i].y + h.y , p[i].z + h.z )
-				points[ i + p.length ] = new CANNON.Vec3( p[i].x - h.x , p[i].y - h.y , p[i].z - h.z )
-
-				center.vadd( p[i] )
-			}
-			
-
-				
-			var faces = [[],[]];
-			for( var i = 0 ;i < p.length ; i ++){
-				faces[ 0 ].push( i + p.length * (sens) )
-				faces[ 1 ].unshift( i + p.length * (!sens) )
-			}
-			
-			for( var i = 0 ;i < p.length ; i ++)
-				if( !sens )
-					faces.push( [ i , i + p.length , (i+1)%p.length + p.length  , (i+1)%p.length ] );
-				else
-					faces.push( [ (i+1)%p.length , (i+1)%p.length + p.length , i + p.length , i ] );
-		},
-
 		attach : function(){
 			this.detach();
 			scene.add( this.visual );
@@ -320,18 +312,13 @@ var deconstruction = (function( scope ){
 			this.detach();
 			
 			// real time position
-			this.phy.shapes[0].computeWorldVertices( this.phy.position , this.phy.quaternion )
-			var positions = this.phy.shapes[0].worldVertices
-
-			var l = positions.length/2
-			var p = []
-			for( var i=l;i--; )
-				p.push( new CANNON.Vec3(
-					( positions[i].x + positions[i+l].x )/2,
-					( positions[i].y + positions[i+l].y )/2,
-					( positions[i].z + positions[i+l].z )/2
-				))
-
+			var p = new Array( this.phy.shape.vertices.length/ 2 );
+			
+			for( var i = 0 ; i < p.length ; i ++ )
+				p[ i ] = this.phy.shape.vertices[ i ].vadd( this.phy.shape.vertices[ i + p.length ] ).mult( 0.5 );
+			
+			for( var i = 0 ; i < p.length ; i ++ )
+				p[ i ] = this.phy.quaternion.vmult( p[ i ] ).vadd( this.phy.position ) ;
 			
 			
 			var re = faceProjection( p );
@@ -355,9 +342,9 @@ var deconstruction = (function( scope ){
 				
 				var body =  Body.create( piece , this.visual.material , textureO , textureU , textureV );
 				
-				//body.visual.castShadow = true;
-				//body.visual.receiveShadow = true;
-				//body.visual.useQuaternion = true;
+				body.visual.castShadow = true;
+				body.visual.receiveShadow = true;
+				body.visual.useQuaternion = true;
 				
 				body.attach();
 				body.unableInteraction();
@@ -371,11 +358,13 @@ var deconstruction = (function( scope ){
 			// give implusion,
 			
 			// piston bluid
-			var radius = 3;
+			var rayon = 3;
+			var nface = 4;
+			var sharpness = 0.6;
 			var pulse = 25;
 			var up = 0.5;
 			
-			/*
+			
 			var points = [];
 			var faces = [];
 			points.push( re.P.vmult( new CANNON.Vec3( 0, 0 , sharpness * rayon ) ) );
@@ -386,29 +375,27 @@ var deconstruction = (function( scope ){
 				faces.push( [ 0 , i+1 , i ] );
 			}
 			faces.push( [ 0 , 1 , nface ] );
-			*/
-
-
-			var mass = 5, radius = 1.3;
-            sphereShape = new CANNON.Sphere(radius);
-            hardImpulser = new CANNON.Body({ mass: 10 });
-            hardImpulser.addShape(sphereShape);
-                
-            hardImpulser.linearDamping = 0.9;
-            
+			
+			var normals = this._computeNormals( points , faces );
+			
+			var shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
 			
 			var force = re.P.vmult( new CANNON.Vec3( 0, 0 , 1 ) );
+			
 			force.normalize();
+			
+			//force = force.mult( sharpness * rayon + 0.2 );
 			force = force.mult( 2 );
 			
+			var hardImpulser = new CANNON.RigidBody( 9 , shape );
 			hardImpulser.position = center.vadd( force.mult(-2) );
 			hardImpulser.velocity = force.mult( pulse );
 			
 			scene.world.add( hardImpulser );
 			
 			// visual
+			var mesh;
 			if( debug ){
-				var mesh;
 				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
 				material.color.setRGB( Math.random() * 100 / 100, Math.random() * 100 / 100, Math.random() * 100 / 100 );
 				var sphere_geometry = new THREE.SphereGeometry( rayon * sharpness / ratioVisual  , 8 , 8 );
@@ -662,8 +649,7 @@ var deconstruction = (function( scope ){
 		scene.add( visualGround );
 		
 		var shapeGround = new CANNON.Plane ( new CANNON.Vec3( 0 , 1 , 0 ) );
-		phyGround = new CANNON.Body({mass:0});
-		phyGround.addShape( shapeGround )
+		phyGround = new CANNON.RigidBody(0,shapeGround);
 		phyGround.position.y = 0;
 		world.add( phyGround );
 
@@ -1318,12 +1304,12 @@ var deconstruction = (function( scope ){
 	return {
 		preload : preload,
 		go : go,
-		init : init,
-		camera : camera
+		camera : camera,
+		init: init
 	}
 			
 	
-})(  );
+})( );
 
 
 
