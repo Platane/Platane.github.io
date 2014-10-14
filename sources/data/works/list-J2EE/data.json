@@ -8,24 +8,34 @@
 	"screenShots" : [
 		{
 			"url" : "pweb-display4.jpg",
-			"caption" : ""
+			"caption" : "Cool force engine which pull together the items"
 		},
 		{
 			"url" : "pweb-display.jpg",
-			"caption" : ""
+			"caption" : "The stats about the list"
 		},
 		{
 			"url" : "pweb-home.jpg",
-			"caption" : ""
+			"caption" : "Display all the lists"
 		},
 		{
 			"url" : "pweb-vote.jpg",
-			"caption" : ""
+			"caption" : "Vote for the best between two items"
 		}
 	],
 	"coolness" : 6,
 	"weight" : 3,
+	"tags" : [
+		"Js",
+		"J2EE",
+		"canvas",
+		"academic project",
+		"physic",
+		"graph"
+	],
 	"links" : {
-		"page" : "http://lisa-et-arthur-mangent.appspot.com/"
+		"url" : "/demos/list-battle/Projet%20Esial.html",
+		"label" : "demo",
+		"type" : "page"
 	}
 }
