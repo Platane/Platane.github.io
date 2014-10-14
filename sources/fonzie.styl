@@ -1,0 +1,88 @@
+
+
+    
+.fonzie
+    background-image url("/build/assets/images/fonzieGlasses.png")
+    display none
+    position fixed
+    right 5%
+    bottom 0
+    width 300px
+    height 300px
+
+    span
+        transform rotate( -40deg )
+        position absolute
+        left 200px
+        top 50px
+        width 180px
+        color #A79868
+        text-shadow 0 3px 5px rgba(148, 148, 148, 0.85)
+        font-family "Lucida Grande","Lucida Sans Unicode","DejaVu Sans",Lucida,Arial,Helvetica,sans-serif
+        font-weight bold
+        font-size 1.15em
+
+.cool .fonzie
+    &.visible
+        animation FonzieShow 1s ease-in-out
+        display block
+
+    &.hidden
+        animation FonzieHide 1s ease-in-out , FonzieCantWait 3s infinite 5s
+        display block
+        transform rotate( -90deg )
+        bottom -50px
+        right -230px
+
+@keyframes FonzieShow {
+    0% {
+         transform : rotate( -90deg );
+        bottom : -50px;
+        right : -230px;
+    }
+    30% {
+       bottom : -80px;
+    }
+    60% {
+         transform : rotate( 0deg );
+        bottom : 0;
+        right : 5%; 
+    }
+}
+@keyframes FonzieCantWait {
+    0% {
+         transform : rotate( -90deg );
+        right : -230px;
+    }
+    5% {
+        transform : rotate( -92deg );
+        right : -220px;
+    }
+    8% {
+         transform : rotate( -90deg );
+        right : -230px;
+    }
+    13% {
+        transform : rotate( -88deg );
+        right : -220px;
+    }
+    18% {
+         transform : rotate( -90deg );
+        right : -230px;
+    }
+    
+}
+@keyframes FonzieHide {
+    0% {
+         transform : rotate( 0deg );
+        bottom : 0;
+        right : 5%; 
+    }
+    30% { bottom : -80px; }
+    60% {
+        transform : rotate( -90deg );
+        bottom : -50px;
+        right : -230px; 
+    }
+    
+}

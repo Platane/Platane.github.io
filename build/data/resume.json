@@ -19,16 +19,15 @@
 	"header" : {
 		"name" : "Arthur Brongniart",
 		"birthDate" : "03/01/1991",
-		"mail" : "arthur@arthur-brongniart.fr",
-		"phone" : "(+33)6 98 68 67 44",
+		
 
 		"ext" : {
 			"linkedin" : "http://www.linkedin.com/pub/arthur-brongniart/65/2b/ab8",
 			"github" : "https://github.com/Platane"
 		},
 
-		"portefolio@" : "http://arthur-brongniart.fr/",
-		"portefolio" : "arthur-brongniart.fr",
+		"portefolio@" : "http://www.platane.me/",
+		"portefolio" : "platane.me",
 		"bio" : "I like where the web is going, I wish to be part of the incoming changes."
 	},
 

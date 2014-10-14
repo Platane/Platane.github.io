@@ -1,41 +1,5 @@
-
-$("body").css({ "cursor" : "progress" });
-
-/*
-TODO
-
--change the accept fragment function in burst
-	it need to reconsider the direction of polygon computation, do somathing more looking like tha inertia calcul
-	
--change the impulser direction
-	make it point to the up, to achieve that, rotate the matrix P
-	
-*/
-
-// change the behavior of the random function
-		var _seed = 45678951585432565678;
-		_seed = Math.floor( Math.random() * 10000000000 );
-
-
-		//_seed = 467129903        ;
-
-		console.log( "seed = "+_seed );
-		var _offset = _seed;
-		Math.random = function(){
-				
-			var s = _seed;
-			var square = s *s;
-			
-			var nseed = Math.floor( square / 1000 ) % 10000000000;
-			
-			if( nseed != _seed )
-				_seed = nseed;
-			else
-				_seed = nseed + _offset;
-			return ( _seed / 10000000000 );
-		}
-
-
+/* global THREE, CANNON */
+/* global centerOfMass, burst, area */
 
 window['requestAnimFrame'] = (function(){
   return  window.requestAnimationFrame       || 
@@ -48,636 +12,14 @@ window['requestAnimFrame'] = (function(){
           };
 })();
 
-//Polygon
-(function( scope ){
 
-/** 
- * return either false if there is no intersection with the two segments 
- * the segment are A1A2 and B1B2
- * or { t1 , t2 }  where A1 +  ( A2 - A1 ) * t1 =  B1 +  ( B2 - B1 ) * t2  is the intersection of the two segment   ( yeah, right tA , tB would be better )
- * the function doesnt not react well with null segment ( A1 = A2 )
-  * @function
- *  @param { cc.Point } A1
- *  @param { cc.Point } A2
- *  @param { cc.Point } B1
- *  @param { cc.Point } B2
- *  @return { t1 : number , t2 : number }  
- * Constructor
- */
-var intersectionSegmentSegment = function( A1 , A2 , B1 , B2 ){
-	var 
-	VAx = A2.x - A1.x,
-	VAy = A2.y - A1.y,
-	VBx = B2.x - B1.x,
-	VBy = B2.y - B1.y,
-	PAx = A1.x,
-	PAy = A1.y,
-	PBx = B1.x,
-	PBy = B1.y;
-
-	if( VBy * VAx - VBx * VAy == 0 )		// colineaire
-		return false;
-
-	if( VBy == 0 ){				
-		var ta = ( PBy - PAy )/VAy;			// VAy != 0 sinon VA VB colineaires
-		if( ta < 0 || 1 < ta)
-			return false;
-		var tb = ((PAx-PBx)+VAx*ta)/VBx;	// VBx != 0 sinon B1 == B2
-		if( tb < 0 || 1 < tb)
-			return false;
-		return { ta:ta , tb:tb };
-	}
-	if( VAx == 0 ){
-		var tb = ( PAx - PBx )/VBx;	
-		if( tb < 0 || 1 < tb)
-			return false;
-		var ta = ((PBy-PAy)+VBy*tb)/VAy;
-		if( ta < 0 || 1 < ta)
-			return false;
-		return { ta:ta , tb:tb };
-	}
-	var ta = (  (( PBx - PAx )  + VBx/VBy*(PAy-PBy) )/VAx )/( 1 - VBx * VAy / VAx / VBy );
-	if( ta < 0 || 1 < ta)
-		return false;
-	var tb = ((PAy-PBy)+VAy*ta)/VBy;
-	if( tb < 0 || 1 < tb)
-		return false;
-	return { ta:ta , tb:tb };
-
-}
-
-/**
- * return an array of Polygon, each one is convexe and all form a partition of the polygon given in argument
- * @function
- * @param { Array of Point } polygon
- * @return { Array of Array of Point }  
- * Constructor
- */
-var splitInConvexesEars = function( polygon  ){
-
-	// we will use the det for determinate if the point is in or out a side,
-	// we dont know if a positif mean out or inside, ( because the is no restriction on the order of the corner )
-	// we will perform a check, on all the corner and determine which is the most common 
-
-	// +1 for each positive det , -1 for each neg
-	var sum_order = 0;
-
-	var each_order = new Array( polygon.length );
-
-	var a = polygon[ polygon.length -2 ] , b = polygon[ polygon.length -1 ] , c;
-
-	for( var k = 0 ; k < polygon.length ; k ++ ){
-
-		// a then b then c
-
-		c = polygon[ k ];
-
-		// check if c is on the right side of the edge a b
-
-		var det = ( a.x - b.x ) * ( c.y - b.y ) + ( b.y - a.y ) * ( c.x - b.x );
-
-		if( det >= 0 ){
-			each_order[ ( k-1+polygon.length)%polygon.length ] = true;
-			sum_order ++;
-		} else {
-			each_order[ ( k-1+polygon.length)%polygon.length ] = false;
-			sum_order --;
-		}
-		a = b;
-		b = c;
-	}
-
-	// it is convexe
-	if( Math.abs( sum_order ) == polygon.length )
-		return [ polygon ];
-
-
-	// lets assume the majority of vertex will not be notch
-	// so if sum_order is positive we got a majority of positive det, so assume that a non not vertex has a positive vertex ( respectively negative )
-	var order = sum_order >= 0 ;
-
-
-	var notchs = [];
-	var notch = null;
-	var A , B , Av1 , Av2;
-	for( var i = 0 ; i < each_order.length ; i ++ ){
-		if( each_order[ i ] == order )
-			continue;
-
-		notch = {
-			i : i ,
-			link : [ (i+1)%polygon.length ]
-			};
-
-		A = polygon[ i ];
-		Av2 = { x : A.x - polygon[ (i+1)%polygon.length ].x ,
-				y : A.y - polygon[ (i+1)%polygon.length ].y  }; // prev neightbour vect
-		Av1 = { x : polygon[ (i-1+polygon.length)%polygon.length ].x - A.x ,
-				y : polygon[ (i-1+polygon.length)%polygon.length ].y - A.y }; // next neightbour vect
-
-
-		// check the linkability with all the vertex
-		var j;
-		for( var aj = 2 ; aj < polygon.length - 1 ; aj ++ ){
-
-			j = (i+aj)%polygon.length
-
-			B = polygon[ j ];
-
-			// check the direction of AB ( need to be inside the polygon, at least localy )
-			if( ( B.x - A.x ) * Av1.y + ( A.y - B.y ) * Av1.x > 0 == order 			// right side of first neightbour
-			 && ( B.x - A.x ) * Av2.y + ( A.y - B.y ) * Av2.x > 0 == order )		// right side of second neightbour
-				continue;
-
-			// check the exit on the segment A B
-			var accept = true;
-			for( var k = 1 ; k < polygon.length - 1 ; k ++ ){
-				if( ( j + k + 1 ) % polygon.length == i  ){ // dont check the intersection with a segment that pass by A ( meaning the segment xA and Ax ) 
-					k ++; 	// skip the segment Ax
-					continue;
-				}
-				if( false != cc.Polygon.intersectionSegmentSegment( A , B , polygon[ ( j + k ) % polygon.length ] ,  polygon[ ( j + k + 1 ) % polygon.length ] ) ){
-					accept = false;
-					break;
-				}
-			}
-			if( accept )
-				notch.link.push( j );
-		}
-
-		notch.link.push( ( i-1+polygon.length)%polygon.length );
-
-		notchs.push( notch );
-	}
-
-	// estimation of the largest sub poly
-	for( var i = 0 ; i < notchs.length ; i ++ ){
-
-		var er = [ notchs[ i ].i  ];
-		for( var k = notchs[ i ].link.length-1 ; k >= 0 ; k -- ){
-			var l = notchs[ i ].link[ k ];
-			if( l != ( er[ 0 ] -1 + polygon.length ) % polygon.length || each_order[ l ] != order )
-				break;	
-			var e = polygon[ l ];
-			if( er.length > 2 ){
-
-				// if we add e to the stack, does it stiff form a convex polygon
-				// check for the convexity of the new coner
-				var a  = polygon[ er[ 0 ] ],								// corner next
-					b  = polygon[ er[ 1 ] ];
-				var det = ( a.x - b.x ) * ( e.y - b.y ) + ( b.y - a.y ) * ( e.x - b.x );
-				if( det > 0 != order )
-					break;
-
-				var a  =  polygon[ er[ ( er.length-2 + er.length )% er.length ] ],		// corner prev
-					b  =  polygon[ er[ ( er.length-1 + er.length )% er.length ] ];
-				var det = ( e.x - a.x ) * ( b.y - a.y ) + ( a.y - e.y ) * ( b.x - a.x );
-				if( det > 0 != order )
-					break;
-
-				var a  =  polygon[ er[ ( er.length-1 + er.length )% er.length ] ],		// corner new 
-					b  =  polygon[ er[ 0 ] ];
-				var det = ( a.x - e.x ) * ( b.y - e.y ) + ( e.y - a.y ) * ( b.x - e.x );
-				if( det > 0 != order )
-					break;
-			}
-			er.unshift( l );
-		}
-
-		var ea = [ notchs[ i ].i  ];
-		for( var k = 0 ; k < notchs[ i ].link.length ; k ++ ){
-			var l = notchs[ i ].link[ k ];
-			if( l != ( ea[ ea.length - 1 ] +1 ) % polygon.length || each_order[ l ] != order ) // point have to be consecutive, l have to be next ,
-				break;	
-			var e = polygon[ l ];
-			if( ea.length > 2 ){
-
-				// if we add e to the stack, does it stiff form a convex polygon
-				// check for the convexity of the new coner
-				var a  =  polygon[ ea[ ( ea.length-2 + ea.length )% ea.length ] ],		// corner prev
-					b  =  polygon[ ea[ ( ea.length-1 + ea.length )% ea.length ] ];
-				var det = ( a.x - b.x ) * ( e.y - b.y ) + ( b.y - a.y ) * ( e.x - b.x );
-				if( det > 0 != order )
-					break;
-
-				var a  =  polygon[ ea[ 0% ea.length ] ],										// corner next
-					b  =  polygon[ ea[ 1% ea.length ] ];
-				var det = ( e.x - a.x ) * ( b.y - a.y ) + ( a.y - e.y ) * ( b.x - a.x );
-				if( det > 0 != order )
-					break;
-
-				var a  =  polygon[ ea[ ( ea.length-1 + ea.length )% ea.length ] ],		// corner new 
-					b  =  polygon[ ea[ 0% ea.length ] ];
-				var det = ( a.x - e.x ) * ( b.y - e.y ) + ( e.y - a.y ) * ( b.x - e.x );
-				if( det > 0 != order )
-					break;
-			}
-			ea.push( l );
-		}
-
-		if( er.length > ea.length )
-			ea = er;
-
-		if( ea.length > 2 ){
-			// form the dual polygon
-			var dual = [];
-			var next = ea[ ea.length-1 ];
-			while( next != ea[ 0 ] ){
-				dual.push( polygon[ next ] );
-				next = ( next + 1 ) % polygon.length;
-			}
-			dual.push( polygon[ next ] );
-
-			var stack = [];
-			for( var k = 0 ; k < ea.length ; k ++ )
-				stack.push( polygon[ ea[ k ] ] );
-			return [ stack ].concat( cc.Polygon.splitInConvexesEars( dual ) );
-
-			//return [ stack ];
-		}
-	}
-
-	return null;
-};
-
-/**
- * return an array of Polygon, each one is a triangle form a partition of the convex polygon given in argument
- * 
- * @function
- * @param { Array of Point } convex polygon
- * @return { Array of Array of Point }  
- * Constructor
- */
-var splitInTriangle = function( poly ){
-	
-	var splits = [];
-	
-	splits.push( [ poly[0] , poly[1] , poly[2] ] );
-	
-	for( var i = 3 ; i< poly.length ; i ++ ){
-		splits.push( [ poly[0] , poly[i-1] , poly[i] ] );
-	}
-	
-	return splits;
-}
-
-/**
- * return the area of the polygon
- * 
- * @function
- * @param { Array of Point } convex polygon
- * @return { Number }  area of the polygon
- * Constructor
- */
-var area = function( poly ){
-	
-	var splits = splitInTriangle( poly );
-	
-	var sum = 0;
-	
-	for( var i = 0 ; i< splits.length ; i ++ )
-		sum = Math.abs( ( splits[ i ][ 1 ].x - splits[ i ][ 0 ].x ) * ( splits[ i ][ 2 ].y - splits[ i ][ 0 ].y ) - ( splits[ i ][ 2 ].x - splits[ i ][ 0 ].x ) * ( splits[ i ][ 1 ].y - splits[ i ][ 0 ].y ) );
-		
-	sum /= 2;
-	
-	return sum;
-}
-
-/**
- * return the polygon center of mass
- * 
- * @function
- * @param { Array of Point } convex polygon
- * @return { Point }  center of mass
- * Constructor
- */
-var centerOfMass = function( poly ){
-	
-	var splits = splitInTriangle( poly )
-	
-	var c = { x :0 , y: 0  },
-		poid,
-		poidTotal = 0;
-	for( var i = 0 ; i < splits.length ; i ++ ){
-		
-		poid = area( splits[ i ] );
-		
-		for( var j = 0 ; j < splits[ i ].length ; j ++ ){
-			c.x+= splits[ i ][ j ].x * poid;
-			c.y+= splits[ i ][ j ].y * poid;
-		}
-		
-		poidTotal += poid;
-	}
-	
-	c.x/=3*poidTotal;
-	c.y/=3*poidTotal;
-	
-	return c;
-}
-
-/**
- * return the direction of the polygon
- * 
- * @function
- * @param { Array of Point } convex polygon
- * @return { Point }  vector
- * Constructor
- */
-var direction = function( poly  ){
-	
-	var c = centerOfMass( poly );
-	
-	var dir = {x:0,y:0};
-	
-	var totalWeight = 0;
-	
-	for( var i = 0 ; i < poly.length ; i ++ ){
-	
-		var tri = [ c , poly[ i ] , poly[ (i+1)%poly.length ] ]; 
-		
-		var cmid = {
-			x : ( poly[ i ].x + poly[ (i+1)%poly.length ].x ) *0.5 - c.x,
-			y : ( poly[ i ].y + poly[ (i+1)%poly.length ].y ) *0.5 - c.y
-		};
-		
-		var d = Math.sqrt( cmid.x * cmid.x + cmid.y * cmid.y );
-		
-		var weight = area( tri );
-		
-		if( ( cmid.x != 0 && cmid.x > 0 ) || ( cmid.x == 0 && cmid.y > 0 ) ){
-		
-			dir.x +=  cmid.x  * weight ;
-			dir.y +=  cmid.y  * weight ;
-		} else {
-			dir.x -=  cmid.x  * weight ;
-			dir.y -=  cmid.y  * weight ;
-		}
-		totalWeight += weight;
-	}
-	
-	var po = Math.sqrt( totalWeight ) * totalWeight;
-	
-	dir.x = dir.x / po;
-	dir.y = dir.y / po;
-	
-	return dir;
-}
-
-/**
- * return the polygon center of mass
- * 
- * @function
- * @param { Array of Point } convex polygon
- * @return { Point }  center of mass
- * Constructor
- */
-var burst = function( poly , center  ){
-	
-	
-	var min_surface = 2;
-	
-	var surface = Math.max( min_surface , area( poly ) );
-	
-	center = center || centerOfMass( poly );
-	var neclat = Math.floor(  Math.random() * 4 + 5 );
-	
-	
-	var loin = 1000;
-	
-	
-	
-	function calculEclatRadial( poly , a , b , sens ){
-		var ia , A , ib , B, e = [];
-		
-		var dA = {
-			x: center.x + Math.cos( a ) * loin,
-			y: center.y + Math.sin( a ) * loin,
-		},
-		dB = {
-			x: center.x + Math.cos( b ) * loin,
-			y: center.y + Math.sin( b ) * loin,
-		};
-		
-		
-		
-		for( var ia = 0 ; ia < poly.length ; ia ++ ){
-			var re = intersectionSegmentSegment( center , dA , poly[ ia ] , poly[ ( ia +1 )%poly.length ] );
-			if( re != false ){
-				A = {
-					x: center.x + Math.cos( a ) * loin * re.ta,
-					y: center.y + Math.sin( a ) * loin * re.ta,
-				};
-				break;
-			}
-		}
-		
-		for( var ib = 0 ; ib < poly.length ; ib ++ ){
-			var re = intersectionSegmentSegment( center , dB , poly[ ib ] , poly[ ( ib +1 )%poly.length ] );
-			if( re != false ){
-				B = {
-					x: center.x + Math.cos( b ) * loin * re.ta,
-					y: center.y + Math.sin( b ) * loin * re.ta,
-				};
-				break;
-			}
-		}
-		
-		
-		e.push( center );
-		
-		e.push( sens ? A : B  );
-		
-		if( ia != ib ){
-			for( var i = (( sens ? ia : ib )+1)%poly.length ; i != ( sens ? ib : ia ) ; i = ( i +1 )%poly.length )
-				e.push( poly[ i ] );
-			
-			e.push( poly[ i ] );
-		}
-		
-		e.push( sens ? B : A  );
-		
-		return e;
-	}
-	
-	function calculEclatTransversal( poly , v ){
-		
-		// set the poly in a oriented box
-		var max = -Infinity,
-			min = Infinity;
-		
-		for( var i = 0 ; i < poly.length ; i ++ ){
-			
-			var d = poly[ i ].x * v.x + poly[ i ].y * v.y;
-			
-			if( d > max )
-				max = d;
-			if( d < min )
-				min = d;
-		}
-		
-		var alpha = Math.random() * 0.6 + 0.2;
-		
-		var cut = alpha * min + (1-alpha) * max;
-		
-		var o = {
-			x : v.x * cut,
-			y : v.y * cut,
-		};
-		var oh = {
-			x : o.x + v.y * loin,
-			y : o.y - v.x * loin,
-		},
-			ohh = {
-			x : o.x - v.y * loin,
-			y : o.y + v.x * loin,
-		};
-		
-		
-		var A = [] , B = [], side = false;
-		
-		var Ai = [] , Bi = [];
-		
-		for( var i = 0 ; i < poly.length ; i ++ ){
-			
-			if( side )
-				A.push( poly[ i ] );
-			else
-				B.push( poly[ i ] );
-				
-			if( side )
-				Ai.push( i );
-			else
-				Bi.push( i );
-			
-			var re = intersectionSegmentSegment( oh , ohh , poly[ i ] , poly[ ( i +1 )%poly.length ] );
-			if( re != false ){
-				var p = {
-					x: oh.x - v.y * 2 * loin * re.ta,
-					y: oh.y + v.x * 2 * loin * re.ta
-				};
-				A.push( p );
-				B.push( p );
-				
-				Ai.push( i+0.5 );
-				Bi.push( i+0.5 );
-				
-				side = !side;
-			}
-			
-		}
-		
-		
-		return [ A , B ];
-	}
-	
-	function accepteFragement( poly ){
-		
-		
-		// check the area
-		if( area( poly ) < surface / 70 )
-			return false;
-		
-		var dir = direction( poly );
-		if( Math.sqrt( dir.x * dir.x + dir.y * dir.y ) > 0.55 )
-			return false;
-		
-		//accept
-		return true;
-	};
-	
-	// calcul the sens
-	var A = {
-			x: poly[ 0 ].x - center.x ,
-			y: poly[ 0 ].y - center.y
-		},
-		B = {
-			x: poly[ 1 ].x - center.x ,
-			y: poly[ 1 ].y - center.y
-		};
-	
-	var sens = ( A.x * B.y - A.y * B.x > 0 ) ;
-	
-	
-	var eclats = [];
-		
-	var leclat = Math.PI*2 / neclat;	
-	
-	var startA = 0;
-	
-	var offsetA = Math.random() * Math.PI*2;
-	
-	for( var i = 0 ; startA < Math.PI*2 ; i ++ ){
-		
-		
-		leclat = Math.min( Math.PI*2/3 , Math.max( Math.PI*2 / neclat / 1.5 , ( Math.PI*2 - startA ) /( neclat - i )  * ( 0.7 + Math.random() * 0.6  ) ) );
-		
-		if( Math.PI*2 - startA - leclat < Math.PI/8 || startA + leclat >  Math.PI*2 )
-			leclat = Math.PI*2 - startA;
-		
-		var endA = startA + leclat;
-		
-		// cut radialy
-		var cer =  [ calculEclatRadial( poly , offsetA + startA , offsetA + endA , sens ) ];
-		
-		var a = startA + leclat / 2;
-		
-		var v = {
-			x : cer[ 0 ][ 1 ].y - cer[ 0 ][ cer[ 0 ].length-1 ].y,
-			y : -cer[ 0 ][ 1 ].x + cer[ 0 ][ cer[ 0 ].length-1 ].x
-		};
-		var n = Math.sqrt( v.x*v.x + v.y*v.y );
-		
-		v.x /= n;
-		v.y /= n;
-		
-		// cut transversaly
-		for( var i = 0 ; i < cer.length ; i ++ ){
-				var cet = calculEclatTransversal( cer[ i ] , v );
-				
-				// happend when the ray pass exactly on a point, he does not traverse the polygone, whatever ignore that case
-				if( cet[ 1 ].length <= 2 || cet[ 0 ].length <= 2 ){
-					if( Math.random() > 0.5 )
-						i --;
-					continue;
-				}
-				if( !accepteFragement( cet[ 1 ] )  || !accepteFragement( cet[ 0 ] ) ){
-					if( Math.random() > 0.5 )
-						i --;
-					continue;
-				}
-					
-				cer[ i ] = cet[ 0 ];
-				
-				cer.push( cet[ 1 ] );
-				
-				i--;
-		}
-		
-		
-		eclats = eclats.concat( cer );
-		
-		startA = endA;
-	}
-	
-	return eclats;
-}
-
-
-
-scope.centerOfMass = centerOfMass;
-scope.burst = burst;
-scope.area = area;
-
-
-})( this );
 
 
 
 var debug = ( window && window.location ) ? window.location.search == "?debug=true" : false
 
 // destruction procedure
-;(function( scope ){
+var deconstruction = (function( scope ){
 	
 	/*
 	 * param
@@ -689,7 +31,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 	 * var
 	 *
 	 */
-	var scene , renderer , camera , bodies = [] ,  textures = {};
+	var scene , renderer , camera , bodies = [] , textures = {} , structure , container;
 	var ratioVisual = 1,	//ratio taille du monde CANNON / taille fenêtre
 		speedEngine = 1,
 		sceneBox = null,
@@ -727,25 +69,10 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 		return { P : P , P_ : P_ , t : t , face_ : face_ };
 	};
 	
-	function traceLigne( A , B , color ){
-		
-		var r = Math.random(),
-			v = Math.random(),
-			b = Math.random();
-		
-		for( var i = 0 ;  i< 100 ; i ++ ){
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
-					material.color.setRGB( r , v , b );
-					var sphere_geometry = new THREE.SphereGeometry( 2  , 8 , 8 );
-					mesh = new THREE.Mesh( sphere_geometry, material );
-					mesh.position.x = A.x * ( 1 - i/100 ) + B.x * i/100;
-					mesh.position.y = A.y * ( 1 - i/100 ) + B.y * i/100;
-					mesh.position.z = A.z * ( 1 - i/100 ) + B.z * i/100;
-					scene.add( mesh );
-		}
-	}
 	
-	
+	/**
+	 * abstract both rendered and phusical world
+	 */
 	var Body = function(){};
 	Body.prototype = {
 		visual : null,
@@ -758,7 +85,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 		textureV_ : null,
 		init : function( poly , material , textureO , textureU , textureV ){
 			
-			var l = 0.8;
+			var l = 1.2;
 			
 			// search for the center of mass
 			var re = faceProjection( poly );
@@ -803,6 +130,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			
 			for( var i = 2 ; i < p.length ; i ++){
 				geometry.faces.push( new THREE.Face3( 0 , i-1 , i ) );
+				//geometry.faces.push( new THREE.Face3( 0 , i , i-1 ) );
 				
 				//compute the UVmapping
 				if( textureO && textureU && textureV ){
@@ -821,9 +149,9 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 					};
 					
 					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
 						
 						] );
 				}
@@ -848,18 +176,27 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 					};
 					
 					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
-						new THREE.UV( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
-						
+						new THREE.Vector2( ( OA.x * textureU_.x + OA.y * textureU_.y ) / nU , ( OA.x * textureV_.x + OA.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OB.x * textureU_.x + OB.y * textureU_.y ) / nU , ( OB.x * textureV_.x + OB.y * textureV_.y ) / nV ) , 
+						new THREE.Vector2( ( OC.x * textureU_.x + OC.y * textureU_.y ) / nU , ( OC.x * textureV_.x + OC.y * textureV_.y ) / nV ) , 
+					
 						] );
 				}
 			}
-			
-			geometry.computeCentroids();
-			geometry.computeFaceNormals();
-			
+				
+			geometry.verticesNeedUpdate = true
+			geometry.elementsNeedUpdate = true
+			geometry.normalsNeedUpdate = true
+			geometry.buffersNeedUpdate = true
+			geometry.uvsNeedUpdate = true
+
+			geometry.computeFaceNormals()
+
+
+
 			var visual = new THREE.Mesh( geometry, material );
+
+			visual.updateMatrix();
 			
 			visual.castShadow = true;
 			visual.receiveShadow = true;
@@ -907,9 +244,9 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 				normals.push( new CANNON.Vec3( n.x , n.y , n.z ) );
 			}
 			
-			shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
+			var shape = new CANNON.ConvexPolyhedron ( points , faces , normals );
 			this.mass = this.surfasicMass * area( p );
-			phy = new CANNON.RigidBody( this.mass,shape);
+			var phy = new CANNON.RigidBody( this.mass,shape);
 			phy.position = cm.copy();
 			
 			
@@ -1005,10 +342,6 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 				
 				var body =  Body.create( piece , this.visual.material , textureO , textureU , textureV );
 				
-				body.visual.castShadow = true;
-				body.visual.receiveShadow = true;
-				body.visual.useQuaternion = true;
-				
 				body.attach();
 				body.unableInteraction();
 				
@@ -1021,7 +354,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			// give implusion,
 			
 			// piston bluid
-			var rayon = 2;
+			var rayon = 3;
 			var nface = 4;
 			var sharpness = 0.6;
 			var pulse = 25;
@@ -1047,10 +380,11 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			
 			force.normalize();
 			
-			force = force.mult( sharpness * rayon + 0.2 );
+			//force = force.mult( sharpness * rayon + 0.2 );
+			force = force.mult( 2 );
 			
 			var hardImpulser = new CANNON.RigidBody( 9 , shape );
-			hardImpulser.position = center.vadd( force.negate() );
+			hardImpulser.position = center.vadd( force.mult(-2) );
 			hardImpulser.velocity = force.mult( pulse );
 			
 			scene.world.add( hardImpulser );
@@ -1071,7 +405,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			// plan to remove impulsion
 			(function(){
 				
-				var engineTimeRenaming = 750;
+				var engineTimeRenaming = 450;
 				var prevTime = new Date().getTime();
 				var visual = mesh;
 				var phy = hardImpulser;
@@ -1133,7 +467,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 	 * add corresponding element to the world
 	 * need the texture to be rendered ( with initTexture )
 	 */ 
-	var initStructure = function( container , source ){
+	var initStructure = function( container , source , textures ){
 		
 		
 		
@@ -1166,59 +500,25 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			var material = new THREE.MeshPhongMaterial({ 
 				ambient: 0xFFFFEF,
 				specular: 0x333333,
-				shininess : 180,
+				shininess : 28,
 				map : texture,
 				bumpMap: bump,
-				bumpScale: 0.25,
-				//metal: false,
-				transparent : true
+				bumpScale: 0.1,
+				metal: false,
+
+				transparent : true,
+				opacity : 0.95,
+				shading: THREE.FlatShading
 			});
-			
+
+			//var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, metal: true } );
+
+
 			var body = Body.create( p , material , p[1] , p[2].vsub( p[1] ) , p[0].vsub( p[1] ) );
 			body.attach();
 			body.disableInteraction();
 			body.label = e.attr( "id" );
 			
-		});
-		
-	};
-	
-	/*
-	 * use html2canvas to render the texture
-	 * call initScene when all the texture are loaded
-	 */
-	var initTexture = function( container , source , callBack ){
-		
-		var bricks = source.find(".brick");
-		
-		var nTotal = 0,
-			nLoaded = 0;
-		
-		var handler = function(){
-			initStructure( container , source );
-			source.css({ "display" : "none" });
-			if( callBack )
-				callBack.f.call( callBack.o );
-		};
-		source.css({ "display" : "block" });
-		bricks.each( function( ){
-			
-			nTotal ++;
-			
-			var label = $(this).attr( 'id' );
-			
-			html2canvas( [ this ] , {
-				onrendered: function( canvas ) {
-					
-					//$( canvas ).appendTo( $("body") ).css({"display" : "block" , "margin-left" : "auto" , "margin-right" : "auto" });
-					//$( canvas ).css( {"box-shadow" : "0 0 5px 5px #4865ab" } );
-					
-					textures[ label ] = canvas;	
-					nLoaded ++;
-					if( nLoaded >= nTotal )
-						handler();
-				}
-			});
 		});
 		
 	};
@@ -1247,10 +547,6 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 		ctx.putImageData(pix, 0, 0);
 
 		textures[ 'bumpmap' ] = canvas
-
-
-		//$(canvas).css({	'position' : 'absolute', 'top':'0'}).appendTo( $('body') )
-
 	};
 	
 	/*
@@ -1260,11 +556,13 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 	var initScene = function( container , source ) {
 		
 		// Renderer
-		renderer = new THREE.WebGLRenderer({antialias: true});
+		renderer = new THREE.WebGLRenderer({
+			antialias: true,
+			alpha : true
+		});
 		renderer.setSize( container.width() , container.height() );
 		renderer.shadowMapEnabled = true;
-		renderer.shadowMapCullFrontFaces = false;
-		$( renderer.domElement ).appendTo( container );
+		container[0].appendChild( renderer.domElement );
 		
 		
 		// Scene
@@ -1272,29 +570,41 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 
 		// Light
 		
-		var light = new THREE.SpotLight( 0xffffff, 0.5, 0, Math.PI, 1 );
-		light.position.set( 500 , 1500 , 2000 );
-		light.target.position.set( 0, 0, 0 );
-		scene.add( light );
+		var dirLight = new THREE.SpotLight( 0xffffff, 0, 0, Math.PI , 1 );
+		dirLight.position.set( 500 , 1200 , 1500 );
+		dirLight.target.position.set( 0, 200, 0 );
+		scene.add( dirLight );
 
-		light.castShadow = true;
+		dirLight.castShadow = true;
 
-		light.shadowMapWidth = 2048;
-		light.shadowMapHeight = 2048;
+		dirLight.shadowMapWidth = 2048;
+		dirLight.shadowMapHeight = 2048;
 
 		var d = 50;
 
-		light.shadowCameraLeft = -d;
-		light.shadowCameraRight = d;
-		light.shadowCameraTop = d;
-		light.shadowCameraBottom = -d;
+		dirLight.shadowCameraLeft = -d;
+		dirLight.shadowCameraRight = d;
+		dirLight.shadowCameraTop = d;
+		dirLight.shadowCameraBottom = -d;
 
-		light.shadowCameraFar = 44500;
-		light.shadowCameraNear = 10;
-		light.shadowCameraFov = 50;
-		light.shadowBias = -0.0001;
-		light.shadowDarkness = 0.5;
+		dirLight.shadowCameraFar = 44500;
+		dirLight.shadowCameraNear = 10;
+		dirLight.shadowCameraFov = 50;
+		dirLight.shadowBias = -0.0001;
+		dirLight.shadowDarkness = 0.5;
 		
+
+		if( debug )
+			scene.add( new THREE.DirectionalLightHelper(dirLight, 50 ) );
+
+		var pointLight = new THREE.PointLight( 0xffffff, 0.5 , 0 );
+		pointLight.position.set( 500, 550, 500 );
+		scene.add( pointLight );
+		
+		if( debug )
+			scene.add( new THREE.PointLightHelper(pointLight, 50 ) );
+		
+
 
 		var ambient = new THREE.AmbientLight( 0x888888 );
 		scene.add( ambient );
@@ -1309,9 +619,8 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 		);
 		camera.position.set( 60, 50, 60 );
 		camera.lookAt( scene.position );
-		scope.camera = camera;
 		
-		
+
 		//phy
 		 // Create world
         var world = new CANNON.World();
@@ -1374,6 +683,8 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			visual.position.x = phy.position.x / ratioVisual;
 			visual.position.y = phy.position.y / ratioVisual;
 			visual.position.z = phy.position.z / ratioVisual;
+
+			
 			
 		}
 	};
@@ -1572,62 +883,9 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 					if( bodies[ i ].label == label )
 						bodies[ i ].burst();
 			};
-			var action_addFonzie = function( label ){
-				/*
-				var geometry = new THREE.Geometry();
-					geometry.vertices = [ 
-						new THREE.Vector3( 0 / ratioVisual , 0 / ratioVisual , 0 / ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 0 / ratioVisual , 16/ ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 20 / ratioVisual , 16/ ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 20 / ratioVisual , 0/ ratioVisual )
-						];
-					geometry.faces = [ new THREE.Face4( 0 , 1 , 2 , 3 ),new THREE.Face4( 3 , 2 , 1 , 0 ) ];
-					
-					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( 0 , 0 ) , 
-						new THREE.UV( 1 , 0 ) , 
-						new THREE.UV( 1,  1 ) , 
-						new THREE.UV( 0,  1 ) 
-						
-						] );
-						
-					geometry.faceVertexUvs[ 0 ].push( [ 
-
-						new THREE.UV( 0 , 1 ) , 
-						new THREE.UV( 1 , 1 ) , 
-						new THREE.UV( 1,  0 ) , 
-						new THREE.UV( 0,  0 )  
-						
-						] );
-					geometry.computeCentroids();
-					geometry.computeFaceNormals();
-					
-					
-					var texture = THREE.ImageUtils.loadTexture("./ressource/fonzie.png");
-					var material = new THREE.MeshBasicMaterial( {map: texture } );
-					material.transparent = true;
-					
-					fonzie = new THREE.Mesh( geometry, material );
-					
-					scene.add( fonzie );
-					
-					fonzie.rotation.y = Math.PI/2;
-					fonzie.rotation.x = 3*Math.PI/2;
-					
-					fonzie.position.x = 25;
-					fonzie.position.y = 0;
-					fonzie.position.z = -5;
-				*/
-				$("#fonzie").css({ "display" : "block"});
-				$(".thanks").css({ "display" : "block"});
-				
-			};
-			var action_addFonzie2 = function(  ){
+			var action_addFonzie = function(  ){
 				$("#fonzie").addClass( "visible" );
-				$(".thanks").addClass( "visible" );
-			};
-			var action_rotateFonzie = function(  ){
-				//fonzie.rotation.x += Math.PI/200;
+				//$(".thanks").addClass( "visible" );
 			};
 			
 			speedTween = [ 
@@ -1665,10 +923,7 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 				{ t : 33000 , f : function(){ action_bum( "exp" ); } },
 				{ t : 33300 , f : function(){ action_bum( "training" ); } },
 				{ t : 40000 , f : function(){ action_addFonzie(); } },
-				{ t : 40500 , f : function(){ action_addFonzie2(); } },
 			];
-			for( var t = 0 ; t < 100 ; t ++ )
-				action.push( { t : 40500 + t*18 , f : action_rotateFonzie } );
 			
 			
 			var splines = tween;
@@ -1769,21 +1024,21 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 			camera.position.z = position.z;
 			
 			
-			var v = new THREE.Vector3().sub( view , position );
+			var v = (new THREE.Vector3()).subVectors( view , position );
 			
 			var n = v.length();
 			
 			var y = new THREE.Vector3( 0 , 1 , 0 );
 			var e = v.divideScalar( n );
-			var g = new THREE.Vector3().cross( e , y );
+			var g = new THREE.Vector3().crossVectors( e , y );
 			g.normalize();
 			
 			var tdecL = decL * Math.max( 0.5 , n * ratioVisual  / 50 ); 
 			
 			
 			var upPos = new THREE.Vector3().copy( position );
-			upPos.add( upPos , g.multiplyScalar(  posScreen.x * tdecL ) );
-			upPos.add( upPos , y.multiplyScalar(  posScreen.y * tdecL ) );
+			upPos.addVectors( upPos , g.multiplyScalar(  posScreen.x * tdecL ) );
+			upPos.addVectors( upPos , y.multiplyScalar(  posScreen.y * tdecL ) );
 			
 			
 			camera.position.x = upPos.x;
@@ -1799,26 +1054,204 @@ var debug = ( window && window.location ) ? window.location.search == "?debug=tr
 		scope.tweeny = tweeny;
 		scope.initMotion = initMotion;
 		
-	} )(  this );
+	} )( this );
 	
 	
-	scope.init = function( container , structure , callBack ) {
-		initRatio( container , structure );
-		initBumpmap();
-		initTexture( container , structure , callBack );
-		
-		// unless initSctructure, those function does not recquire the texture tu be loaded
-		initScene( container , structure );
+	var preload = function( _container ) {
 
-		initMotion( container , structure );
+		container = _container
+
+		var get = function( url ){
+			return new Promise( function(resolve,rejected){
+
+				var success = function( rep ){
+				    if( rep.target.status != 200 || !rep.target.responseText.length  )
+				        return rejected( rep.target )
+
+				    if( rep.target.status == 200  )
+				        return resolve( rep.target.responseText )
+				}
+
+				var error  = function( rep ){
+				    rejected( rep );
+				}
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("get", url , true);
+				xhr.addEventListener("error", error , false);
+				xhr.addEventListener("abort", error , false);
+				xhr.addEventListener("load", success , false);
+				xhr.send();
+			});
+		};
+
+		var extractResume = function(htmlString){
+
+			var shear = function( htmlString , skip ){
+
+				skip = skip || [
+					"script",
+					"title",
+					"style",
+					"meta",
+					"link"
+				]
+
+				var start=0,
+					end= 0
+
+				for( var i = 0 ; i < skip.length ; i ++ ){
+					
+					start=0
+
+					while( ( start = htmlString.indexOf( "<"+skip[ i ] , start ) ) != -1 ){
+						
+						var nextClosed = htmlString.indexOf( ">" , start)
+						
+						var nextAutoClosed = htmlString.indexOf( "/>" , start)
+						
+						if( nextAutoClosed > 0 && nextClosed == nextAutoClosed+1 ){
+							// tag < ... />
+							end = nextClosed+1;
+						} else {
+							end = htmlString.indexOf( "</"+skip[ i ]+">" , start );
+							if( end == -1 )
+								// can't fin the closing tag /!\
+								end = nextClosed+1;
+							else 
+								end += ("</"+skip[ i ]+">").length
+						}
+						
+						htmlString = htmlString.substring( 0 , start ) + htmlString.substring( end , htmlString.length );
+					}
+				}
+
+				return htmlString
+			}
+
+			htmlString = htmlString.replace(/\&nbsp;/g , ' ')
+			htmlString = htmlString.replace(/\&/g , 'a')
+			htmlString = shear( htmlString )
+
+			// happend the string to a node
+			var container = document.createElement('div')
+			container.innerHTML = htmlString
+
+			return container.querySelector( '.resume' )
+		};
+
+		var promiseAllAsObject = function( set ){
+			return new Promise(function(resolve,reject){
+
+				var res = {};
+
+				for(var i in set )
+					(function(){
+						var label = i
+						set[ i ].then(function( data ){
+							res[ label ] = data
+
+							var finished=true
+							for(var i in set)
+								if( !res[i] )
+									finished=false
+
+							if(finished)
+								resolve( res )
+						},reject)
+					})()
+			})
+		}
+
+		var renderAllTextures = function( dom ){
+
+			// happend the dom to the document ( mandatory )
+			var container = document.createElement('div')
+			//container.style.display = 'none'
+			container.appendChild(dom)
+
+			var body = document.getElementsByTagName('body')[0]
+			body.appendChild(container)
+
+			if( debug )
+				body.style.overflow = 'visible'
+
+			// forced reflow
+			container.offsetWidth
+
+			// grab the bricks
+			var bricks = dom.querySelectorAll('.brick')
+
+			// create the html2canvas promise
+			var promises = {}
+			var options = {}
+			
+			for(var i=bricks.length;i--;)
+				promises[ bricks[i].getAttribute('id') ] = html2canvas( bricks[i] , options )
+
+			
+			// merge all the promises
+			return promiseAllAsObject( promises )
+		};
+
+		// grab the file which contains the structure of the resume
+		return get('/build/resume.html')
+
+		// grab the resume from this file
+		.then( extractResume )
+
+		// save the structure
+		// and start rendering the bricks on canvas
+		.then(function( dom ){
+			structure = $(dom)
+
+			// start rendering the textures
+			return renderAllTextures( dom )
+		})
+
+		// save the textures
+		.then(function( _textures ){
+
+			for( var i in _textures )
+				textures[i] = _textures[i]
+
+			if( debug )
+				for( var i in textures )
+					document.getElementsByTagName('body')[0].appendChild(textures[i])
+		})
+		
 	};
-	scope.go = function(){
+	var init = function(){
+
+		// compute the ratio container/world
+		initRatio( container , structure );
+
+		// bootstrap the scene
+		initScene( container );
+		initMotion( container );
+		initBumpmap();
+
+		// init the bodies ( need )
+		initStructure( container , structure , textures );
+
+	};
+	var go = function(){
+
 		lastTime = new Date().getTime();
 		requestAnimFrame(main);
 	};
+
+	return {
+		preload : preload,
+		go : go,
+		camera : camera,
+		init: init
+	}
 			
 	
-})( window );
+})( );
+
+
 
 
 

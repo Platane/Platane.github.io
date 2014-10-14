@@ -1,4 +1,4 @@
-I did the 20th __global game__ with some friends at the Nancy spot.
+I did the 20th __global game Jam__ with some friends at the Nancy spot.
 
 We made a game in __48h__, barely sleeping.
 

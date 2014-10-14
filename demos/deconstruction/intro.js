@@ -335,21 +335,39 @@ scope.launchAnimation = launch;
 
 window.onload = function(){
 	
+	var preload = deconstruction.preload( $( "#container" ) )
+	.then(function(){
+		preload = true
+	})
+	.then(null,function(e){
+		console.error(e.message,e.stack)
+	})
+
 	inithAnimation( $( "#container" ) );
-	launchAnimation( $( "#container" ) , { o : this , f : function(){
-		init( $( "#container" ) , $( "#structure" ) , { o : this , f:function(){
-			this.go(); 
+	launchAnimation( $( "#container" ) , { 
+		o : this ,
+		f : function(){
+
+			var start = function(){
+				deconstruction.init()
+
+				$("#sound_player_loop")[0].pause();
+				$("#sound_player")[0] = $("#sound_player_loop")[0].currentTime = 0;
 			
-			
-			$("#sound_player_loop")[0].pause();
-			$("#sound_player_loop")[0].currentTime = 0;
-			
-			$("#sound_player")[0].play(); 
-			
-			$("body").css({ "cursor" : "auto" });
-		} 
-		} );
-	} } );
+				$("#sound_player")[0].play(); 
+
+				deconstruction.go()
+			}
+
+			// launch
+			if( preload === true )
+				start()
+			else
+				preload.then(start)
+
+		}
+	});
+
 
 	$("#volumeControl").bind( "change" , function( e ){
 		$("#sound_player")[0].volume = parseInt( e.target.value ) / 100;
@@ -363,4 +381,6 @@ window.onload = function(){
 	
 	$("#volumeControl")[0].value = 70;
 	$("#volumeControl").change();
+
+	//$("#sound_player")[0].volume = $("#sound_player_loop")[0].volume = 0
 };

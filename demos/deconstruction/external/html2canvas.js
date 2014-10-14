@@ -1,2874 +1,2718 @@
-/**
-  @license html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
-
-  Released under MIT License
- */
-(function(window, document, undefined){
-
 /*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
-
-  Released under MIT License
- */
-"use strict";
-
-var _html2canvas = {},
-previousElement,
-computedCSS,
-html2canvas;
-
-
-function h2clog(a) {
-    if (_html2canvas.logging && window.console && window.console.log) {
-        window.console.log(a);
-    }
-}
-
-_html2canvas.Util = {};
-
-_html2canvas.Util.backgroundImage = function (src) {
-
-    if (/data:image\/.*;base64,/i.test( src ) || /^(-webkit|-moz|linear-gradient|-o-)/.test( src )) {
-        return src;
-    }
-
-    if (src.toLowerCase().substr( 0, 5 ) === 'url("') {
-        src = src.substr( 5 );
-        src = src.substr( 0, src.length - 2 );
-    } else {
-        src = src.substr( 4 );
-        src = src.substr( 0, src.length - 1 );
-    }
-
-    return src;
-};
-
-_html2canvas.Util.Bounds = function getBounds (el) {
-    var clientRect,
-    bounds = {};
-
-    if (el.getBoundingClientRect){
-        clientRect = el.getBoundingClientRect();
-
-
-        // TODO add scroll position to bounds, so no scrolling of window necessary
-        bounds.top = clientRect.top;
-        bounds.bottom = clientRect.bottom || (clientRect.top + clientRect.height);
-        bounds.left = clientRect.left;
-
-        // older IE doesn't have width/height, but top/bottom instead
-        bounds.width = clientRect.width || (clientRect.right - clientRect.left);
-        bounds.height = clientRect.height || (clientRect.bottom - clientRect.top);
-
-        return bounds;
-
-    }
-};
-
-_html2canvas.Util.getCSS = function (el, attribute) {
-    // return $(el).css(attribute);
-
-    var val;
-
-    function toPX( attribute, val ) {
-        var rsLeft = el.runtimeStyle && el.runtimeStyle[ attribute ],
-        left,
-        style = el.style;
-
-        // Check if we are not dealing with pixels, (Opera has issues with this)
-        // Ported from jQuery css.js
-        // From the awesome hack by Dean Edwards
-        // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
-
-        // If we're not dealing with a regular pixel number
-        // but a number that has a weird ending, we need to convert it to pixels
-
-        if ( !/^-?[0-9]+\.?[0-9]*(?:px)?$/i.test( val ) && /^-?\d/.test( val ) ) {
-
-            // Remember the original values
-            left = style.left;
-
-            // Put in the new values to get a computed value out
-            if ( rsLeft ) {
-                el.runtimeStyle.left = el.currentStyle.left;
-            }
-            style.left = attribute === "fontSize" ? "1em" : (val || 0);
-            val = style.pixelLeft + "px";
-
-            // Revert the changed values
-            style.left = left;
-            if ( rsLeft ) {
-                el.runtimeStyle.left = rsLeft;
-            }
-
-        }
-
-        if (!/^(thin|medium|thick)$/i.test( val )) {
-            return Math.round(parseFloat( val )) + "px";
-        }
-
-        return val;
-
-    }
-
-
-    if ( window.getComputedStyle ) {
-        if ( previousElement !== el ) {
-            computedCSS = document.defaultView.getComputedStyle(el, null);
-        }
-        val = computedCSS[ attribute ];
-
-        if ( attribute === "backgroundPosition" ) {
-
-            val = (val.split(",")[0] || "0 0").split(" ");
-
-            val[ 0 ] = ( val[0].indexOf( "%" ) === -1 ) ? toPX(  attribute + "X", val[ 0 ] ) : val[ 0 ];
-            val[ 1 ] = ( val[1] === undefined ) ? val[0] : val[1]; // IE 9 doesn't return double digit always
-            val[ 1 ] = ( val[1].indexOf( "%" ) === -1 ) ? toPX(  attribute + "Y", val[ 1 ] ) : val[ 1 ];
-        }
-
-    } else if ( el.currentStyle ) {
-        // IE 9>
-        if (attribute === "backgroundPosition") {
-            // Older IE uses -x and -y
-            val = [ toPX(  attribute + "X", el.currentStyle[ attribute + "X" ]  ), toPX(  attribute + "Y", el.currentStyle[ attribute + "Y" ]  ) ];
-        } else {
-
-            val = toPX(  attribute, el.currentStyle[ attribute ]  );
-
-            if (/^(border)/i.test( attribute ) && /^(medium|thin|thick)$/i.test( val )) {
-                switch (val) {
-                    case "thin":
-                        val = "1px";
-                        break;
-                    case "medium":
-                        val = "0px"; // this is wrong, it should be 3px but IE uses medium for no border as well.. TODO find a work around
-                        break;
-                    case "thick":
-                        val = "5px";
-                        break;
-                }
-            }
-        }
-
-
-
-    }
-
-
-
-
-    return val;
-
-
-
-//return $(el).css(attribute);
-
-
-};
-
-
-_html2canvas.Util.BackgroundPosition = function ( el, bounds, image ) {
-    // TODO add support for multi image backgrounds
-
-    var bgposition =  _html2canvas.Util.getCSS( el, "backgroundPosition" ) ,
-    topPos,
-    left,
-    percentage,
-    val;
-
-    if (bgposition.length === 1){
-        val = bgposition;
-
-        bgposition = [];
-
-        bgposition[0] = val;
-        bgposition[1] = val;
-    }
-
-
-
-    if (bgposition[0].toString().indexOf("%") !== -1){
-        percentage = (parseFloat(bgposition[0])/100);
-        left =  ((bounds.width * percentage)-(image.width*percentage));
-
-    }else{
-        left = parseInt(bgposition[0],10);
-    }
-
-    if (bgposition[1].toString().indexOf("%") !== -1){
-
-        percentage = (parseFloat(bgposition[1])/100);
-        topPos =  ((bounds.height * percentage)-(image.height*percentage));
-    }else{
-        topPos = parseInt(bgposition[1],10);
-    }
-
-
-
-
-    return {
-        top: topPos,
-        left: left
-    };
-
-};
-
-_html2canvas.Util.Extend = function (options, defaults) {
-    for (var key in options) {
-        if (options.hasOwnProperty(key)) {
-            defaults[key] = options[key];
-        }
-    }
-    return defaults;
-};
-
-
-/*
- * Derived from jQuery.contents()
- * Copyright 2010, John Resig
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
- */
-_html2canvas.Util.Children = function( elem ) {
-
-
-    var children;
-    try {
-
-        children = (elem.nodeName && elem.nodeName.toUpperCase() === "IFRAME") ?
-        elem.contentDocument || elem.contentWindow.document : (function( array ){
-            var ret = [];
-
-            if ( array !== null ) {
-
-                (function( first, second ) {
-                    var i = first.length,
-                    j = 0;
-
-                    if ( typeof second.length === "number" ) {
-                        for ( var l = second.length; j < l; j++ ) {
-                            first[ i++ ] = second[ j ];
-                        }
-
-                    } else {
-                        while ( second[j] !== undefined ) {
-                            first[ i++ ] = second[ j++ ];
-                        }
-                    }
-
-                    first.length = i;
-
-                    return first;
-                })( ret, array );
-
-            }
-
-            return ret;
-        })( elem.childNodes );
-
-    } catch (ex) {
-        h2clog("html2canvas.Util.Children failed with exception: " + ex.message);
-        children = [];
-    }
-    return children;
-};
-
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
-
-  Contributor(s):
-      Niklas von Hertzen <http://www.twitter.com/niklasvh>
-      André Fiedler      <http://www.twitter.com/sonnenkiste>
-
-  Released under MIT License
- */
-
-(function(){
-
-_html2canvas.Generate = {};
-
-var reGradients = [
-    /^(-webkit-linear-gradient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
-    /^(-o-linear-gradient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
-    /^(-webkit-gradient)\((linear|radial),\s((?:\d{1,3}%?)\s(?:\d{1,3}%?),\s(?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)-]+)\)$/,
-    /^(-moz-linear-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)]+)\)$/,
-    /^(-webkit-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z-]+)([\w\d\.\s,%\(\)]+)\)$/,
-    /^(-moz-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s?([a-z-]*)([\w\d\.\s,%\(\)]+)\)$/,
-    /^(-o-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z-]+)([\w\d\.\s,%\(\)]+)\)$/
-];
-
-/*
- * TODO: Add IE10 vendor prefix (-ms) support
- * TODO: Add W3C gradient (linear-gradient) support
- * TODO: Add old Webkit -webkit-gradient(radial, ...) support
- * TODO: Maybe some RegExp optimizations are possible ;o)
- */
-_html2canvas.Generate.parseGradient = function(css, bounds) {
-    var gradient, i, len = reGradients.length, m1, stop, m2, m2Len, step, m3;
-
-    for(i = 0; i < len; i+=1){
-        m1 = css.match(reGradients[i]);
-        if(m1) break;
-    }
-
-    if(m1) {
-        switch(m1[1]) {
-            case '-webkit-linear-gradient':
-            case '-o-linear-gradient':
-
-                gradient = {
-                    type: 'linear',
-                    x0: null,
-                    y0: null,
-                    x1: null,
-                    y1: null,
-                    colorStops: []
-                };
-
-                // get coordinates
-                m2 = m1[2].match(/\w+/g);
-                if(m2){
-                    m2Len = m2.length;
-                    for(i = 0; i < m2Len; i+=1){
-                        switch(m2[i]) {
-                            case 'top':
-                                gradient.y0 = 0;
-                                gradient.y1 = bounds.height;
-                                break;
-
-                            case 'right':
-                                gradient.x0 = bounds.width;
-                                gradient.x1 = 0;
-                                break;
-
-                            case 'bottom':
-                                gradient.y0 = bounds.height;
-                                gradient.y1 = 0;
-                                break;
-
-                            case 'left':
-                                gradient.x0 = 0;
-                                gradient.x1 = bounds.width;
-                                break;
-                        }
-                    }
-                }
-                if(gradient.x0 === null && gradient.x1 === null){ // center
-                    gradient.x0 = gradient.x1 = bounds.width / 2;
-                }
-                if(gradient.y0 === null && gradient.y1 === null){ // center
-                    gradient.y0 = gradient.y1 = bounds.height / 2;
-                }
-
-                // get colors and stops
-                m2 = m1[3].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\)(?:\s\d{1,3}(?:%|px))?)+/g);
-                if(m2){
-                    m2Len = m2.length;
-                    step = 1 / Math.max(m2Len - 1, 1);
-                    for(i = 0; i < m2Len; i+=1){
-                        m3 = m2[i].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\s*(\d{1,3})?(%|px)?/);
-                        if(m3[2]){
-                            stop = parseFloat(m3[2]);
-                            if(m3[3] === '%'){
-                                stop /= 100;
-                            } else { // px - stupid opera
-                                stop /= bounds.width;
-                            }
-                        } else {
-                            stop = i * step;
-                        }
-                        gradient.colorStops.push({
-                            color: m3[1],
-                            stop: stop
-                        });
-                    }
-                }
-                break;
-
-            case '-webkit-gradient':
-
-                gradient = {
-                    type: m1[2] === 'radial' ? 'circle' : m1[2], // TODO: Add radial gradient support for older mozilla definitions
-                    x0: 0,
-                    y0: 0,
-                    x1: 0,
-                    y1: 0,
-                    colorStops: []
-                };
-
-                // get coordinates
-                m2 = m1[3].match(/(\d{1,3})%?\s(\d{1,3})%?,\s(\d{1,3})%?\s(\d{1,3})%?/);
-                if(m2){
-                    gradient.x0 = (m2[1] * bounds.width) / 100;
-                    gradient.y0 = (m2[2] * bounds.height) / 100;
-                    gradient.x1 = (m2[3] * bounds.width) / 100;
-                    gradient.y1 = (m2[4] * bounds.height) / 100;
-                }
-
-                // get colors and stops
-                m2 = m1[4].match(/((?:from|to|color-stop)\((?:[0-9\.]+,\s)?(?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\)\))+/g);
-                if(m2){
-                    m2Len = m2.length;
-                    for(i = 0; i < m2Len; i+=1){
-                        m3 = m2[i].match(/(from|to|color-stop)\(([0-9\.]+)?(?:,\s)?((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\)/);
-                        stop = parseFloat(m3[2]);
-                        if(m3[1] === 'from') stop = 0.0;
-                        if(m3[1] === 'to') stop = 1.0;
-                        gradient.colorStops.push({
-                            color: m3[3],
-                            stop: stop
-                        });
-                    }
-                }
-                break;
-
-            case '-moz-linear-gradient':
-
-                gradient = {
-                    type: 'linear',
-                    x0: 0,
-                    y0: 0,
-                    x1: 0,
-                    y1: 0,
-                    colorStops: []
-                };
-
-                // get coordinates
-                m2 = m1[2].match(/(\d{1,3})%?\s(\d{1,3})%?/);
-
-                // m2[1] == 0%   -> left
-                // m2[1] == 50%  -> center
-                // m2[1] == 100% -> right
-
-                // m2[2] == 0%   -> top
-                // m2[2] == 50%  -> center
-                // m2[2] == 100% -> bottom
-
-                if(m2){
-                    gradient.x0 = (m2[1] * bounds.width) / 100;
-                    gradient.y0 = (m2[2] * bounds.height) / 100;
-                    gradient.x1 = bounds.width - gradient.x0;
-                    gradient.y1 = bounds.height - gradient.y0;
-                }
-
-                // get colors and stops
-                m2 = m1[3].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\)(?:\s\d{1,3}%)?)+/g);
-                if(m2){
-                    m2Len = m2.length;
-                    step = 1 / Math.max(m2Len - 1, 1);
-                    for(i = 0; i < m2Len; i+=1){
-                        m3 = m2[i].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\s*(\d{1,3})?(%)?/);
-                        if(m3[2]){
-                            stop = parseFloat(m3[2]);
-                            if(m3[3]){ // percentage
-                                stop /= 100;
-                            }
-                        } else {
-                            stop = i * step;
-                        }
-                        gradient.colorStops.push({
-                            color: m3[1],
-                            stop: stop
-                        });
-                    }
-                }
-                break;
-
-            case '-webkit-radial-gradient':
-            case '-moz-radial-gradient':
-            case '-o-radial-gradient':
-
-                gradient = {
-                    type: 'circle',
-                    x0: 0,
-                    y0: 0,
-                    x1: bounds.width,
-                    y1: bounds.height,
-                    cx: 0,
-                    cy: 0,
-                    rx: 0,
-                    ry: 0,
-                    colorStops: []
-                };
-
-                // center
-                m2 = m1[2].match(/(\d{1,3})%?\s(\d{1,3})%?/);
-                if(m2){
-                    gradient.cx = (m2[1] * bounds.width) / 100;
-                    gradient.cy = (m2[2] * bounds.height) / 100;
-                }
-
-                // size
-                m2 = m1[3].match(/\w+/);
-                m3 = m1[4].match(/[a-z-]*/);
-                if(m2 && m3){
-                    switch(m3[0]){
-                        case 'farthest-corner':
-                        case 'cover': // is equivalent to farthest-corner
-                        case '': // mozilla removes "cover" from definition :(
-                            var tl = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.cy, 2));
-                            var tr = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
-                            var br = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
-                            var bl = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.cy, 2));
-                            gradient.rx = gradient.ry = Math.max(tl, tr, br, bl);
-                            break;
-                        case 'closest-corner':
-                            var tl = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.cy, 2));
-                            var tr = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
-                            var br = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
-                            var bl = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.cy, 2));
-                            gradient.rx = gradient.ry = Math.min(tl, tr, br, bl);
-                            break;
-                        case 'farthest-side':
-                            if(m2[0] === 'circle'){
-                                gradient.rx = gradient.ry = Math.max(
-                                    gradient.cx,
-                                    gradient.cy,
-                                    gradient.x1 - gradient.cx,
-                                    gradient.y1 - gradient.cy
-                                );
-                            } else { // ellipse
-
-                                gradient.type = m2[0];
-
-                                gradient.rx = Math.max(
-                                    gradient.cx,
-                                    gradient.x1 - gradient.cx
-                                );
-                                gradient.ry = Math.max(
-                                    gradient.cy,
-                                    gradient.y1 - gradient.cy
-                                );
-                            }
-                            break;
-                        case 'closest-side':
-                        case 'contain': // is equivalent to closest-side
-                            if(m2[0] === 'circle'){
-                                gradient.rx = gradient.ry = Math.min(
-                                    gradient.cx,
-                                    gradient.cy,
-                                    gradient.x1 - gradient.cx,
-                                    gradient.y1 - gradient.cy
-                                );
-                            } else { // ellipse
-
-                                gradient.type = m2[0];
-
-                                gradient.rx = Math.min(
-                                    gradient.cx,
-                                    gradient.x1 - gradient.cx
-                                );
-                                gradient.ry = Math.min(
-                                    gradient.cy,
-                                    gradient.y1 - gradient.cy
-                                );
-                            }
-                            break;
-
-                        // TODO: add support for "30px 40px" sizes (webkit only)
-                    }
-                }
-
-                // color stops
-                m2 = m1[5].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\)(?:\s\d{1,3}(?:%|px))?)+/g);
-                if(m2){
-                    m2Len = m2.length;
-                    step = 1 / Math.max(m2Len - 1, 1);
-                    for(i = 0; i < m2Len; i+=1){
-                        m3 = m2[i].match(/((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\s*(\d{1,3})?(%|px)?/);
-                        if(m3[2]){
-                            stop = parseFloat(m3[2]);
-                            if(m3[3] === '%'){
-                                stop /= 100;
-                            } else { // px - stupid opera
-                                stop /= bounds.width;
-                            }
-                        } else {
-                            stop = i * step;
-                        }
-                        gradient.colorStops.push({
-                            color: m3[1],
-                            stop: stop
-                        });
-                    }
-                }
-                break;
-        }
-    }
-
-    return gradient;
-};
-
-_html2canvas.Generate.Gradient = function(src, bounds) {
-    var canvas = document.createElement('canvas'),
-    ctx = canvas.getContext('2d'),
-    gradient, grad, i, len, img;
-
-    canvas.width = bounds.width;
-    canvas.height = bounds.height;
-
-    // TODO: add support for multi defined background gradients (like radial gradient example in background.html)
-    gradient = _html2canvas.Generate.parseGradient(src, bounds);
-
-    img = new Image();
-
-    if(gradient){
-        if(gradient.type === 'linear'){
-            grad = ctx.createLinearGradient(gradient.x0, gradient.y0, gradient.x1, gradient.y1);
-
-            for (i = 0, len = gradient.colorStops.length; i < len; i+=1) {
-                try {
-                    grad.addColorStop(gradient.colorStops[i].stop, gradient.colorStops[i].color);
-                }
-                catch(e) {
-                    h2clog(['failed to add color stop: ', e, '; tried to add: ', gradient.colorStops[i], '; stop: ', i, '; in: ', src]);
-                }
-            }
-
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, bounds.width, bounds.height);
-
-            img.src = canvas.toDataURL();
-        } else if(gradient.type === 'circle'){
-
-            grad = ctx.createRadialGradient(gradient.cx, gradient.cy, 0, gradient.cx, gradient.cy, gradient.rx);
-
-            for (i = 0, len = gradient.colorStops.length; i < len; i+=1) {
-                try {
-                    grad.addColorStop(gradient.colorStops[i].stop, gradient.colorStops[i].color);
-                }
-                catch(e) {
-                    h2clog(['failed to add color stop: ', e, '; tried to add: ', gradient.colorStops[i], '; stop: ', i, '; in: ', src]);
-                }
-            }
-
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, bounds.width, bounds.height);
-
-            img.src = canvas.toDataURL();
-        } else if(gradient.type === 'ellipse'){
-
-            // draw circle
-            var canvasRadial = document.createElement('canvas'),
-                ctxRadial = canvasRadial.getContext('2d'),
-                ri = Math.max(gradient.rx, gradient.ry),
-                di = ri * 2, imgRadial;
-
-            canvasRadial.width = canvasRadial.height = di;
-
-            grad = ctxRadial.createRadialGradient(gradient.rx, gradient.ry, 0, gradient.rx, gradient.ry, ri);
-
-            for (i = 0, len = gradient.colorStops.length; i < len; i+=1) {
-                try {
-                    grad.addColorStop(gradient.colorStops[i].stop, gradient.colorStops[i].color);
-                }
-                catch(e) {
-                    h2clog(['failed to add color stop: ', e, '; tried to add: ', gradient.colorStops[i], '; stop: ', i, '; in: ', src]);
-                }
-            }
-
-            ctxRadial.fillStyle = grad;
-            ctxRadial.fillRect(0, 0, di, di);
-
-            ctx.fillStyle = gradient.colorStops[i - 1].color;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            imgRadial = new Image();
-            imgRadial.onload = function() { // wait until the image is filled
-
-                // transform circle to ellipse
-                ctx.drawImage(imgRadial, gradient.cx - gradient.rx, gradient.cy - gradient.ry, 2 * gradient.rx, 2 * gradient.ry);
-
-                img.src = canvas.toDataURL();
-
-            }
-            imgRadial.src = canvasRadial.toDataURL();
-        }
-    }
-
-    return img;
-};
-
-_html2canvas.Generate.ListAlpha = function(number) {
-    var tmp = "",
-    modulus;
-
-    do {
-        modulus = number % 26;
-        tmp = String.fromCharCode((modulus) + 64) + tmp;
-        number = number / 26;
-    }while((number*26) > 26);
-
-    return tmp;
-};
-
-_html2canvas.Generate.ListRoman = function(number) {
-    var romanArray = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"],
-    decimal = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1],
-    roman = "",
-    v,
-    len = romanArray.length;
-
-    if (number <= 0 || number >= 4000) {
-        return number;
-    }
-
-    for (v=0; v < len; v+=1) {
-        while (number >= decimal[v]) {
-            number -= decimal[v];
-            roman += romanArray[v];
-        }
-    }
-
-    return roman;
-
-};
-
-})();
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
+  html2canvas 0.5.0-alpha <http://html2canvas.hertzen.com>
+  Copyright (c) 2014 Niklas von Hertzen
 
   Released under MIT License
 */
 
+(function(window, document, undefined){
+
 /*
- *  New function for traversing elements
+ Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+ the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ of the Software, and to permit persons to whom the Software is furnished to do
+ so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
  */
+!function(){var a,b,c,d;!function(){var e={},f={};a=function(a,b,c){e[a]={deps:b,callback:c}},d=c=b=function(a){function c(b){if("."!==b.charAt(0))return b;for(var c=b.split("/"),d=a.split("/").slice(0,-1),e=0,f=c.length;f>e;e++){var g=c[e];if(".."===g)d.pop();else{if("."===g)continue;d.push(g)}}return d.join("/")}if(d._eak_seen=e,f[a])return f[a];if(f[a]={},!e[a])throw new Error("Could not find module "+a);for(var g,h=e[a],i=h.deps,j=h.callback,k=[],l=0,m=i.length;m>l;l++)"exports"===i[l]?k.push(g={}):k.push(b(c(i[l])));var n=j.apply(this,k);return f[a]=g||n}}(),a("promise/all",["./utils","exports"],function(a,b){"use strict";function c(a){var b=this;if(!d(a))throw new TypeError("You must pass an array to all.");return new b(function(b,c){function d(a){return function(b){f(a,b)}}function f(a,c){h[a]=c,0===--i&&b(h)}var g,h=[],i=a.length;0===i&&b([]);for(var j=0;j<a.length;j++)g=a[j],g&&e(g.then)?g.then(d(j),c):f(j,g)})}var d=a.isArray,e=a.isFunction;b.all=c}),a("promise/asap",["exports"],function(a){"use strict";function b(){return function(){process.nextTick(e)}}function c(){var a=0,b=new i(e),c=document.createTextNode("");return b.observe(c,{characterData:!0}),function(){c.data=a=++a%2}}function d(){return function(){j.setTimeout(e,1)}}function e(){for(var a=0;a<k.length;a++){var b=k[a],c=b[0],d=b[1];c(d)}k=[]}function f(a,b){var c=k.push([a,b]);1===c&&g()}var g,h="undefined"!=typeof window?window:{},i=h.MutationObserver||h.WebKitMutationObserver,j="undefined"!=typeof global?global:this,k=[];g="undefined"!=typeof process&&"[object process]"==={}.toString.call(process)?b():i?c():d(),a.asap=f}),a("promise/cast",["exports"],function(a){"use strict";function b(a){if(a&&"object"==typeof a&&a.constructor===this)return a;var b=this;return new b(function(b){b(a)})}a.cast=b}),a("promise/config",["exports"],function(a){"use strict";function b(a,b){return 2!==arguments.length?c[a]:(c[a]=b,void 0)}var c={instrument:!1};a.config=c,a.configure=b}),a("promise/polyfill",["./promise","./utils","exports"],function(a,b,c){"use strict";function d(){var a="Promise"in window&&"cast"in window.Promise&&"resolve"in window.Promise&&"reject"in window.Promise&&"all"in window.Promise&&"race"in window.Promise&&function(){var a;return new window.Promise(function(b){a=b}),f(a)}();a||(window.Promise=e)}var e=a.Promise,f=b.isFunction;c.polyfill=d}),a("promise/promise",["./config","./utils","./cast","./all","./race","./resolve","./reject","./asap","exports"],function(a,b,c,d,e,f,g,h,i){"use strict";function j(a){if(!w(a))throw new TypeError("You must pass a resolver function as the first argument to the promise constructor");if(!(this instanceof j))throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");this._subscribers=[],k(a,this)}function k(a,b){function c(a){p(b,a)}function d(a){r(b,a)}try{a(c,d)}catch(e){d(e)}}function l(a,b,c,d){var e,f,g,h,i=w(c);if(i)try{e=c(d),g=!0}catch(j){h=!0,f=j}else e=d,g=!0;o(b,e)||(i&&g?p(b,e):h?r(b,f):a===F?p(b,e):a===G&&r(b,e))}function m(a,b,c,d){var e=a._subscribers,f=e.length;e[f]=b,e[f+F]=c,e[f+G]=d}function n(a,b){for(var c,d,e=a._subscribers,f=a._detail,g=0;g<e.length;g+=3)c=e[g],d=e[g+b],l(b,c,d,f);a._subscribers=null}function o(a,b){var c,d=null;try{if(a===b)throw new TypeError("A promises callback cannot return that same promise.");if(v(b)&&(d=b.then,w(d)))return d.call(b,function(d){return c?!0:(c=!0,b!==d?p(a,d):q(a,d),void 0)},function(b){return c?!0:(c=!0,r(a,b),void 0)}),!0}catch(e){return c?!0:(r(a,e),!0)}return!1}function p(a,b){a===b?q(a,b):o(a,b)||q(a,b)}function q(a,b){a._state===D&&(a._state=E,a._detail=b,u.async(s,a))}function r(a,b){a._state===D&&(a._state=E,a._detail=b,u.async(t,a))}function s(a){n(a,a._state=F)}function t(a){n(a,a._state=G)}var u=a.config,v=(a.configure,b.objectOrFunction),w=b.isFunction,x=(b.now,c.cast),y=d.all,z=e.race,A=f.resolve,B=g.reject,C=h.asap;u.async=C;var D=void 0,E=0,F=1,G=2;j.prototype={constructor:j,_state:void 0,_detail:void 0,_subscribers:void 0,then:function(a,b){var c=this,d=new this.constructor(function(){});if(this._state){var e=arguments;u.async(function(){l(c._state,d,e[c._state-1],c._detail)})}else m(this,d,a,b);return d},"catch":function(a){return this.then(null,a)}},j.all=y,j.cast=x,j.race=z,j.resolve=A,j.reject=B,i.Promise=j}),a("promise/race",["./utils","exports"],function(a,b){"use strict";function c(a){var b=this;if(!d(a))throw new TypeError("You must pass an array to race.");return new b(function(b,c){for(var d,e=0;e<a.length;e++)d=a[e],d&&"function"==typeof d.then?d.then(b,c):b(d)})}var d=a.isArray;b.race=c}),a("promise/reject",["exports"],function(a){"use strict";function b(a){var b=this;return new b(function(b,c){c(a)})}a.reject=b}),a("promise/resolve",["exports"],function(a){"use strict";function b(a){var b=this;return new b(function(b){b(a)})}a.resolve=b}),a("promise/utils",["exports"],function(a){"use strict";function b(a){return c(a)||"object"==typeof a&&null!==a}function c(a){return"function"==typeof a}function d(a){return"[object Array]"===Object.prototype.toString.call(a)}var e=Date.now||function(){return(new Date).getTime()};a.objectOrFunction=b,a.isFunction=c,a.isArray=d,a.now=e}),b("promise/polyfill").polyfill()}();
 
-_html2canvas.Parse = function ( images, options ) {
-    window.scroll(0,0);
+if (typeof(Object.create) !== "function" || typeof(document.createElement("canvas").getContext) !== "function") {
+    window.html2canvas = function() {
+        return Promise.reject("No canvas support");
+    };
+    return;
+}
 
-    var support = {
-        rangeBounds: false,
-        svgRendering: options.svgRendering && (function( ){
-            var img = new Image(),
-            canvas = document.createElement("canvas"),
-            ctx = (canvas.getContext === undefined) ? false : canvas.getContext("2d");
-            if (ctx === false) {
-                // browser doesn't support canvas, good luck supporting SVG on canvas
-                return false;
-            }
-            canvas.width = canvas.height = 10;
-            img.src = [
-            "data:image/svg+xml,",
-            "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'>",
-            "<foreignObject width='10' height='10'>",
-            "<div xmlns='http://www.w3.org/1999/xhtml' style='width:10;height:10;'>",
-            "sup",
-            "</div>",
-            "</foreignObject>",
-            "</svg>"
-            ].join("");
-            try {
-                ctx.drawImage(img, 0, 0);
-                canvas.toDataURL();
-            } catch(e) {
-                return false;
-            }
-            h2clog('html2canvas: Parse: SVG powered rendering available');
-            return true;
+/*! https://mths.be/punycode v1.3.1 by @mathias */
+;(function(root) {
 
-        })()
-    },
-    element = (( options.elements === undefined ) ? document.body : options.elements[0]), // select body by default
-    needReorder = false,
-    numDraws = 0,
-    fontData = {},
-    doc = element.ownerDocument,
-    ignoreElementsRegExp = new RegExp("(" + options.ignoreElements + ")"),
-    body = doc.body,
-    r,
-    testElement,
-    rangeBounds,
-    rangeHeight,
-    stack,
-    ctx,
-    docDim,
-    i,
-    children,
-    childrenLen;
+	/** Detect free variables */
+	var freeExports = typeof exports == 'object' && exports &&
+		!exports.nodeType && exports;
+	var freeModule = typeof module == 'object' && module &&
+		!module.nodeType && module;
+	var freeGlobal = typeof global == 'object' && global;
+	if (
+		freeGlobal.global === freeGlobal ||
+		freeGlobal.window === freeGlobal ||
+		freeGlobal.self === freeGlobal
+	) {
+		root = freeGlobal;
+	}
 
+	/**
+	 * The `punycode` object.
+	 * @name punycode
+	 * @type Object
+	 */
+	var punycode,
 
-    function docSize(){
+	/** Highest positive signed 32-bit float value */
+	maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
 
-        return {
-            width: Math.max(
-                Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
-                Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
-                Math.max(doc.body.clientWidth, doc.documentElement.clientWidth)
-                ),
-            height: Math.max(
-                Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
-                Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
-                Math.max(doc.body.clientHeight, doc.documentElement.clientHeight)
-                )
-        };
+	/** Bootstring parameters */
+	base = 36,
+	tMin = 1,
+	tMax = 26,
+	skew = 38,
+	damp = 700,
+	initialBias = 72,
+	initialN = 128, // 0x80
+	delimiter = '-', // '\x2D'
 
+	/** Regular expressions */
+	regexPunycode = /^xn--/,
+	regexNonASCII = /[^\x20-\x7E]/, // unprintable ASCII chars + non-ASCII chars
+	regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, // RFC 3490 separators
+
+	/** Error messages */
+	errors = {
+		'overflow': 'Overflow: input needs wider integers to process',
+		'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+		'invalid-input': 'Invalid input'
+	},
+
+	/** Convenience shortcuts */
+	baseMinusTMin = base - tMin,
+	floor = Math.floor,
+	stringFromCharCode = String.fromCharCode,
+
+	/** Temporary variable */
+	key;
+
+	/*--------------------------------------------------------------------------*/
+
+	/**
+	 * A generic error utility function.
+	 * @private
+	 * @param {String} type The error type.
+	 * @returns {Error} Throws a `RangeError` with the applicable error message.
+	 */
+	function error(type) {
+		throw RangeError(errors[type]);
+	}
+
+	/**
+	 * A generic `Array#map` utility function.
+	 * @private
+	 * @param {Array} array The array to iterate over.
+	 * @param {Function} callback The function that gets called for every array
+	 * item.
+	 * @returns {Array} A new array of values returned by the callback function.
+	 */
+	function map(array, fn) {
+		var length = array.length;
+		var result = [];
+		while (length--) {
+			result[length] = fn(array[length]);
+		}
+		return result;
+	}
+
+	/**
+	 * A simple `Array#map`-like wrapper to work with domain name strings or email
+	 * addresses.
+	 * @private
+	 * @param {String} domain The domain name or email address.
+	 * @param {Function} callback The function that gets called for every
+	 * character.
+	 * @returns {Array} A new string of characters returned by the callback
+	 * function.
+	 */
+	function mapDomain(string, fn) {
+		var parts = string.split('@');
+		var result = '';
+		if (parts.length > 1) {
+			// In email addresses, only the domain name should be punycoded. Leave
+			// the local part (i.e. everything up to `@`) intact.
+			result = parts[0] + '@';
+			string = parts[1];
+		}
+		var labels = string.split(regexSeparators);
+		var encoded = map(labels, fn).join('.');
+		return result + encoded;
+	}
+
+	/**
+	 * Creates an array containing the numeric code points of each Unicode
+	 * character in the string. While JavaScript uses UCS-2 internally,
+	 * this function will convert a pair of surrogate halves (each of which
+	 * UCS-2 exposes as separate characters) into a single code point,
+	 * matching UTF-16.
+	 * @see `punycode.ucs2.encode`
+	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+	 * @memberOf punycode.ucs2
+	 * @name decode
+	 * @param {String} string The Unicode input string (UCS-2).
+	 * @returns {Array} The new array of code points.
+	 */
+	function ucs2decode(string) {
+		var output = [],
+		    counter = 0,
+		    length = string.length,
+		    value,
+		    extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
+			} else {
+				output.push(value);
+			}
+		}
+		return output;
+	}
+
+	/**
+	 * Creates a string based on an array of numeric code points.
+	 * @see `punycode.ucs2.decode`
+	 * @memberOf punycode.ucs2
+	 * @name encode
+	 * @param {Array} codePoints The array of numeric code points.
+	 * @returns {String} The new Unicode string (UCS-2).
+	 */
+	function ucs2encode(array) {
+		return map(array, function(value) {
+			var output = '';
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
+			return output;
+		}).join('');
+	}
+
+	/**
+	 * Converts a basic code point into a digit/integer.
+	 * @see `digitToBasic()`
+	 * @private
+	 * @param {Number} codePoint The basic numeric code point value.
+	 * @returns {Number} The numeric value of a basic code point (for use in
+	 * representing integers) in the range `0` to `base - 1`, or `base` if
+	 * the code point does not represent a value.
+	 */
+	function basicToDigit(codePoint) {
+		if (codePoint - 48 < 10) {
+			return codePoint - 22;
+		}
+		if (codePoint - 65 < 26) {
+			return codePoint - 65;
+		}
+		if (codePoint - 97 < 26) {
+			return codePoint - 97;
+		}
+		return base;
+	}
+
+	/**
+	 * Converts a digit/integer into a basic code point.
+	 * @see `basicToDigit()`
+	 * @private
+	 * @param {Number} digit The numeric value of a basic code point.
+	 * @returns {Number} The basic code point whose value (when used for
+	 * representing integers) is `digit`, which needs to be in the range
+	 * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+	 * used; else, the lowercase form is used. The behavior is undefined
+	 * if `flag` is non-zero and `digit` has no uppercase form.
+	 */
+	function digitToBasic(digit, flag) {
+		//  0..25 map to ASCII a..z or A..Z
+		// 26..35 map to ASCII 0..9
+		return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+	}
+
+	/**
+	 * Bias adaptation function as per section 3.4 of RFC 3492.
+	 * http://tools.ietf.org/html/rfc3492#section-3.4
+	 * @private
+	 */
+	function adapt(delta, numPoints, firstTime) {
+		var k = 0;
+		delta = firstTime ? floor(delta / damp) : delta >> 1;
+		delta += floor(delta / numPoints);
+		for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+			delta = floor(delta / baseMinusTMin);
+		}
+		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+	}
+
+	/**
+	 * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+	 * symbols.
+	 * @memberOf punycode
+	 * @param {String} input The Punycode string of ASCII-only symbols.
+	 * @returns {String} The resulting string of Unicode symbols.
+	 */
+	function decode(input) {
+		// Don't use UCS-2
+		var output = [],
+		    inputLength = input.length,
+		    out,
+		    i = 0,
+		    n = initialN,
+		    bias = initialBias,
+		    basic,
+		    j,
+		    index,
+		    oldi,
+		    w,
+		    k,
+		    digit,
+		    t,
+		    /** Cached calculation results */
+		    baseMinusT;
+
+		// Handle the basic code points: let `basic` be the number of input code
+		// points before the last delimiter, or `0` if there is none, then copy
+		// the first basic code points to the output.
+
+		basic = input.lastIndexOf(delimiter);
+		if (basic < 0) {
+			basic = 0;
+		}
+
+		for (j = 0; j < basic; ++j) {
+			// if it's not a basic code point
+			if (input.charCodeAt(j) >= 0x80) {
+				error('not-basic');
+			}
+			output.push(input.charCodeAt(j));
+		}
+
+		// Main decoding loop: start just after the last delimiter if any basic code
+		// points were copied; start at the beginning otherwise.
+
+		for (index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
+
+			// `index` is the index of the next character to be consumed.
+			// Decode a generalized variable-length integer into `delta`,
+			// which gets added to `i`. The overflow checking is easier
+			// if we increase `i` as we go, then subtract off its starting
+			// value at the end to obtain `delta`.
+			for (oldi = i, w = 1, k = base; /* no condition */; k += base) {
+
+				if (index >= inputLength) {
+					error('invalid-input');
+				}
+
+				digit = basicToDigit(input.charCodeAt(index++));
+
+				if (digit >= base || digit > floor((maxInt - i) / w)) {
+					error('overflow');
+				}
+
+				i += digit * w;
+				t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+
+				if (digit < t) {
+					break;
+				}
+
+				baseMinusT = base - t;
+				if (w > floor(maxInt / baseMinusT)) {
+					error('overflow');
+				}
+
+				w *= baseMinusT;
+
+			}
+
+			out = output.length + 1;
+			bias = adapt(i - oldi, out, oldi == 0);
+
+			// `i` was supposed to wrap around from `out` to `0`,
+			// incrementing `n` each time, so we'll fix that now:
+			if (floor(i / out) > maxInt - n) {
+				error('overflow');
+			}
+
+			n += floor(i / out);
+			i %= out;
+
+			// Insert `n` at position `i` of the output
+			output.splice(i++, 0, n);
+
+		}
+
+		return ucs2encode(output);
+	}
+
+	/**
+	 * Converts a string of Unicode symbols (e.g. a domain name label) to a
+	 * Punycode string of ASCII-only symbols.
+	 * @memberOf punycode
+	 * @param {String} input The string of Unicode symbols.
+	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
+	 */
+	function encode(input) {
+		var n,
+		    delta,
+		    handledCPCount,
+		    basicLength,
+		    bias,
+		    j,
+		    m,
+		    q,
+		    k,
+		    t,
+		    currentValue,
+		    output = [],
+		    /** `inputLength` will hold the number of code points in `input`. */
+		    inputLength,
+		    /** Cached calculation results */
+		    handledCPCountPlusOne,
+		    baseMinusT,
+		    qMinusT;
+
+		// Convert the input in UCS-2 to Unicode
+		input = ucs2decode(input);
+
+		// Cache the length
+		inputLength = input.length;
+
+		// Initialize the state
+		n = initialN;
+		delta = 0;
+		bias = initialBias;
+
+		// Handle the basic code points
+		for (j = 0; j < inputLength; ++j) {
+			currentValue = input[j];
+			if (currentValue < 0x80) {
+				output.push(stringFromCharCode(currentValue));
+			}
+		}
+
+		handledCPCount = basicLength = output.length;
+
+		// `handledCPCount` is the number of code points that have been handled;
+		// `basicLength` is the number of basic code points.
+
+		// Finish the basic string - if it is not empty - with a delimiter
+		if (basicLength) {
+			output.push(delimiter);
+		}
+
+		// Main encoding loop:
+		while (handledCPCount < inputLength) {
+
+			// All non-basic code points < n have been handled already. Find the next
+			// larger one:
+			for (m = maxInt, j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+				if (currentValue >= n && currentValue < m) {
+					m = currentValue;
+				}
+			}
+
+			// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+			// but guard against overflow
+			handledCPCountPlusOne = handledCPCount + 1;
+			if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+				error('overflow');
+			}
+
+			delta += (m - n) * handledCPCountPlusOne;
+			n = m;
+
+			for (j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+
+				if (currentValue < n && ++delta > maxInt) {
+					error('overflow');
+				}
+
+				if (currentValue == n) {
+					// Represent delta as a generalized variable-length integer
+					for (q = delta, k = base; /* no condition */; k += base) {
+						t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+						if (q < t) {
+							break;
+						}
+						qMinusT = q - t;
+						baseMinusT = base - t;
+						output.push(
+							stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+						);
+						q = floor(qMinusT / baseMinusT);
+					}
+
+					output.push(stringFromCharCode(digitToBasic(q, 0)));
+					bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+					delta = 0;
+					++handledCPCount;
+				}
+			}
+
+			++delta;
+			++n;
+
+		}
+		return output.join('');
+	}
+
+	/**
+	 * Converts a Punycode string representing a domain name or an email address
+	 * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+	 * it doesn't matter if you call it on a string that has already been
+	 * converted to Unicode.
+	 * @memberOf punycode
+	 * @param {String} input The Punycoded domain name or email address to
+	 * convert to Unicode.
+	 * @returns {String} The Unicode representation of the given Punycode
+	 * string.
+	 */
+	function toUnicode(input) {
+		return mapDomain(input, function(string) {
+			return regexPunycode.test(string)
+				? decode(string.slice(4).toLowerCase())
+				: string;
+		});
+	}
+
+	/**
+	 * Converts a Unicode string representing a domain name or an email address to
+	 * Punycode. Only the non-ASCII parts of the domain name will be converted,
+	 * i.e. it doesn't matter if you call it with a domain that's already in
+	 * ASCII.
+	 * @memberOf punycode
+	 * @param {String} input The domain name or email address to convert, as a
+	 * Unicode string.
+	 * @returns {String} The Punycode representation of the given domain name or
+	 * email address.
+	 */
+	function toASCII(input) {
+		return mapDomain(input, function(string) {
+			return regexNonASCII.test(string)
+				? 'xn--' + encode(string)
+				: string;
+		});
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	/** Define the public API */
+	punycode = {
+		/**
+		 * A string representing the current Punycode.js version number.
+		 * @memberOf punycode
+		 * @type String
+		 */
+		'version': '1.3.1',
+		/**
+		 * An object of methods to convert from JavaScript's internal character
+		 * representation (UCS-2) to Unicode code points, and back.
+		 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+		 * @memberOf punycode
+		 * @type Object
+		 */
+		'ucs2': {
+			'decode': ucs2decode,
+			'encode': ucs2encode
+		},
+		'decode': decode,
+		'encode': encode,
+		'toASCII': toASCII,
+		'toUnicode': toUnicode
+	};
+
+	/** Expose `punycode` */
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define('punycode', function() {
+			return punycode;
+		});
+	} else if (freeExports && freeModule) {
+		if (module.exports == freeExports) { // in Node.js or RingoJS v0.8.0+
+			freeModule.exports = punycode;
+		} else { // in Narwhal or RingoJS v0.7.0-
+			for (key in punycode) {
+				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
+			}
+		}
+	} else { // in Rhino or a web browser
+		root.punycode = punycode;
+	}
+
+}(this));
+
+var html2canvasNodeAttribute = "data-html2canvas-node";
+
+window.html2canvas = function(nodeList, options) {
+    options = options || {};
+    if (options.logging) {
+        window.html2canvas.logging = true;
+        window.html2canvas.start = Date.now();
     }
 
-    images = images || {};
+    options.async = typeof(options.async) === "undefined" ? true : options.async;
+    options.allowTaint = typeof(options.allowTaint) === "undefined" ? false : options.allowTaint;
+    options.removeContainer = typeof(options.removeContainer) === "undefined" ? true : options.removeContainer;
 
-    // Test whether we can use ranges to measure bounding boxes
-    // Opera doesn't provide valid bounds.height/bottom even though it supports the method.
-
-
-    if (doc.createRange) {
-        r = doc.createRange();
-        //this.support.rangeBounds = new Boolean(r.getBoundingClientRect);
-        if (r.getBoundingClientRect){
-            testElement = doc.createElement('boundtest');
-            testElement.style.height = "123px";
-            testElement.style.display = "block";
-            body.appendChild(testElement);
-
-            r.selectNode(testElement);
-            rangeBounds = r.getBoundingClientRect();
-            rangeHeight = rangeBounds.height;
-
-            if (rangeHeight === 123) {
-                support.rangeBounds = true;
-            }
-            body.removeChild(testElement);
-
-
+    var node = ((nodeList === undefined) ? [document.documentElement] : ((nodeList.length) ? nodeList : [nodeList]))[0];
+    node.setAttribute(html2canvasNodeAttribute, "true");
+    return renderDocument(node.ownerDocument, options, node.ownerDocument.defaultView.innerWidth, node.ownerDocument.defaultView.innerHeight).then(function(canvas) {
+        if (typeof(options.onrendered) === "function") {
+            log("options.onrendered is deprecated, html2canvas returns a Promise containing the canvas");
+            options.onrendered(canvas);
         }
+        return canvas;
+    });
+};
 
-    }
+window.html2canvas.punycode = this.punycode;
+window.html2canvas.proxy = {};
 
-
-    /*
-    var rootStack = new this.storageContext($(document).width(),$(document).height());
-    rootStack.opacity = this.getCSS(this.element,"opacity");
-    var stack = this.newElement(this.element,rootStack);
-
-
-    this.parseElement(this.element,stack);
-     */
-
-
-
-
-    var getCSS = _html2canvas.Util.getCSS;
-    function getCSSInt(element, attribute) {
-        var val = parseInt(getCSS(element, attribute), 10);
-        return (isNaN(val)) ? 0 : val; // borders in old IE are throwing 'medium' for demo.html
-    }
-
-    // Drawing a rectangle
-    function renderRect (ctx, x, y, w, h, bgcolor) {
-        if (bgcolor !=="transparent"){
-            ctx.setVariable("fillStyle", bgcolor);
-            ctx.fillRect (x, y, w, h);
-            numDraws+=1;
-        }
-    }
-
-
-    function textTransform (text, transform) {
-        switch(transform){
-            case "lowercase":
-                return text.toLowerCase();
-
-            case "capitalize":
-                return text.replace( /(^|\s|:|-|\(|\))([a-z])/g , function (m, p1, p2) {
-                    if (m.length > 0) {
-                        return p1 + p2.toUpperCase();
-                    }
-                } );
-
-            case "uppercase":
-                return text.toUpperCase();
-
-            default:
-                return text;
-
-        }
-
-    }
-
-    function trimText (text) {
-        return text.replace(/^\s*/g, "").replace(/\s*$/g, "");
-    }
-
-    function fontMetrics (font, fontSize) {
-
-        if (fontData[font + "-" + fontSize] !== undefined) {
-            return fontData[font + "-" + fontSize];
-        }
-
-
-        var container = doc.createElement('div'),
-        img = doc.createElement('img'),
-        span = doc.createElement('span'),
-        baseline,
-        middle,
-        metricsObj;
-
-
-        container.style.visibility = "hidden";
-        container.style.fontFamily = font;
-        container.style.fontSize = fontSize;
-        container.style.margin = 0;
-        container.style.padding = 0;
-
-        body.appendChild(container);
-
-
-
-        // http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever (handtinywhite.gif)
-        img.src = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACwAAAAAAQABAAACAkQBADs=";
-        img.width = 1;
-        img.height = 1;
-
-        img.style.margin = 0;
-        img.style.padding = 0;
-        img.style.verticalAlign = "baseline";
-
-        span.style.fontFamily = font;
-        span.style.fontSize = fontSize;
-        span.style.margin = 0;
-        span.style.padding = 0;
-
-
-
-
-        span.appendChild(doc.createTextNode('Hidden Text'));
-        container.appendChild(span);
-        container.appendChild(img);
-        baseline = (img.offsetTop - span.offsetTop) + 1;
-
-        container.removeChild(span);
-        container.appendChild(doc.createTextNode('Hidden Text'));
-
-        container.style.lineHeight = "normal";
-        img.style.verticalAlign = "super";
-
-        middle = (img.offsetTop-container.offsetTop) + 1;
-        metricsObj = {
-            baseline: baseline,
-            lineWidth: 1,
-            middle: middle
-        };
-
-
-        fontData[font + "-" + fontSize] = metricsObj;
-
-        body.removeChild(container);
-
-        return metricsObj;
-
-    }
-
-
-    function drawText(currentText, x, y, ctx){
-        if (trimText(currentText).length>0) {
-            ctx.fillText(currentText,x,y);
-            numDraws+=1;
-        }
-    }
-
-
-    function renderText(el, textNode, stack) {
-        var ctx = stack.ctx,
-        family = getCSS(el, "fontFamily"),
-        size = getCSS(el, "fontSize"),
-        color = getCSS(el, "color"),
-        text_decoration = getCSS(el, "textDecoration"),
-        text_align = getCSS(el, "textAlign"),
-        letter_spacing = getCSS(el, "letterSpacing"),
-        bounds,
-        text,
-        metrics,
-        renderList,
-        listLen,
-        bold = getCSS(el, "fontWeight"),
-        font_style = getCSS(el, "fontStyle"),
-        font_variant = getCSS(el, "fontVariant"),
-        align = false,
-        newTextNode,
-        textValue,
-        textOffset = 0,
-        oldTextNode,
-        c,
-        range,
-        parent,
-        wrapElement,
-        backupText;
-
-        // apply text-transform:ation to the text
-
-
-
-        textNode.nodeValue = textTransform(textNode.nodeValue, getCSS(el, "textTransform"));
-        text = trimText(textNode.nodeValue);
-
-        if (text.length>0){
-
-            if (text_decoration !== "none"){
-                metrics = fontMetrics(family, size);
+function renderDocument(document, options, windowWidth, windowHeight) {
+    return createWindowClone(document, document, windowWidth, windowHeight, options)
+    .then( function(x){
+    	//nasty hack
+    	return new Promise(function(resolve,reject){
+    		setTimeout(function(){
+    			resolve(x)
+    		},500)
+    	})
+    })
+    .then(function(container) {
+        log("Document cloned");
+        var selector = "[" + html2canvasNodeAttribute + "='true']";
+        document.querySelector(selector).removeAttribute(html2canvasNodeAttribute);
+        var clonedWindow = container.contentWindow;
+        var node = clonedWindow.document.querySelector(selector);
+        var support = new Support(clonedWindow.document);
+        var imageLoader = new ImageLoader(options, support);
+        var bounds = getBounds(node);
+        var width = options.width != null ? options.width : options.type === "view" ? Math.min(bounds.width, windowWidth) : documentWidth(clonedWindow.document);
+        var height = options.height != null ? options.height : options.type === "view" ? Math.min(bounds.height, windowHeight) : documentHeight(clonedWindow.document);
+        var renderer = new CanvasRenderer(width, height, imageLoader, options, document);
+        var parser = new NodeParser(node, renderer, support, imageLoader, options);
+        return parser.ready.then(function() {
+            log("Finished rendering");
+            var canvas = (options.type !== "view" && (node === clonedWindow.document.body || node === clonedWindow.document.documentElement)) ? renderer.canvas : crop(renderer.canvas, bounds);
+            if (options.removeContainer) {
+                container.parentNode.removeChild(container);
+                log("Cleaned up container");
             }
-
-            text_align = text_align.replace(["-webkit-auto"],["auto"]);
-
-            if (options.letterRendering === false && /^(left|right|justify|auto)$/.test(text_align) && /^(normal|none)$/.test(letter_spacing)){
-                // this.setContextVariable(ctx,"textAlign",text_align);
-                renderList = textNode.nodeValue.split(/(\b| )/);
-
-            }else{
-                //  this.setContextVariable(ctx,"textAlign","left");
-                renderList = textNode.nodeValue.split("");
-            }
-
-            switch(parseInt(bold, 10)){
-                case 401:
-                    bold = "bold";
-                    break;
-                case 400:
-                    bold = "normal";
-                    break;
-            }
-
-            ctx.setVariable("fillStyle", color);
-
-            /*
-              need to be defined in the order as defined in http://www.w3.org/TR/CSS21/fonts.html#font-shorthand
-              to properly work in Firefox
-            */
-            ctx.setVariable("font", font_style+ " " + font_variant  + " " + bold + " " + size + " " + family);
-
-            if (align){
-                ctx.setVariable("textAlign", "right");
-            }else{
-                ctx.setVariable("textAlign", "left");
-            }
-
-
-            /*
-        if (stack.clip){
-        ctx.rect (stack.clip.left, stack.clip.top, stack.clip.width, stack.clip.height);
-        ctx.clip();
-        }
-             */
-
-
-            oldTextNode = textNode;
-
-
-            for ( c=0, listLen = renderList.length; c < listLen; c+=1 ) {
-                textValue = null;
-
-
-
-                if (support.rangeBounds){
-                    // getBoundingClientRect is supported for ranges
-                    if (text_decoration !== "none" || trimText(renderList[c]).length !== 0) {
-                        textValue = renderList[c];
-                        if (doc.createRange){
-                            range = doc.createRange();
-
-                            range.setStart(textNode, textOffset);
-                            range.setEnd(textNode, textOffset + textValue.length);
-                        }else{
-                            // TODO add IE support
-                            range = body.createTextRange();
-                        }
-
-                        if (range.getBoundingClientRect()) {
-                            bounds = range.getBoundingClientRect();
-                        }else{
-                            bounds = {};
-                        }
-
-                    }
-                }else{
-                    // it isn't supported, so let's wrap it inside an element instead and get the bounds there
-
-                    // IE 9 bug
-                    if (typeof oldTextNode.nodeValue !== "string" ){
-                        continue;
-                    }
-
-                    newTextNode = oldTextNode.splitText(renderList[c].length);
-
-                    parent = oldTextNode.parentNode;
-                    wrapElement = doc.createElement('wrapper');
-                    backupText = oldTextNode.cloneNode(true);
-
-                    wrapElement.appendChild(oldTextNode.cloneNode(true));
-                    parent.replaceChild(wrapElement, oldTextNode);
-
-                    bounds = _html2canvas.Util.Bounds(wrapElement);
-
-                    textValue = oldTextNode.nodeValue;
-
-                    oldTextNode = newTextNode;
-                    parent.replaceChild(backupText, wrapElement);
-
-
-                }
-
-                if (textValue !== null){
-                    drawText(textValue, bounds.left, bounds.bottom, ctx);
-                }
-
-                switch(text_decoration) {
-                    case "underline":
-                        // Draws a line at the baseline of the font
-                        // TODO As some browsers display the line as more than 1px if the font-size is big, need to take that into account both in position and size
-                        renderRect(ctx, bounds.left, Math.round(bounds.top + metrics.baseline + metrics.lineWidth), bounds.width, 1, color);
-                        break;
-                    case "overline":
-                        renderRect(ctx, bounds.left, bounds.top, bounds.width, 1, color);
-                        break;
-                    case "line-through":
-                        // TODO try and find exact position for line-through
-                        renderRect(ctx, bounds.left, Math.ceil(bounds.top + metrics.middle + metrics.lineWidth), bounds.width, 1, color);
-                        break;
-
-                }
-
-
-
-
-
-                textOffset += renderList[c].length;
-
-            }
-
-
-
-        }
-
-    }
-
-    function listPosition (element, val) {
-        var boundElement = doc.createElement( "boundelement" ),
-        type,
-        bounds;
-
-        boundElement.style.display = "inline";
-        //boundElement.style.width = "1px";
-        //boundElement.style.height = "1px";
-
-        type = element.style.listStyleType;
-        element.style.listStyleType = "none";
-
-        boundElement.appendChild( doc.createTextNode( val ) );
-
-
-        element.insertBefore(boundElement, element.firstChild);
-
-
-        bounds = _html2canvas.Util.Bounds( boundElement );
-        element.removeChild( boundElement );
-        element.style.listStyleType = type;
-        return bounds;
-
-    }
-    
-
-    
-    function elementIndex( el ) {
-        var i = -1,
-        count = 1,
-        childs = el.parentNode.childNodes;
-
-        if ( el.parentNode ) {
-            while( childs[ ++i ] !== el ) {
-               if ( childs[ i ].nodeType === 1 ) {
-                   count++;
-               }
-            }
-            return count;
-        } else {
-            return -1;
-        }
-       
-    }
-
-    function renderListItem(element, stack, elBounds) {
-
-
-        var position = getCSS(element, "listStylePosition"),
-        x,
-        y,
-        type = getCSS(element, "listStyleType"),
-        currentIndex,
-        text,
-        listBounds,
-        bold = getCSS(element, "fontWeight");
-
-        if (/^(decimal|decimal-leading-zero|upper-alpha|upper-latin|upper-roman|lower-alpha|lower-greek|lower-latin|lower-roman)$/i.test(type)) {
-
-            currentIndex = elementIndex( element );
-
-            switch(type){
-                case "decimal":
-                    text = currentIndex;
-                    break;
-                case "decimal-leading-zero":
-                    if (currentIndex.toString().length === 1){
-                        text = currentIndex = "0" + currentIndex.toString();
-                    }else{
-                        text = currentIndex.toString();
-                    }
-                    break;
-                case "upper-roman":
-                    text = _html2canvas.Generate.ListRoman( currentIndex );
-                    break;
-                case "lower-roman":
-                    text = _html2canvas.Generate.ListRoman( currentIndex ).toLowerCase();
-                    break;
-                case "lower-alpha":
-                    text = _html2canvas.Generate.ListAlpha( currentIndex ).toLowerCase();
-                    break;
-                case "upper-alpha":
-                    text = _html2canvas.Generate.ListAlpha( currentIndex );
-                    break;
-            }
-
-
-            text += ". ";
-            listBounds = listPosition(element, text);
-
-
-
-            switch(bold){
-                case 401:
-                    bold = "bold";
-                    break;
-                case 400:
-                    bold = "normal";
-                    break;
-            }
-
-
-
-
-            ctx.setVariable( "fillStyle", getCSS(element, "color") );
-            ctx.setVariable( "font", getCSS(element, "fontVariant") + " " + bold + " " + getCSS(element, "fontStyle") + " " + getCSS(element, "fontSize") + " " + getCSS(element, "fontFamily") );
-
-
-            if ( position === "inside" ) {
-                ctx.setVariable("textAlign", "left");
-                //   this.setFont(stack.ctx, element, false);
-                x = elBounds.left;
-
-            }else{
-                return;
-            /*
-                 TODO really need to figure out some more accurate way to try and find the position.
-                 as defined in http://www.w3.org/TR/CSS21/generate.html#propdef-list-style-position, it does not even have a specified "correct" position, so each browser
-                 may display it whatever way it feels like.
-                 "The position of the list-item marker adjacent to floats is undefined in CSS 2.1. CSS 2.1 does not specify the precise location of the marker box or its position in the painting order"
-
-                ctx.setVariable("textAlign", "right");
-                //  this.setFont(stack.ctx, element, true);
-                x = elBounds.left - 10;
-                 */
-            }
-
-            y = listBounds.bottom;
-
-            drawText(text, x, y, ctx);
-
-
-        }
-
-
-    }
-
-    function loadImage (src){
-        var img = images[src];
-        if (img && img.succeeded === true) {
-            return img.img;
-        } else {
-            return false;
-        }
-    }
-
-
-
-
-
-
-    function clipBounds(src, dst){
-
-        var x = Math.max(src.left, dst.left),
-        y = Math.max(src.top, dst.top),
-        x2 = Math.min((src.left + src.width), (dst.left + dst.width)),
-        y2 = Math.min((src.top + src.height), (dst.top + dst.height));
-
-        return {
-            left:x,
-            top:y,
-            width:x2-x,
-            height:y2-y
-        };
-
-    }
-
-    function setZ(zIndex, parentZ){
-        // TODO fix static elements overlapping relative/absolute elements under same stack, if they are defined after them
-        var newContext;
-        if (!parentZ){
-            newContext = h2czContext(0);
-            return newContext;
-        }
-
-        if (zIndex !== "auto"){
-            needReorder = true;
-            newContext = h2czContext(zIndex);
-            parentZ.children.push(newContext);
-            return newContext;
-
-        }
-
-        return parentZ;
-
-    }
-
-    function renderBorders(el, ctx, bounds, clip){
-
-        /*
-         *  TODO add support for different border-style's than solid
+            return canvas;
+        });
+    });
+}
+
+function crop(canvas, bounds) {
+    var croppedCanvas = document.createElement("canvas");
+    var x1 = Math.min(canvas.width - 1, Math.max(0, bounds.left));
+    var x2 = Math.min(canvas.width, Math.max(1, bounds.left + bounds.width));
+    var y1 = Math.min(canvas.height - 1, Math.max(0, bounds.top));
+    var y2 = Math.min(canvas.height, Math.max(1, bounds.top + bounds.height));
+    var width = croppedCanvas.width = x2 - x1;
+    var height = croppedCanvas.height =  y2 - y1;
+    log("Cropping canvas at:", "left:", bounds.left, "top:", bounds.top, "width:", bounds.width, "height:", bounds.height);
+    log("Resulting crop with width", width, "and height", height, " with x", x1, "and y", y1);
+    croppedCanvas.getContext("2d").drawImage(canvas, x1, y1, width, height, 0, 0, width, height);
+    return croppedCanvas;
+}
+
+function documentWidth (doc) {
+    return Math.max(
+        Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
+        Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
+        Math.max(doc.body.clientWidth, doc.documentElement.clientWidth)
+    );
+}
+
+function documentHeight (doc) {
+    return Math.max(
+        Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
+        Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
+        Math.max(doc.body.clientHeight, doc.documentElement.clientHeight)
+    );
+}
+
+function smallImage() {
+    return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+}
+
+function createWindowClone(ownerDocument, containerDocument, width, height, options) {
+    var documentElement = ownerDocument.documentElement.cloneNode(true),
+        container = containerDocument.createElement("iframe");
+
+    container.style.visibility = "hidden";
+    container.style.position = "absolute";
+    container.style.left = container.style.top = "-10000px";
+    container.width = width;
+    container.height = height;
+    container.scrolling = "no"; // ios won't scroll without it
+    containerDocument.body.appendChild(container);
+
+    return new Promise(function(resolve) {
+        var documentClone = container.contentWindow.document;
+        /* Chrome doesn't detect relative background-images assigned in inline <style> sheets when fetched through getComputedStyle
+        if window url is about:blank, we can assign the url to current by writing onto the document
          */
+        container.contentWindow.onload = container.onload = function() {
+            resolve(container);
+        };
 
-        var x = bounds.left,
-        y = bounds.top,
-        w = bounds.width,
-        h = bounds.height,
-        borderSide,
-        borderData,
-        bx,
-        by,
-        bw,
-        bh,
-        borderBounds,
-        borders = (function(el){
-            var borders = [],
-            sides = ["Top","Right","Bottom","Left"],
-            s;
+        documentClone.open();
+        documentClone.write("<!DOCTYPE html>");
+        documentClone.close();
 
-            for (s = 0; s < 4; s+=1){
-                borders.push({
-                    width: getCSSInt(el, 'border' + sides[s] + 'Width'),
-                    color: getCSS(el, 'border' + sides[s] + 'Color')
-                });
+        documentClone.replaceChild(removeScriptNodes(documentClone.adoptNode(documentElement)), documentClone.documentElement);
+        if (options.type === "view") {
+            container.contentWindow.scrollTo(window.pageXOffset, window.pageYOffset);
+        }
+    });
+}
+
+function removeScriptNodes(parent) {
+    [].slice.call(parent.childNodes, 0).filter(isElementNode).forEach(function(node) {
+        if (node.tagName === "SCRIPT") {
+            parent.removeChild(node);
+        } else {
+            removeScriptNodes(node);
+        }
+    });
+    return parent;
+}
+
+function isElementNode(node) {
+    return node.nodeType === Node.ELEMENT_NODE;
+}
+
+function DummyImageContainer(src) {
+    this.src = src;
+    log("DummyImageContainer for", src);
+    if (!this.promise || !this.image) {
+        log("Initiating DummyImageContainer");
+        DummyImageContainer.prototype.image = new Image();
+        var image = this.image;
+        DummyImageContainer.prototype.promise = new Promise(function(resolve, reject) {
+            image.onload = resolve;
+            image.onerror = reject;
+            image.src = smallImage();
+            if (image.complete === true) {
+                resolve(image);
             }
+        });
+    }
+}
 
-            return borders;
+function Font(family, size) {
+    var container = document.createElement('div'),
+        img = document.createElement('img'),
+        span = document.createElement('span'),
+        sampleText = 'Hidden Text',
+        baseline,
+        middle;
 
-        }(el));
+    container.style.visibility = "hidden";
+    container.style.fontFamily = family;
+    container.style.fontSize = size;
+    container.style.margin = 0;
+    container.style.padding = 0;
+
+    document.body.appendChild(container);
+
+    img.src = smallImage();
+    img.width = 1;
+    img.height = 1;
+
+    img.style.margin = 0;
+    img.style.padding = 0;
+    img.style.verticalAlign = "baseline";
+
+    span.style.fontFamily = family;
+    span.style.fontSize = size;
+    span.style.margin = 0;
+    span.style.padding = 0;
+
+    span.appendChild(document.createTextNode(sampleText));
+    container.appendChild(span);
+    container.appendChild(img);
+    baseline = (img.offsetTop - span.offsetTop) + 1;
+
+    container.removeChild(span);
+    container.appendChild(document.createTextNode(sampleText));
+
+    container.style.lineHeight = "normal";
+    img.style.verticalAlign = "super";
+
+    middle = (img.offsetTop-container.offsetTop) + 1;
+
+    document.body.removeChild(container);
+
+    this.baseline = baseline;
+    this.lineWidth = 1;
+    this.middle = middle;
+}
+
+function FontMetrics() {
+    this.data = {};
+}
+
+FontMetrics.prototype.getMetrics = function(family, size) {
+    if (this.data[family + "-" + size] === undefined) {
+        this.data[family + "-" + size] = new Font(family, size);
+    }
+    return this.data[family + "-" + size];
+};
+
+function FrameContainer(container, sameOrigin, proxy) {
+    this.image = null;
+    this.src = container;
+    var self = this;
+    var bounds = getBounds(container);
+    this.promise = (!sameOrigin ? this.proxyLoad(proxy, bounds) : new Promise(function(resolve) {
+        if (container.contentWindow.document.URL === "about:blank" || container.contentWindow.document.documentElement == null) {
+            container.contentWindow.onload = container.onload = function() {
+                resolve(container);
+            };
+        } else {
+            resolve(container);
+        }
+    })).then(function(container) {
+        return html2canvas(container.contentWindow.document.documentElement, {type: 'view', proxy: proxy});
+    }).then(function(canvas) {
+        return self.image = canvas;
+    });
+}
+
+FrameContainer.prototype.proxyLoad = function(proxy, bounds) {
+    var container = this.src;
+    return new Proxy(container.src, proxy, window.document).then(documentFromHTML(container)).then(function(doc) {
+        return createWindowClone(doc, container.ownerDocument, bounds.width, bounds.height, {});
+    });
+};
+
+function documentFromHTML(container) {
+    return function(html) {
+        var doc = document.implementation.createHTMLDocument("");
+        doc.open();
+        doc.write(html);
+        doc.close();
+
+        var b = doc.querySelector("base");
+        if (!b || !b.href.host) {
+            var base = doc.createElement("base");
+            base.href = container.src;
+            doc.head.insertBefore(base, doc.head.firstChild);
+        }
+
+        return doc;
+    };
+}
+
+function GradientContainer(imageData) {
+    this.src = imageData.value;
+    this.colorStops = [];
+    this.type = null;
+    this.x0 = 0.5;
+    this.y0 = 0.5;
+    this.x1 = 0.5;
+    this.y1 = 0.5;
+    this.promise = Promise.resolve(true);
+}
+
+GradientContainer.prototype.TYPES = {
+    LINEAR: 1,
+    RADIAL: 2
+};
+
+function ImageContainer(src, cors) {
+    this.src = src;
+    this.image = new Image();
+    var self = this;
+    this.tainted = null;
+    this.promise = new Promise(function(resolve, reject) {
+        self.image.onload = resolve;
+        self.image.onerror = reject;
+        if (cors) {
+            self.image.crossOrigin = "anonymous";
+        }
+        self.image.src = src;
+        if (self.image.complete === true) {
+            resolve(self.image);
+        }
+    });
+}
+
+function ImageLoader(options, support) {
+    this.link = null;
+    this.options = options;
+    this.support = support;
+    this.origin = window.location.protocol + window.location.hostname + window.location.port;
+}
+
+ImageLoader.prototype.findImages = function(nodes) {
+    var images = [];
+    nodes.reduce(function(imageNodes, container) {
+        switch(container.node.nodeName) {
+            case "IMG":
+                return imageNodes.concat([{
+                    args: [container.node.src],
+                    method: "url"
+                }]);
+            case "svg":
+            case "IFRAME":
+                return imageNodes.concat([{
+                    args: [container.node],
+                    method: container.node.nodeName
+                }]);
+        }
+        return imageNodes;
+    }, []).forEach(this.addImage(images, this.loadImage), this);
+    return images;
+};
+
+ImageLoader.prototype.findBackgroundImage = function(images, container) {
+    container.parseBackgroundImages().filter(this.hasImageBackground).forEach(this.addImage(images, this.loadImage), this);
+    return images;
+};
+
+ImageLoader.prototype.addImage = function(images, callback) {
+    return function(newImage) {
+        newImage.args.forEach(function(image) {
+            if (!this.imageExists(images, image)) {
+                images.splice(0, 0, callback.call(this, newImage));
+                log('Added image #' + (images.length), typeof(image) === "string" ? image.substring(0, 100) : image);
+            }
+        }, this);
+    };
+};
+
+ImageLoader.prototype.hasImageBackground = function(imageData) {
+    return imageData.method !== "none";
+};
+
+ImageLoader.prototype.loadImage = function(imageData) {
+    if (imageData.method === "url") {
+        var src = imageData.args[0];
+        if (this.isSVG(src) && !this.support.svg && !this.options.allowTaint) {
+            return new SVGContainer(src);
+        } else if (src.match(/data:image\/.*;base64,/i)) {
+            return new ImageContainer(src.replace(/url\(['"]{0,}|['"]{0,}\)$/ig, ''), false);
+        } else if (this.isSameOrigin(src) || this.options.allowTaint === true || this.isSVG(src)) {
+            return new ImageContainer(src, false);
+        } else if (this.support.cors && !this.options.allowTaint && this.options.useCORS) {
+            return new ImageContainer(src, true);
+        } else if (this.options.proxy) {
+            return new ProxyImageContainer(src, this.options.proxy);
+        } else {
+            return new DummyImageContainer(src);
+        }
+    } else if (imageData.method === "linear-gradient") {
+        return new LinearGradientContainer(imageData);
+    } else if (imageData.method === "gradient") {
+        return new WebkitGradientContainer(imageData);
+    } else if (imageData.method === "svg") {
+        return new SVGNodeContainer(imageData.args[0], this.support.svg);
+    } else if (imageData.method === "IFRAME") {
+        return new FrameContainer(imageData.args[0], this.isSameOrigin(imageData.args[0].src), this.options.proxy);
+    } else {
+        return new DummyImageContainer(imageData);
+    }
+};
+
+ImageLoader.prototype.isSVG = function(src) {
+    return (/(.+).svg$/i.test(src)) || SVGContainer.prototype.isInline(src);
+};
+
+ImageLoader.prototype.imageExists = function(images, src) {
+    return images.some(function(image) {
+        return image.src === src;
+    });
+};
+
+ImageLoader.prototype.isSameOrigin = function(url) {
+    var link = this.link || (this.link = document.createElement("a"));
+    link.href = url;
+    link.href = link.href; // IE9, LOL! - http://jsfiddle.net/niklasvh/2e48b/
+    var origin = link.protocol + link.hostname + link.port;
+    return (origin === this.origin);
+};
+
+ImageLoader.prototype.getPromise = function(container) {
+    return container.promise['catch'](function() {
+        var dummy = new DummyImageContainer(container.src);
+        return dummy.promise.then(function(image) {
+            container.image = image;
+        });
+    });
+};
+
+ImageLoader.prototype.get = function(src) {
+    var found = null;
+    return this.images.some(function(img) {
+        return (found = img).src === src;
+    }) ? found : null;
+};
+
+ImageLoader.prototype.fetch = function(nodes) {
+    this.images = nodes.reduce(bind(this.findBackgroundImage, this), this.findImages(nodes));
+    this.images.forEach(function(image, index) {
+        image.promise.then(function() {
+            log("Succesfully loaded image #"+ (index+1));
+        }, function() {
+            log("Failed loading image #"+ (index+1));
+        });
+    });
+    this.ready = Promise.all(this.images.map(this.getPromise));
+    log("Finished searching images");
+    return this;
+};
+
+function LinearGradientContainer(imageData) {
+    GradientContainer.apply(this, arguments);
+    this.type = this.TYPES.LINEAR;
+
+    var hasDirection = imageData.args[0].match(this.stepRegExp) === null;
+
+    if (hasDirection) {
+        imageData.args[0].split(" ").reverse().forEach(function(position) {
+            switch(position) {
+                case "left":
+                    this.x0 = 0;
+                    this.x1 = 1;
+                    break;
+                case "top":
+                    this.y0 = 0;
+                    this.y1 = 1;
+                    break;
+                case "right":
+                    this.x0 = 1;
+                    this.x1 = 0;
+                    break;
+                case "bottom":
+                    this.y0 = 1;
+                    this.y1 = 0;
+                    break;
+                case "to":
+                    var y0 = this.y0;
+                    var x0 = this.x0;
+                    this.y0 = this.y1;
+                    this.x0 = this.x1;
+                    this.x1 = x0;
+                    this.y1 = y0;
+                    break;
+            }
+        }, this);
+    } else {
+        this.y0 = 0;
+        this.y1 = 1;
+    }
+
+    this.colorStops = imageData.args.slice(hasDirection ? 1 : 0).map(function(colorStop) {
+        var colorStopMatch = colorStop.match(this.stepRegExp);
+        return {
+            color: colorStopMatch[1],
+            stop: colorStopMatch[3] === "%" ? colorStopMatch[2] / 100 : null
+        };
+    }, this);
+
+    if (this.colorStops[0].stop === null) {
+        this.colorStops[0].stop = 0;
+    }
+
+    if (this.colorStops[this.colorStops.length - 1].stop === null) {
+        this.colorStops[this.colorStops.length - 1].stop = 1;
+    }
+
+    this.colorStops.forEach(function(colorStop, index) {
+        if (colorStop.stop === null) {
+            this.colorStops.slice(index).some(function(find, count) {
+                if (find.stop !== null) {
+                    colorStop.stop = ((find.stop - this.colorStops[index - 1].stop) / (count + 1)) + this.colorStops[index - 1].stop;
+                    return true;
+                } else {
+                    return false;
+                }
+            }, this);
+        }
+    }, this);
+}
+
+LinearGradientContainer.prototype = Object.create(GradientContainer.prototype);
+
+LinearGradientContainer.prototype.stepRegExp = /((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\s*(\d{1,3})?(%|px)?/;
+
+function log() {
+    if (window.html2canvas.logging && window.console && window.console.log) {
+        Function.prototype.bind.call(window.console.log, (window.console)).apply(window.console, [(Date.now() - window.html2canvas.start) + "ms", "html2canvas:"].concat([].slice.call(arguments, 0)));
+    }
+}
+
+function NodeContainer(node, parent) {
+    this.node = node;
+    this.parent = parent;
+    this.stack = null;
+    this.bounds = null;
+    this.offsetBounds = null;
+    this.visible = null;
+    this.computedStyles = null;
+    this.styles = {};
+    this.backgroundImages = null;
+    this.transformData = null;
+    this.transformMatrix = null;
+}
+
+NodeContainer.prototype.assignStack = function(stack) {
+    this.stack = stack;
+    stack.children.push(this);
+};
+
+NodeContainer.prototype.isElementVisible = function() {
+    return this.node.nodeType === Node.TEXT_NODE ? this.parent.visible : (
+        this.css('display') !== "none" &&
+        this.css('visibility') !== "hidden" &&
+        !this.node.hasAttribute("data-html2canvas-ignore") &&
+        (this.node.nodeName !== "INPUT" || this.node.getAttribute("type") !== "hidden")
+    );
+};
+
+NodeContainer.prototype.css = function(attribute) {
+    if (!this.computedStyles) {
+        this.computedStyles = this.computedStyle(null);
+    }
+
+    return this.styles[attribute] || (this.styles[attribute] = this.computedStyles[attribute]);
+};
+
+NodeContainer.prototype.prefixedCss = function(attribute) {
+    var prefixes = ["webkit", "moz", "ms", "o"];
+    var value = this.css(attribute);
+    if (value === undefined) {
+        prefixes.some(function(prefix) {
+            value = this.css(prefix + attribute.substr(0, 1).toUpperCase() + attribute.substr(1));
+            return value !== undefined;
+        }, this);
+    }
+    return value === undefined ? null : value;
+};
+
+NodeContainer.prototype.computedStyle = function(type) {
+    return this.node.ownerDocument.defaultView.getComputedStyle(this.node, type);
+};
+
+NodeContainer.prototype.cssInt = function(attribute) {
+    var value = parseInt(this.css(attribute), 10);
+    return (isNaN(value)) ? 0 : value; // borders in old IE are throwing 'medium' for demo.html
+};
+
+NodeContainer.prototype.cssFloat = function(attribute) {
+    var value = parseFloat(this.css(attribute));
+    return (isNaN(value)) ? 0 : value;
+};
+
+NodeContainer.prototype.fontWeight = function() {
+    var weight = this.css("fontWeight");
+    switch(parseInt(weight, 10)){
+        case 401:
+            weight = "bold";
+            break;
+        case 400:
+            weight = "normal";
+            break;
+    }
+    return weight;
+};
+
+NodeContainer.prototype.parseBackgroundImages = function() {
+    return this.backgroundImages || (this.backgroundImages = parseBackgrounds(this.css("backgroundImage")));
+};
+
+NodeContainer.prototype.cssList = function(property, index) {
+    var value = (this.css(property) || '').split(',');
+    value = value[index || 0] || value[0] || 'auto';
+    value = value.trim().split(' ');
+    if (value.length === 1) {
+        value = [value[0], value[0]];
+    }
+    return value;
+};
+
+NodeContainer.prototype.parseBackgroundSize = function(bounds, image, index) {
+    var size = this.cssList("backgroundSize", index);
+    var width, height;
+
+    if (isPercentage(size[0])) {
+        width = bounds.width * parseFloat(size[0]) / 100;
+    } else if (/contain|cover/.test(size[0])) {
+        var targetRatio = bounds.width / bounds.height, currentRatio = image.width / image.height;
+        return (targetRatio < currentRatio ^ size[0] === 'contain') ?  {width: bounds.height * currentRatio, height: bounds.height} : {width: bounds.width, height: bounds.width / currentRatio};
+    } else {
+        width = parseInt(size[0], 10);
+    }
+
+    if (size[0] === 'auto' && size[1] === 'auto') {
+        height = image.height;
+    } else if (size[1] === 'auto') {
+        height = width / image.width * image.height;
+    } else if (isPercentage(size[1])) {
+        height =  bounds.height * parseFloat(size[1]) / 100;
+    } else {
+        height = parseInt(size[1], 10);
+    }
+
+    if (size[0] === 'auto') {
+        width = height / image.height * image.width;
+    }
+
+    return {width: width, height: height};
+};
+
+NodeContainer.prototype.parseBackgroundPosition = function(bounds, image, index, backgroundSize) {
+    var position = this.cssList('backgroundPosition', index);
+    var left, top;
+
+    if (isPercentage(position[0])){
+        left = (bounds.width - (backgroundSize || image).width) * (parseFloat(position[0]) / 100);
+    } else {
+        left = parseInt(position[0], 10);
+    }
+
+    if (position[1] === 'auto') {
+        top = left / image.width * image.height;
+    } else if (isPercentage(position[1])){
+        top =  (bounds.height - (backgroundSize || image).height) * parseFloat(position[1]) / 100;
+    } else {
+        top = parseInt(position[1], 10);
+    }
+
+    if (position[0] === 'auto') {
+        left = top / image.height * image.width;
+    }
+
+    return {left: left, top: top};
+};
+
+NodeContainer.prototype.parseBackgroundRepeat = function(index) {
+    return this.cssList("backgroundRepeat", index)[0];
+};
+
+NodeContainer.prototype.parseTextShadows = function() {
+    var textShadow = this.css("textShadow");
+    var results = [];
+
+    if (textShadow && textShadow !== 'none') {
+        var shadows = textShadow.match(this.TEXT_SHADOW_PROPERTY);
+        for (var i = 0; shadows && (i < shadows.length); i++) {
+            var s = shadows[i].match(this.TEXT_SHADOW_VALUES);
+            results.push({
+                color: s[0],
+                offsetX: s[1] ? s[1].replace('px', '') : 0,
+                offsetY: s[2] ? s[2].replace('px', '') : 0,
+                blur: s[3] ? s[3].replace('px', '') : 0
+            });
+        }
+    }
+    return results;
+};
+
+NodeContainer.prototype.parseTransform = function() {
+    if (!this.transformData) {
+        if (this.hasTransform()) {
+            var offset = this.parseBounds();
+            var origin = this.prefixedCss("transformOrigin").split(" ").map(removePx).map(asFloat);
+            origin[0] += offset.left;
+            origin[1] += offset.top;
+            this.transformData = {
+                origin: origin,
+                matrix: this.parseTransformMatrix()
+            };
+        } else {
+            this.transformData = {
+                origin: [0, 0],
+                matrix: [1, 0, 0, 1, 0, 0]
+            };
+        }
+    }
+    return this.transformData;
+};
+
+NodeContainer.prototype.parseTransformMatrix = function() {
+    if (!this.transformMatrix) {
+        var transform = this.prefixedCss("transform");
+        var matrix = transform ? parseMatrix(transform.match(this.MATRIX_PROPERTY)) : null;
+        this.transformMatrix = matrix ? matrix : [1, 0, 0, 1, 0, 0];
+    }
+    return this.transformMatrix;
+};
+
+NodeContainer.prototype.parseBounds = function() {
+    return this.bounds || (this.bounds = this.hasTransform() ? offsetBounds(this.node) : getBounds(this.node));
+};
+
+NodeContainer.prototype.hasTransform = function() {
+    return this.parseTransformMatrix().join(",") !== "1,0,0,1,0,0" || (this.parent && this.parent.hasTransform());
+};
+
+NodeContainer.prototype.getValue = function() {
+    var value = this.node.value || "";
+    value = (this.node.tagName === "SELECT") ? selectionValue(this.node) : value;
+    return value.length === 0 ? (this.node.placeholder || "") : value;
+};
+
+NodeContainer.prototype.MATRIX_PROPERTY = /(matrix)\((.+)\)/;
+NodeContainer.prototype.TEXT_SHADOW_PROPERTY = /((rgba|rgb)\([^\)]+\)(\s-?\d+px){0,})/g;
+NodeContainer.prototype.TEXT_SHADOW_VALUES = /(-?\d+px)|(#.+)|(rgb\(.+\))|(rgba\(.+\))/g;
+
+function selectionValue(node) {
+    var option = node.options[node.selectedIndex || 0];
+    return option ? (option.text || "") : "";
+}
+
+function parseMatrix(match) {
+    if (match && match[1] === "matrix") {
+        return match[2].split(",").map(function(s) {
+            return parseFloat(s.trim());
+        });
+    }
+}
+
+function isPercentage(value) {
+    return value.toString().indexOf("%") !== -1;
+}
+
+function parseBackgrounds(backgroundImage) {
+    var whitespace = ' \r\n\t',
+        method, definition, prefix, prefix_i, block, results = [],
+        mode = 0, numParen = 0, quote, args;
+    var appendResult = function() {
+        if(method) {
+            if (definition.substr(0, 1) === '"') {
+                definition = definition.substr(1, definition.length - 2);
+            }
+            if (definition) {
+                args.push(definition);
+            }
+            if (method.substr(0, 1) === '-' && (prefix_i = method.indexOf('-', 1 ) + 1) > 0) {
+                prefix = method.substr(0, prefix_i);
+                method = method.substr(prefix_i);
+            }
+            results.push({
+                prefix: prefix,
+                method: method.toLowerCase(),
+                value: block,
+                args: args,
+                image: null
+            });
+        }
+        args = [];
+        method = prefix = definition = block = '';
+    };
+    args = [];
+    method = prefix = definition = block = '';
+    backgroundImage.split("").forEach(function(c) {
+        if (mode === 0 && whitespace.indexOf(c) > -1) {
+            return;
+        }
+        switch(c) {
+            case '"':
+                if(!quote) {
+                    quote = c;
+                }
+                else if(quote === c) {
+                    quote = null;
+                }
+                break;
+            case '(':
+                if(quote) {
+                    break;
+                } else if(mode === 0) {
+                    mode = 1;
+                    block += c;
+                    return;
+                } else {
+                    numParen++;
+                }
+                break;
+            case ')':
+                if (quote) {
+                    break;
+                } else if(mode === 1) {
+                    if(numParen === 0) {
+                        mode = 0;
+                        block += c;
+                        appendResult();
+                        return;
+                    } else {
+                        numParen--;
+                    }
+                }
+                break;
+
+            case ',':
+                if (quote) {
+                    break;
+                } else if(mode === 0) {
+                    appendResult();
+                    return;
+                } else if (mode === 1) {
+                    if (numParen === 0 && !method.match(/^url$/i)) {
+                        args.push(definition);
+                        definition = '';
+                        block += c;
+                        return;
+                    }
+                }
+                break;
+        }
+
+        block += c;
+        if (mode === 0) {
+            method += c;
+        } else {
+            definition += c;
+        }
+    });
+
+    appendResult();
+    return results;
+}
+
+function removePx(str) {
+    return str.replace("px", "");
+}
+
+function asFloat(str) {
+    return parseFloat(str);
+}
+
+function getBounds(node) {
+    if (node.getBoundingClientRect) {
+        var clientRect = node.getBoundingClientRect();
+        var width = node.offsetWidth == null ? clientRect.width : node.offsetWidth;
+        return {
+            top: clientRect.top,
+            bottom: clientRect.bottom || (clientRect.top + clientRect.height),
+            right: clientRect.left + width,
+            left: clientRect.left,
+            width:  width,
+            height: node.offsetHeight == null ? clientRect.height : node.offsetHeight
+        };
+    }
+    return {};
+}
+
+function offsetBounds(node) {
+    var parent = node.offsetParent ? offsetBounds(node.offsetParent) : {top: 0, left: 0};
+
+    return {
+        top: node.offsetTop + parent.top,
+        bottom: node.offsetTop + node.offsetHeight + parent.top,
+        right: node.offsetLeft + parent.left + node.offsetWidth,
+        left: node.offsetLeft + parent.left,
+        width: node.offsetWidth,
+        height: node.offsetHeight
+    };
+}
+
+function NodeParser(element, renderer, support, imageLoader, options) {
+    log("Starting NodeParser");
+    this.renderer = renderer;
+    this.options = options;
+    this.range = null;
+    this.support = support;
+    this.renderQueue = [];
+    this.stack = new StackingContext(true, 1, element.ownerDocument, null);
+    var parent = new NodeContainer(element, null);
+    if (element === element.ownerDocument.documentElement) {
+        // http://www.w3.org/TR/css3-background/#special-backgrounds
+        var canvasBackground = new NodeContainer(this.renderer.isTransparent(parent.css('backgroundColor')) ? element.ownerDocument.body : element.ownerDocument.documentElement, null);
+        renderer.rectangle(0, 0, renderer.width, renderer.height, canvasBackground.css('backgroundColor'));
+    }
+    parent.visibile = parent.isElementVisible();
+    this.createPseudoHideStyles(element.ownerDocument);
+    this.nodes = flatten([parent].concat(this.getChildren(parent)).filter(function(container) {
+        return container.visible = container.isElementVisible();
+    }).map(this.getPseudoElements, this));
+    this.fontMetrics = new FontMetrics();
+    log("Fetched nodes");
+    this.images = imageLoader.fetch(this.nodes.filter(isElement));
+    log("Creating stacking contexts");
+    this.createStackingContexts();
+    log("Sorting stacking contexts");
+    this.sortStackingContexts(this.stack);
+    this.ready = this.images.ready.then(bind(function() {
+        log("Images loaded, starting parsing");
+        this.parse(this.stack);
+        log("Render queue created with " + this.renderQueue.length + " items");
+        return new Promise(bind(function(resolve) {
+            if (!options.async) {
+                this.renderQueue.forEach(this.paint, this);
+                resolve();
+            } else if (typeof(options.async) === "function") {
+                options.async.call(this, this.renderQueue, resolve);
+            } else {
+                this.renderIndex = 0;
+                this.asyncRenderer(this.renderQueue, resolve);
+            }
+        }, this));
+    }, this));
+}
+
+NodeParser.prototype.asyncRenderer = function(queue, resolve, asyncTimer) {
+    asyncTimer = asyncTimer || Date.now();
+    this.paint(queue[this.renderIndex++]);
+    if (queue.length === this.renderIndex) {
+        resolve();
+    } else if (asyncTimer + 20 > Date.now()) {
+        this.asyncRenderer(queue, resolve, asyncTimer);
+    } else {
+        setTimeout(bind(function() {
+            this.asyncRenderer(queue, resolve);
+        }, this), 0);
+    }
+};
+
+NodeParser.prototype.createPseudoHideStyles = function(document) {
+    var hidePseudoElements = document.createElement('style');
+    hidePseudoElements.innerHTML = '.' + this.pseudoHideClass + ':before { content: "" !important; display: none !important; }' +
+        '.' + this.pseudoHideClass + ':after { content: "" !important; display: none !important; }';
+    document.body.appendChild(hidePseudoElements);
+};
+
+NodeParser.prototype.getPseudoElements = function(container) {
+    var nodes = [[container]];
+    if (container.node.nodeType === Node.ELEMENT_NODE) {
+        var before = this.getPseudoElement(container, ":before");
+        var after = this.getPseudoElement(container, ":after");
+
+        if (before) {
+            container.node.insertBefore(before[0].node, container.node.firstChild);
+            nodes.push(before);
+        }
+
+        if (after) {
+            container.node.appendChild(after[0].node);
+            nodes.push(after);
+        }
+
+        if (before || after) {
+            container.node.className += " " + this.pseudoHideClass;
+        }
+    }
+    return flatten(nodes);
+};
+
+function toCamelCase(str) {
+    return str.replace(/(\-[a-z])/g, function(match){
+        return match.toUpperCase().replace('-','');
+    });
+}
+
+NodeParser.prototype.getPseudoElement = function(container, type) {
+    var style = container.computedStyle(type);
+    if(!style || !style.content || style.content === "none" || style.content === "-moz-alt-content" || style.display === "none") {
+        return null;
+    }
+
+    var content = stripQuotes(style.content);
+    var isImage = content.substr(0, 3) === 'url';
+    var pseudoNode = document.createElement(isImage ? 'img' : 'html2canvaspseudoelement');
+    var pseudoContainer = new NodeContainer(pseudoNode, container);
+
+    for (var i = style.length-1; i >= 0; i--) {
+        var property = toCamelCase(style.item(i));
+        pseudoNode.style[property] = style[property];
+    }
+
+    pseudoNode.className = this.pseudoHideClass;
+
+    if (isImage) {
+        pseudoNode.src = parseBackgrounds(content)[0].args[0];
+        return [pseudoContainer];
+    } else {
+        var text = document.createTextNode(content);
+        pseudoNode.appendChild(text);
+        return [pseudoContainer, new TextContainer(text, pseudoContainer)];
+    }
+};
 
 
-        for (borderSide = 0; borderSide < 4; borderSide+=1){
-            borderData = borders[borderSide];
+NodeParser.prototype.getChildren = function(parentContainer) {
+    return flatten([].filter.call(parentContainer.node.childNodes, renderableNode).map(function(node) {
+        var container = [node.nodeType === Node.TEXT_NODE ? new TextContainer(node, parentContainer) : new NodeContainer(node, parentContainer)].filter(nonIgnoredElement);
+        return node.nodeType === Node.ELEMENT_NODE && container.length && node.tagName !== "TEXTAREA" ? (container[0].isElementVisible() ? container.concat(this.getChildren(container[0])) : []) : container;
+    }, this));
+};
 
-            if (borderData.width>0){
-                bx = x;
-                by = y;
-                bw = w;
-                bh = h - (borders[2].width);
+NodeParser.prototype.newStackingContext = function(container, hasOwnStacking) {
+    var stack = new StackingContext(hasOwnStacking, container.cssFloat('opacity'), container.node, container.parent);
+    stack.visible = container.visible;
+    var parentStack = hasOwnStacking ? stack.getParentStack(this) : stack.parent.stack;
+    parentStack.contexts.push(stack);
+    container.stack = stack;
+};
 
-                switch(borderSide){
+NodeParser.prototype.createStackingContexts = function() {
+    this.nodes.forEach(function(container) {
+        if (isElement(container) && (this.isRootElement(container) || hasOpacity(container) || isPositionedForStacking(container) || this.isBodyWithTransparentRoot(container) || container.hasTransform())) {
+            this.newStackingContext(container, true);
+        } else if (isElement(container) && ((isPositioned(container) && zIndex0(container)) || isInlineBlock(container) || isFloating(container))) {
+            this.newStackingContext(container, false);
+        } else {
+            container.assignStack(container.parent.stack);
+        }
+    }, this);
+};
+
+NodeParser.prototype.isBodyWithTransparentRoot = function(container) {
+    return container.node.nodeName === "BODY" && this.renderer.isTransparent(container.parent.css('backgroundColor'));
+};
+
+NodeParser.prototype.isRootElement = function(container) {
+    return container.parent === null;
+};
+
+NodeParser.prototype.sortStackingContexts = function(stack) {
+    stack.contexts.sort(zIndexSort);
+    stack.contexts.forEach(this.sortStackingContexts, this);
+};
+
+NodeParser.prototype.parseTextBounds = function(container) {
+    return function(text, index, textList) {
+        if (container.parent.css("textDecoration").substr(0, 4) !== "none" || text.trim().length !== 0) {
+            if (this.support.rangeBounds && !container.parent.hasTransform()) {
+                var offset = textList.slice(0, index).join("").length;
+                return this.getRangeBounds(container.node, offset, text.length);
+            } else if (container.node && typeof(container.node.data) === "string") {
+                var replacementNode = container.node.splitText(text.length);
+                var bounds = this.getWrapperBounds(container.node, container.parent.hasTransform());
+                container.node = replacementNode;
+                return bounds;
+            }
+        } else if(!this.support.rangeBounds || container.parent.hasTransform()){
+            container.node = container.node.splitText(text.length);
+        }
+        return {};
+    };
+};
+
+NodeParser.prototype.getWrapperBounds = function(node, transform) {
+    var wrapper = node.ownerDocument.createElement('html2canvaswrapper');
+    var parent = node.parentNode,
+        backupText = node.cloneNode(true);
+
+    wrapper.appendChild(node.cloneNode(true));
+    parent.replaceChild(wrapper, node);
+    var bounds = transform ? offsetBounds(wrapper) : getBounds(wrapper);
+    parent.replaceChild(backupText, wrapper);
+    return bounds;
+};
+
+NodeParser.prototype.getRangeBounds = function(node, offset, length) {
+    var range = this.range || (this.range = node.ownerDocument.createRange());
+    range.setStart(node, offset);
+    range.setEnd(node, offset + length);
+    return range.getBoundingClientRect();
+};
+
+function ClearTransform() {}
+
+NodeParser.prototype.parse = function(stack) {
+    // http://www.w3.org/TR/CSS21/visuren.html#z-index
+    var negativeZindex = stack.contexts.filter(negativeZIndex); // 2. the child stacking contexts with negative stack levels (most negative first).
+    var descendantElements = stack.children.filter(isElement);
+    var descendantNonFloats = descendantElements.filter(not(isFloating));
+    var nonInlineNonPositionedDescendants = descendantNonFloats.filter(not(isPositioned)).filter(not(inlineLevel)); // 3 the in-flow, non-inline-level, non-positioned descendants.
+    var nonPositionedFloats = descendantElements.filter(not(isPositioned)).filter(isFloating); // 4. the non-positioned floats.
+    var inFlow = descendantNonFloats.filter(not(isPositioned)).filter(inlineLevel); // 5. the in-flow, inline-level, non-positioned descendants, including inline tables and inline blocks.
+    var stackLevel0 = stack.contexts.concat(descendantNonFloats.filter(isPositioned)).filter(zIndex0); // 6. the child stacking contexts with stack level 0 and the positioned descendants with stack level 0.
+    var text = stack.children.filter(isTextNode).filter(hasText);
+    var positiveZindex = stack.contexts.filter(positiveZIndex); // 7. the child stacking contexts with positive stack levels (least positive first).
+    negativeZindex.concat(nonInlineNonPositionedDescendants).concat(nonPositionedFloats)
+        .concat(inFlow).concat(stackLevel0).concat(text).concat(positiveZindex).forEach(function(container) {
+            this.renderQueue.push(container);
+            if (isStackingContext(container)) {
+                this.parse(container);
+                this.renderQueue.push(new ClearTransform());
+            }
+        }, this);
+};
+
+NodeParser.prototype.paint = function(container) {
+    try {
+        if (container instanceof ClearTransform) {
+            this.renderer.ctx.restore();
+        } else if (isTextNode(container)) {
+            this.paintText(container);
+        } else {
+            this.paintNode(container);
+        }
+    } catch(e) {
+        log(e);
+    }
+};
+
+NodeParser.prototype.paintNode = function(container) {
+    if (isStackingContext(container)) {
+        this.renderer.setOpacity(container.opacity);
+        this.renderer.ctx.save();
+        if (container.hasTransform()) {
+            this.renderer.setTransform(container.parseTransform());
+        }
+    }
+    var bounds = container.parseBounds();
+    var borderData = this.parseBorders(container);
+    this.renderer.clip(borderData.clip, function() {
+        this.renderer.renderBackground(container, bounds, borderData.borders.map(getWidth));
+    }, this);
+    this.renderer.renderBorders(borderData.borders);
+    switch(container.node.nodeName) {
+        case "svg":
+        case "IFRAME":
+            var imgContainer = this.images.get(container.node);
+            if (imgContainer) {
+                this.renderer.renderImage(container, bounds, borderData, imgContainer);
+            } else {
+                log("Error loading <" + container.node.nodeName + ">", container.node);
+            }
+            break;
+        case "IMG":
+            var imageContainer = this.images.get(container.node.src);
+            if (imageContainer) {
+                this.renderer.renderImage(container, bounds, borderData, imageContainer);
+            } else {
+                log("Error loading <img>", container.node.src);
+            }
+            break;
+        case "SELECT":
+        case "INPUT":
+        case "TEXTAREA":
+            this.paintFormValue(container);
+            break;
+    }
+};
+
+NodeParser.prototype.paintFormValue = function(container) {
+    if (container.getValue().length > 0) {
+        var document = container.node.ownerDocument;
+        var wrapper = document.createElement('html2canvaswrapper');
+        var properties = ['lineHeight', 'textAlign', 'fontFamily', 'fontWeight', 'fontSize', 'color',
+            'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
+            'width', 'height', 'borderLeftStyle', 'borderTopStyle', 'borderLeftWidth', 'borderTopWidth',
+            'boxSizing', 'whiteSpace', 'wordWrap'];
+
+        properties.forEach(function(property) {
+            try {
+                wrapper.style[property] = container.css(property);
+            } catch(e) {
+                // Older IE has issues with "border"
+                log("html2canvas: Parse: Exception caught in renderFormValue: " + e.message);
+            }
+        });
+        var bounds = container.parseBounds();
+        wrapper.style.position = "absolute";
+        wrapper.style.left = bounds.left + "px";
+        wrapper.style.top = bounds.top + "px";
+        wrapper.textContent = container.getValue();
+        document.body.appendChild(wrapper);
+        this.paintText(new TextContainer(wrapper.firstChild, container));
+        document.body.removeChild(wrapper);
+    }
+};
+
+NodeParser.prototype.paintText = function(container) {
+    container.applyTextTransform();
+    var characters = window.html2canvas.punycode.ucs2.decode(container.node.data);
+    var textList = (!this.options.letterRendering || noLetterSpacing(container)) && !hasUnicode(container.node.data) ? getWords(characters) : characters.map(function(character) {
+        return window.html2canvas.punycode.ucs2.encode([character]);
+    });
+
+    var weight = container.parent.fontWeight();
+    var size = container.parent.css('fontSize');
+    var family = container.parent.css('fontFamily');
+    var shadows = container.parent.parseTextShadows();
+
+    this.renderer.font(container.parent.css('color'), container.parent.css('fontStyle'), container.parent.css('fontVariant'), weight, size, family);
+    if (shadows.length) {
+        // TODO: support multiple text shadows
+        this.renderer.fontShadow(shadows[0].color, shadows[0].offsetX, shadows[0].offsetY, shadows[0].blur);
+    } else {
+        this.renderer.clearShadow();
+    }
+
+    textList.map(this.parseTextBounds(container), this).forEach(function(bounds, index) {
+        if (bounds) {
+            this.renderer.text(textList[index], bounds.left, bounds.bottom);
+            this.renderTextDecoration(container.parent, bounds, this.fontMetrics.getMetrics(family, size));
+        }
+    }, this);
+};
+
+NodeParser.prototype.renderTextDecoration = function(container, bounds, metrics) {
+    switch(container.css("textDecoration").split(" ")[0]) {
+        case "underline":
+            // Draws a line at the baseline of the font
+            // TODO As some browsers display the line as more than 1px if the font-size is big, need to take that into account both in position and size
+            this.renderer.rectangle(bounds.left, Math.round(bounds.top + metrics.baseline + metrics.lineWidth), bounds.width, 1, container.css("color"));
+            break;
+        case "overline":
+            this.renderer.rectangle(bounds.left, Math.round(bounds.top), bounds.width, 1, container.css("color"));
+            break;
+        case "line-through":
+            // TODO try and find exact position for line-through
+            this.renderer.rectangle(bounds.left, Math.ceil(bounds.top + metrics.middle + metrics.lineWidth), bounds.width, 1, container.css("color"));
+            break;
+    }
+};
+
+NodeParser.prototype.parseBorders = function(container) {
+    var nodeBounds = container.bounds;
+    var radius = getBorderRadiusData(container);
+    var borders = ["Top", "Right", "Bottom", "Left"].map(function(side) {
+        return {
+            width: container.cssInt('border' + side + 'Width'),
+            color: container.css('border' + side + 'Color'),
+            args: null
+        };
+    });
+    var borderPoints = calculateCurvePoints(nodeBounds, radius, borders);
+
+    return {
+        clip: this.parseBackgroundClip(container, borderPoints, borders, radius, nodeBounds),
+        borders: borders.map(function(border, borderSide) {
+            if (border.width > 0) {
+                var bx = nodeBounds.left;
+                var by = nodeBounds.top;
+                var bw = nodeBounds.width;
+                var bh = nodeBounds.height - (borders[2].width);
+
+                switch(borderSide) {
                     case 0:
                         // top border
                         bh = borders[0].width;
+                        border.args = drawSide({
+                                c1: [bx, by],
+                                c2: [bx + bw, by],
+                                c3: [bx + bw - borders[1].width, by + bh],
+                                c4: [bx + borders[3].width, by + bh]
+                            }, radius[0], radius[1],
+                            borderPoints.topLeftOuter, borderPoints.topLeftInner, borderPoints.topRightOuter, borderPoints.topRightInner);
                         break;
                     case 1:
                         // right border
-                        bx = x + w - (borders[1].width);
+                        bx = nodeBounds.left + nodeBounds.width - (borders[1].width);
                         bw = borders[1].width;
+
+                        border.args = drawSide({
+                                c1: [bx + bw, by],
+                                c2: [bx + bw, by + bh + borders[2].width],
+                                c3: [bx, by + bh],
+                                c4: [bx, by + borders[0].width]
+                            }, radius[1], radius[2],
+                            borderPoints.topRightOuter, borderPoints.topRightInner, borderPoints.bottomRightOuter, borderPoints.bottomRightInner);
                         break;
                     case 2:
                         // bottom border
-                        by = (by + h) - (borders[2].width);
+                        by = (by + nodeBounds.height) - (borders[2].width);
                         bh = borders[2].width;
+                        border.args = drawSide({
+                                c1: [bx + bw, by + bh],
+                                c2: [bx, by + bh],
+                                c3: [bx + borders[3].width, by],
+                                c4: [bx + bw - borders[3].width, by]
+                            }, radius[2], radius[3],
+                            borderPoints.bottomRightOuter, borderPoints.bottomRightInner, borderPoints.bottomLeftOuter, borderPoints.bottomLeftInner);
                         break;
                     case 3:
                         // left border
                         bw = borders[3].width;
+                        border.args = drawSide({
+                                c1: [bx, by + bh + borders[2].width],
+                                c2: [bx, by],
+                                c3: [bx + bw, by + borders[0].width],
+                                c4: [bx + bw, by + bh]
+                            }, radius[3], radius[0],
+                            borderPoints.bottomLeftOuter, borderPoints.bottomLeftInner, borderPoints.topLeftOuter, borderPoints.topLeftInner);
                         break;
                 }
-
-                borderBounds = {
-                    left:bx,
-                    top:by,
-                    width: bw,
-                    height:bh
-                };
-
-                if (clip){
-                    borderBounds = clipBounds(borderBounds, clip);
-                }
-
-
-                if (borderBounds.width>0 && borderBounds.height>0){
-                    renderRect(ctx, bx, by, borderBounds.width, borderBounds.height, borderData.color);
-                }
-
-
             }
-        }
-
-        return borders;
-
-    }
-
-
-    function renderFormValue (el, bounds, stack){
-
-        var valueWrap = doc.createElement('valuewrap'),
-        cssArr = ['lineHeight','textAlign','fontFamily','color','fontSize','paddingLeft','paddingTop','width','height','border','borderLeftWidth','borderTopWidth'],
-        i,
-        textValue,
-        textNode,
-        arrLen,
-        style;
-
-        for (i = 0, arrLen = cssArr.length; i < arrLen; i+=1){
-            style = cssArr[i];
-
-            try {
-                valueWrap.style[style] = getCSS(el, style);
-            } catch( e ) {
-                // Older IE has issues with "border"
-                h2clog("html2canvas: Parse: Exception caught in renderFormValue: " + e.message);
-            }
-        }
-
-
-        valueWrap.style.borderColor = "black";
-        valueWrap.style.borderStyle = "solid";
-        valueWrap.style.display = "block";
-        valueWrap.style.position = "absolute";
-        if (/^(submit|reset|button|text|password)$/.test(el.type) || el.nodeName === "SELECT"){
-            valueWrap.style.lineHeight = getCSS(el, "height");
-        }
-
-
-        valueWrap.style.top = bounds.top + "px";
-        valueWrap.style.left = bounds.left + "px";
-
-        if (el.nodeName === "SELECT"){
-            // TODO increase accuracy of text position
-            textValue = el.options[el.selectedIndex].text;
-        } else{
-            textValue = el.value;
-        }
-        textNode = doc.createTextNode(textValue);
-
-        valueWrap.appendChild(textNode);
-        body.appendChild(valueWrap);
-
-
-        renderText(el, textNode, stack);
-        body.removeChild(valueWrap);
-
-
-
-    }
-
-
-
-
-
-    function renderImage (ctx, image, sx, sy, sw, sh, dx, dy, dw, dh) {
-        ctx.drawImage(
-            image,
-            sx, //sx
-            sy, //sy
-            sw, //sw
-            sh, //sh
-            dx, //dx
-            dy, // dy
-            dw, //dw
-            dh //dh
-            );
-        numDraws+=1;
-
-    }
-
-
-    function renderBackgroundRepeat (ctx, image, x, y, width, height, elx, ely){
-        var sourceX = 0,
-        sourceY=0;
-        if (elx-x>0){
-            sourceX = elx-x;
-        }
-
-        if (ely-y>0){
-            sourceY = ely-y;
-        }
-
-        renderImage(
-            ctx,
-            image,
-            sourceX, // source X
-            sourceY, // source Y
-            width-sourceX, // source Width
-            height-sourceY, // source Height
-            x+sourceX, // destination X
-            y+sourceY, // destination Y
-            width-sourceX, // destination width
-            height-sourceY // destination height
-            );
-    }
-
-
-    function renderBackgroundRepeatY (ctx, image, bgp, x, y, w, h){
-
-        var height,
-        width = Math.min(image.width,w),bgy;
-
-        bgp.top = bgp.top-Math.ceil(bgp.top/image.height)*image.height;
-
-
-        for(bgy=(y+bgp.top);bgy<h+y;){
-
-
-            if ( Math.floor(bgy+image.height)>h+y){
-                height = (h+y)-bgy;
-            }else{
-                height = image.height;
-            }
-            renderBackgroundRepeat(ctx,image,x+bgp.left,bgy,width,height,x,y);
-
-            bgy = Math.floor(bgy+image.height);
-
-        }
-    }
-
-    function renderBackgroundRepeatX(ctx, image, bgp, x, y, w, h){
-
-        var height = Math.min(image.height,h),
-        width,bgx;
-
-
-        bgp.left = bgp.left-Math.ceil(bgp.left/image.width)*image.width;
-
-
-        for (bgx=(x+bgp.left);bgx<w+x;) {
-
-            if (Math.floor(bgx+image.width)>w+x){
-                width = (w+x)-bgx;
-            }else{
-                width = image.width;
-            }
-
-            renderBackgroundRepeat(ctx,image,bgx,(y+bgp.top),width,height,x,y);
-
-            bgx = Math.floor(bgx+image.width);
-
-
-        }
-    }
-
-    function renderBackground(el,bounds,ctx){
-
-        // TODO add support for multi background-images
-        var background_image = getCSS(el, "backgroundImage"),
-        background_repeat = getCSS(el, "backgroundRepeat").split(",")[0],
-        image,
-        bgp,
-        bgy,
-        bgw,
-        bgsx,
-        bgsy,
-        bgdx,
-        bgdy,
-        bgh,
-        h,
-        height,
-        add;
-
-        //   if (typeof background_image !== "undefined" && /^(1|none)$/.test(background_image) === false && /^(-webkit|-moz|linear-gradient|-o-)/.test(background_image)===false){
-
-        if ( !/data:image\/.*;base64,/i.test(background_image) && !/^(-webkit|-moz|linear-gradient|-o-)/.test(background_image) ) {
-            background_image = background_image.split(",")[0];
-        }
-
-        if ( typeof background_image !== "undefined" && /^(1|none)$/.test( background_image ) === false ) {
-            background_image = _html2canvas.Util.backgroundImage( background_image );
-            image = loadImage( background_image );
-
-
-            bgp = _html2canvas.Util.BackgroundPosition(el, bounds, image);
-
-            // TODO add support for background-origin
-            if ( image ){
-                switch ( background_repeat ) {
-
-                    case "repeat-x":
-                        renderBackgroundRepeatX( ctx, image, bgp, bounds.left, bounds.top, bounds.width, bounds.height );
-                        break;
-
-                    case "repeat-y":
-                        renderBackgroundRepeatY( ctx, image, bgp, bounds.left, bounds.top, bounds.width, bounds.height );
-                        break;
-
-                    case "no-repeat":
-                        /*
-                    this.drawBackgroundRepeat(
-                        ctx,
-                        image,
-                        bgp.left+bounds.left, // sx
-                        bgp.top+bounds.top, // sy
-                        Math.min(bounds.width,image.width),
-                        Math.min(bounds.height,image.height),
-                        bounds.left,
-                        bounds.top
-                        );*/
-
-
-                       
-                        bgw = bounds.width - bgp.left;
-                        bgh = bounds.height - bgp.top;
-                        bgsx = bgp.left;
-                        bgsy = bgp.top;
-                        bgdx = bgp.left+bounds.left;
-                        bgdy = bgp.top+bounds.top;
-
-                        //
-                        //     bgw = Math.min(bgw,image.width);
-                        //  bgh = Math.min(bgh,image.height);
-
-                        if (bgsx<0){
-                            bgsx = Math.abs(bgsx);
-                            bgdx += bgsx;
-                            bgw = Math.min(bounds.width,image.width-bgsx);
-                        }else{
-                            bgw = Math.min(bgw,image.width);
-                            bgsx = 0;
-                        }
-
-                        if (bgsy<0){
-                            bgsy = Math.abs(bgsy);
-                            bgdy += bgsy;
-                            // bgh = bgh-bgsy;
-                            bgh = Math.min(bounds.height,image.height-bgsy);
-                        }else{
-                            bgh = Math.min(bgh,image.height);
-                            bgsy = 0;
-                        }
-
-
-                        if (bgh>0 && bgw > 0){
-                            renderImage(
-                                ctx,
-                                image,
-                                bgsx, // source X : 0
-                                bgsy, // source Y : 1695
-                                bgw, // source Width : 18
-                                bgh, // source Height : 1677
-                                bgdx, // destination X :906
-                                bgdy, // destination Y : 1020
-                                bgw, // destination width : 18
-                                bgh // destination height : 1677
-                                );
-
-                        }
-                        break;
-                    default:
-
-
-
-                        bgp.top = bgp.top-Math.ceil(bgp.top/image.height)*image.height;
-
-
-                        for(bgy=(bounds.top+bgp.top);bgy<bounds.height+bounds.top;){
-
-
-
-                            h = Math.min(image.height,(bounds.height+bounds.top)-bgy);
-
-
-                            if ( Math.floor(bgy+image.height)>h+bgy){
-                                height = (h+bgy)-bgy;
-                            }else{
-                                height = image.height;
-                            }
-                            // console.log(height);
-
-                            if (bgy<bounds.top){
-                                add = bounds.top-bgy;
-                                bgy = bounds.top;
-
-                            }else{
-                                add = 0;
-                            }
-
-                            renderBackgroundRepeatX(ctx,image,bgp,bounds.left,bgy,bounds.width,height);
-                            if (add>0){
-                                bgp.top += add;
-                            }
-                            bgy = Math.floor(bgy+image.height)-add;
-                        }
-                        break;
-
-
-                }
-            }else{
-                h2clog("html2canvas: Error loading background:" + background_image);
-            //console.log(images);
-            }
-
-        }
-    }
-
-
-
-    function renderElement(el, parentStack){
-
-        var bounds = _html2canvas.Util.Bounds(el),
-        x = bounds.left,
-        y = bounds.top,
-        w = bounds.width,
-        h = bounds.height,
-        image,
-        bgcolor = getCSS(el, "backgroundColor"),
-        cssPosition = getCSS(el, "position"),
-        zindex,
-        opacity = getCSS(el, "opacity"),
-        stack,
-        stackLength,
-        borders,
-        ctx,
-        bgbounds,
-        imgSrc,
-        paddingLeft,
-        paddingTop,
-        paddingRight,
-        paddingBottom;
-
-        if (!parentStack){
-            docDim = docSize();
-            parentStack = {
-                opacity: 1
-            };
-        }else{
-            docDim = {};
-        }
-
-
-        //var zindex = this.formatZ(this.getCSS(el,"zIndex"),cssPosition,parentStack.zIndex,el.parentNode);
-
-        zindex = setZ( getCSS( el, "zIndex"), parentStack.zIndex );
-
-
-
-        stack = {
-            ctx: h2cRenderContext( docDim.width || w , docDim.height || h ),
-            zIndex: zindex,
-            opacity: opacity * parentStack.opacity,
-            cssPosition: cssPosition
-        };
-
-
-
-        // TODO correct overflow for absolute content residing under a static position
-
-        if (parentStack.clip){
-            stack.clip = _html2canvas.Util.Extend( {}, parentStack.clip );
-        //stack.clip = parentStack.clip;
-        //   stack.clip.height = stack.clip.height - parentStack.borders[2].width;
-        }
-
-
-        if ( options.useOverflow === true && /(hidden|scroll|auto)/.test(getCSS(el, "overflow")) === true && /(BODY)/i.test(el.nodeName) === false ){
-            if (stack.clip){
-                stack.clip = clipBounds(stack.clip, bounds);
-            }else{
-                stack.clip = bounds;
-            }
-        }
-
-
-        stackLength =  zindex.children.push(stack);
-
-        ctx = zindex.children[stackLength-1].ctx;
-
-        ctx.setVariable("globalAlpha", stack.opacity);
-
-        // draw element borders
-        borders = renderBorders(el, ctx, bounds, false);
-        stack.borders = borders;
-
-
-        // let's modify clip area for child elements, so borders dont get overwritten
-
-        /*
-    if (stack.clip){
-        stack.clip.width = stack.clip.width-(borders[1].width);
-        stack.clip.height = stack.clip.height-(borders[2].width);
-    }
-     */
-        if (ignoreElementsRegExp.test(el.nodeName) && options.iframeDefault !== "transparent"){
-            if (options.iframeDefault === "default"){
-                bgcolor = "#efefef";
-            }else{
-                bgcolor = options.iframeDefault;
-            }
-        }
-
-        // draw base element bgcolor
-
-        bgbounds = {
-            left: x + borders[3].width,
-            top: y + borders[0].width,
-            width: w - (borders[1].width + borders[3].width),
-            height: h - (borders[0].width + borders[2].width)
-        };
-
-        //if (this.withinBounds(stack.clip,bgbounds)){
-
-        if (stack.clip){
-            bgbounds = clipBounds(bgbounds, stack.clip);
-
-        //}
-
-        }
-
-
-        if (bgbounds.height > 0 && bgbounds.width > 0){
-            renderRect(
-                ctx,
-                bgbounds.left,
-                bgbounds.top,
-                bgbounds.width,
-                bgbounds.height,
-                bgcolor
-                );
-
-            renderBackground(el, bgbounds, ctx);
-        }
-
-        switch(el.nodeName){
-            case "IMG":
-                imgSrc = el.getAttribute('src');
-                image = loadImage(imgSrc);
-                if (image){
-
-                    paddingLeft = getCSSInt(el, 'paddingLeft');
-                    paddingTop = getCSSInt(el, 'paddingTop');
-                    paddingRight = getCSSInt(el, 'paddingRight');
-                    paddingBottom = getCSSInt(el, 'paddingBottom');
-
-
-                    renderImage(
-                        ctx,
-                        image,
-                        0, //sx
-                        0, //sy
-                        image.width, //sw
-                        image.height, //sh
-                        x + paddingLeft + borders[3].width, //dx
-                        y + paddingTop + borders[0].width, // dy
-                        bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight), //dw
-                        bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom) //dh
-                        );
-
-                }else{
-                    h2clog("html2canvas: Error loading <img>:" + imgSrc);
-                }
-                break;
-            case "INPUT":
-                // TODO add all relevant type's, i.e. HTML5 new stuff
-                // todo add support for placeholder attribute for browsers which support it
-                if (/^(text|url|email|submit|button|reset)$/.test(el.type) && el.value.length > 0){
-
-                    renderFormValue(el, bounds, stack);
-
-
-                /*
-                 this just doesn't work well enough
-
-                this.newText(el,{
-                    nodeValue:el.value,
-                    splitText: function(){
-                        return this;
-                    },
-                    formValue:true
-                },stack);
-                 */
-                }
-                break;
-            case "TEXTAREA":
-                if (el.value.length > 0){
-                    renderFormValue(el, bounds, stack);
-                }
-                break;
-            case "SELECT":
-                if (el.options.length > 0){
-                    renderFormValue(el, bounds, stack);
-                }
-                break;
-            case "LI":
-                renderListItem(el, stack, bgbounds);
-                break;
-            case "CANVAS":
-                paddingLeft = getCSSInt(el, 'paddingLeft');
-                paddingTop = getCSSInt(el, 'paddingTop');
-                paddingRight = getCSSInt(el, 'paddingRight');
-                paddingBottom = getCSSInt(el, 'paddingBottom');
-                renderImage(
-                    ctx,
-                    el,
-                    0, //sx
-                    0, //sy
-                    el.width, //sw
-                    el.height, //sh
-                    x + paddingLeft + borders[3].width, //dx
-                    y + paddingTop + borders[0].width, // dy
-                    bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight), //dw
-                    bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom) //dh
-                    );
-                break;
-        }
-
-        return zindex.children[stackLength - 1];
-    }
-
-
-
-    function parseElement (el, stack) {
-
-        // skip hidden elements and their children
-        if (getCSS(el, 'display') !== "none" && getCSS(el, 'visibility') !== "hidden") {
-
-            stack = renderElement(el, stack) || stack;
-
-            ctx = stack.ctx;
-
-            if ( !ignoreElementsRegExp.test( el.nodeName ) ) {
-                var elementChildren = _html2canvas.Util.Children( el ),
-                i,
-                node,
-                childrenLen;
-                for (i = 0, childrenLen = elementChildren.length; i < childrenLen; i+=1) {
-                    node = elementChildren[i];
-
-                    if ( node.nodeType === 1 ) {
-                        parseElement(node, stack);
-                    }else if ( node.nodeType === 3 ) {
-                        renderText(el, node, stack);
-                    }
-
-                }
-
-            }
-        } 
-    }
-
-    stack = renderElement(element, null);
-
-    /*
-    SVG powered HTML rendering, non-tainted canvas available from FF 11+ onwards
-    */
-
-    if ( support.svgRendering ) {
-        (function( body ){
-            var img = new Image(),
-            size =  docSize(),
-            html = "";
-
-            function parseDOM( el ) {
-                var children = _html2canvas.Util.Children( el ),
-                len = children.length,
-                attr,
-                a,
-                alen,
-                elm,
-                i;
-                for ( i = 0; i < len; i+=1 ) {
-                    elm = children[ i ];
-                    if ( elm.nodeType === 3 ) {
-                        // Text node
-
-                        html += elm.nodeValue.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
-                    } else if ( elm.nodeType === 1 ) {
-                        // Element
-                        if ( !/^(script|meta|title)$/.test(elm.nodeName.toLowerCase()) ) {
-
-                            html += "<" + elm.nodeName.toLowerCase();
-
-                            // add attributes
-                            if ( elm.hasAttributes() ) {
-                                attr = elm.attributes;
-                                alen = attr.length;
-                                for ( a = 0; a < alen; a+=1 ) {
-                                    html += " " + attr[ a ].name + '="' + attr[ a ].value + '"';
-                                }
-                            }
-
-
-                            html += '>';
-
-                            parseDOM( elm );
-
-
-                            html += "</" + elm.nodeName.toLowerCase() + ">";
-                        }
-                    }
-
-                }
-
-            }
-
-            parseDOM( body );
-            img.src = [
-            "data:image/svg+xml,",
-            "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='" + size.width + "' height='" + size.height + "'>",
-            "<foreignObject width='" + size.width + "' height='" + size.height + "'>",
-            "<html xmlns='http://www.w3.org/1999/xhtml' style='margin:0;'>",
-            html.replace(/\#/g,"%23"),
-            "</html>",
-            "</foreignObject>",
-            "</svg>"
-            ].join("");
-
-
-
-
-            img.onload = function() {
-                stack.svgRender = img;
-            };
-
-        })( document.documentElement );
-
-    }
-
-
-    // parse every child element
-    for (i = 0, children = element.children, childrenLen = children.length; i < childrenLen; i+=1){
-        parseElement(children[i], stack);
-    }
-
-
-    stack.backgroundColor = getCSS( document.documentElement, "backgroundColor" );
-
-    return stack;
-
+            return border;
+        })
+    };
 };
 
-function h2czContext(zindex) {
+NodeParser.prototype.parseBackgroundClip = function(container, borderPoints, borders, radius, bounds) {
+    var backgroundClip = container.css('backgroundClip'),
+        borderArgs = [];
+
+    switch(backgroundClip) {
+        case "content-box":
+        case "padding-box":
+            parseCorner(borderArgs, radius[0], radius[1], borderPoints.topLeftInner, borderPoints.topRightInner, bounds.left + borders[3].width, bounds.top + borders[0].width);
+            parseCorner(borderArgs, radius[1], radius[2], borderPoints.topRightInner, borderPoints.bottomRightInner, bounds.left + bounds.width - borders[1].width, bounds.top + borders[0].width);
+            parseCorner(borderArgs, radius[2], radius[3], borderPoints.bottomRightInner, borderPoints.bottomLeftInner, bounds.left + bounds.width - borders[1].width, bounds.top + bounds.height - borders[2].width);
+            parseCorner(borderArgs, radius[3], radius[0], borderPoints.bottomLeftInner, borderPoints.topLeftInner, bounds.left + borders[3].width, bounds.top + bounds.height - borders[2].width);
+            break;
+
+        default:
+            parseCorner(borderArgs, radius[0], radius[1], borderPoints.topLeftOuter, borderPoints.topRightOuter, bounds.left, bounds.top);
+            parseCorner(borderArgs, radius[1], radius[2], borderPoints.topRightOuter, borderPoints.bottomRightOuter, bounds.left + bounds.width, bounds.top);
+            parseCorner(borderArgs, radius[2], radius[3], borderPoints.bottomRightOuter, borderPoints.bottomLeftOuter, bounds.left + bounds.width, bounds.top + bounds.height);
+            parseCorner(borderArgs, radius[3], radius[0], borderPoints.bottomLeftOuter, borderPoints.topLeftOuter, bounds.left, bounds.top + bounds.height);
+            break;
+    }
+
+    return borderArgs;
+};
+
+NodeParser.prototype.pseudoHideClass = "___html2canvas___pseudoelement";
+
+function getCurvePoints(x, y, r1, r2) {
+    var kappa = 4 * ((Math.sqrt(2) - 1) / 3);
+    var ox = (r1) * kappa, // control point offset horizontal
+        oy = (r2) * kappa, // control point offset vertical
+        xm = x + r1, // x-middle
+        ym = y + r2; // y-middle
     return {
-        zindex: zindex,
-        children: []
+        topLeft: bezierCurve({x: x, y: ym}, {x: x, y: ym - oy}, {x: xm - ox, y: y}, {x: xm, y: y}),
+        topRight: bezierCurve({x: x, y: y}, {x: x + ox,y: y}, {x: xm, y: ym - oy}, {x: xm, y: ym}),
+        bottomRight: bezierCurve({x: xm, y: y}, {x: xm, y: y + oy}, {x: x + ox, y: ym}, {x: x, y: ym}),
+        bottomLeft: bezierCurve({x: xm, y: ym}, {x: xm - ox, y: ym}, {x: x, y: y + oy}, {x: x, y:y})
     };
 }
 
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
+function calculateCurvePoints(bounds, borderRadius, borders) {
+    var x = bounds.left,
+        y = bounds.top,
+        width = bounds.width,
+        height = bounds.height,
 
-  Released under MIT License
+        tlh = borderRadius[0][0],
+        tlv = borderRadius[0][1],
+        trh = borderRadius[1][0],
+        trv = borderRadius[1][1],
+        brh = borderRadius[2][0],
+        brv = borderRadius[2][1],
+        blh = borderRadius[3][0],
+        blv = borderRadius[3][1];
+
+    var topWidth = width - trh,
+        rightHeight = height - brv,
+        bottomWidth = width - brh,
+        leftHeight = height - blv;
+
+    return {
+        topLeftOuter: getCurvePoints(x, y, tlh, tlv).topLeft.subdivide(0.5),
+        topLeftInner: getCurvePoints(x + borders[3].width, y + borders[0].width, Math.max(0, tlh - borders[3].width), Math.max(0, tlv - borders[0].width)).topLeft.subdivide(0.5),
+        topRightOuter: getCurvePoints(x + topWidth, y, trh, trv).topRight.subdivide(0.5),
+        topRightInner: getCurvePoints(x + Math.min(topWidth, width + borders[3].width), y + borders[0].width, (topWidth > width + borders[3].width) ? 0 :trh - borders[3].width, trv - borders[0].width).topRight.subdivide(0.5),
+        bottomRightOuter: getCurvePoints(x + bottomWidth, y + rightHeight, brh, brv).bottomRight.subdivide(0.5),
+        bottomRightInner: getCurvePoints(x + Math.min(bottomWidth, width + borders[3].width), y + Math.min(rightHeight, height + borders[0].width), Math.max(0, brh - borders[1].width), Math.max(0, brv - borders[2].width)).bottomRight.subdivide(0.5),
+        bottomLeftOuter: getCurvePoints(x, y + leftHeight, blh, blv).bottomLeft.subdivide(0.5),
+        bottomLeftInner: getCurvePoints(x + borders[3].width, y + leftHeight, Math.max(0, blh - borders[3].width), Math.max(0, blv - borders[2].width)).bottomLeft.subdivide(0.5)
+    };
+}
+
+function bezierCurve(start, startControl, endControl, end) {
+    var lerp = function (a, b, t) {
+        return {
+            x: a.x + (b.x - a.x) * t,
+            y: a.y + (b.y - a.y) * t
+        };
+    };
+
+    return {
+        start: start,
+        startControl: startControl,
+        endControl: endControl,
+        end: end,
+        subdivide: function(t) {
+            var ab = lerp(start, startControl, t),
+                bc = lerp(startControl, endControl, t),
+                cd = lerp(endControl, end, t),
+                abbc = lerp(ab, bc, t),
+                bccd = lerp(bc, cd, t),
+                dest = lerp(abbc, bccd, t);
+            return [bezierCurve(start, ab, abbc, dest), bezierCurve(dest, bccd, cd, end)];
+        },
+        curveTo: function(borderArgs) {
+            borderArgs.push(["bezierCurve", startControl.x, startControl.y, endControl.x, endControl.y, end.x, end.y]);
+        },
+        curveToReversed: function(borderArgs) {
+            borderArgs.push(["bezierCurve", endControl.x, endControl.y, startControl.x, startControl.y, start.x, start.y]);
+        }
+    };
+}
+
+function drawSide(borderData, radius1, radius2, outer1, inner1, outer2, inner2) {
+    var borderArgs = [];
+
+    if (radius1[0] > 0 || radius1[1] > 0) {
+        borderArgs.push(["line", outer1[1].start.x, outer1[1].start.y]);
+        outer1[1].curveTo(borderArgs);
+    } else {
+        borderArgs.push([ "line", borderData.c1[0], borderData.c1[1]]);
+    }
+
+    if (radius2[0] > 0 || radius2[1] > 0) {
+        borderArgs.push(["line", outer2[0].start.x, outer2[0].start.y]);
+        outer2[0].curveTo(borderArgs);
+        borderArgs.push(["line", inner2[0].end.x, inner2[0].end.y]);
+        inner2[0].curveToReversed(borderArgs);
+    } else {
+        borderArgs.push(["line", borderData.c2[0], borderData.c2[1]]);
+        borderArgs.push(["line", borderData.c3[0], borderData.c3[1]]);
+    }
+
+    if (radius1[0] > 0 || radius1[1] > 0) {
+        borderArgs.push(["line", inner1[1].end.x, inner1[1].end.y]);
+        inner1[1].curveToReversed(borderArgs);
+    } else {
+        borderArgs.push(["line", borderData.c4[0], borderData.c4[1]]);
+    }
+
+    return borderArgs;
+}
+
+function parseCorner(borderArgs, radius1, radius2, corner1, corner2, x, y) {
+    if (radius1[0] > 0 || radius1[1] > 0) {
+        borderArgs.push(["line", corner1[0].start.x, corner1[0].start.y]);
+        corner1[0].curveTo(borderArgs);
+        corner1[1].curveTo(borderArgs);
+    } else {
+        borderArgs.push(["line", x, y]);
+    }
+
+    if (radius2[0] > 0 || radius2[1] > 0) {
+        borderArgs.push(["line", corner2[0].start.x, corner2[0].start.y]);
+    }
+}
+
+function negativeZIndex(container) {
+    return container.cssInt("zIndex") < 0;
+}
+
+function positiveZIndex(container) {
+    return container.cssInt("zIndex") > 0;
+}
+
+function zIndex0(container) {
+    return container.cssInt("zIndex") === 0;
+}
+
+function inlineLevel(container) {
+    return ["inline", "inline-block", "inline-table"].indexOf(container.css("display")) !== -1;
+}
+
+function isStackingContext(container) {
+    return (container instanceof StackingContext);
+}
+
+function hasText(container) {
+    return container.node.data.trim().length > 0;
+}
+
+function noLetterSpacing(container) {
+    return (/^(normal|none|0px)$/.test(container.parent.css("letterSpacing")));
+}
+
+function getBorderRadiusData(container) {
+    return ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].map(function(side) {
+        var value = container.css('border' + side + 'Radius');
+        var arr = value.split(" ");
+        if (arr.length <= 1) {
+            arr[1] = arr[0];
+        }
+        return arr.map(asInt);
+    });
+}
+
+function renderableNode(node) {
+    return (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE);
+}
+
+function isPositionedForStacking(container) {
+    var position = container.css("position");
+    var zIndex = (["absolute", "relative", "fixed"].indexOf(position) !== -1) ? container.css("zIndex") : "auto";
+    return zIndex !== "auto";
+}
+
+function isPositioned(container) {
+    return container.css("position") !== "static";
+}
+
+function isFloating(container) {
+    return container.css("float") !== "none";
+}
+
+function isInlineBlock(container) {
+    return ["inline-block", "inline-table"].indexOf(container.css("display")) !== -1;
+}
+
+function not(callback) {
+    var context = this;
+    return function() {
+        return !callback.apply(context, arguments);
+    };
+}
+
+function isElement(container) {
+    return container.node.nodeType === Node.ELEMENT_NODE;
+}
+
+function isTextNode(container) {
+    return container.node.nodeType === Node.TEXT_NODE;
+}
+
+function zIndexSort(a, b) {
+    return a.cssInt("zIndex") - b.cssInt("zIndex");
+}
+
+function hasOpacity(container) {
+    return container.css("opacity") < 1;
+}
+
+function bind(callback, context) {
+    return function() {
+        return callback.apply(context, arguments);
+    };
+}
+
+function asInt(value) {
+    return parseInt(value, 10);
+}
+
+function getWidth(border) {
+    return border.width;
+}
+
+function nonIgnoredElement(nodeContainer) {
+    return (nodeContainer.node.nodeType !== Node.ELEMENT_NODE || ["SCRIPT", "HEAD", "TITLE", "OBJECT", "BR", "OPTION"].indexOf(nodeContainer.node.nodeName) === -1);
+}
+
+function flatten(arrays) {
+    return [].concat.apply([], arrays);
+}
+
+function stripQuotes(content) {
+    var first = content.substr(0, 1);
+    return (first === content.substr(content.length - 1) && first.match(/'|"/)) ? content.substr(1, content.length - 2) : content;
+}
+
+function getWords(characters) {
+    var words = [], i = 0, onWordBoundary = false, word;
+    while(characters.length) {
+        if (isWordBoundary(characters[i]) === onWordBoundary) {
+            word = characters.splice(0, i);
+            if (word.length) {
+                words.push(window.html2canvas.punycode.ucs2.encode(word));
+            }
+            onWordBoundary =! onWordBoundary;
+            i = 0;
+        } else {
+            i++;
+        }
+
+        if (i >= characters.length) {
+            word = characters.splice(0, i);
+            if (word.length) {
+                words.push(window.html2canvas.punycode.ucs2.encode(word));
+            }
+        }
+    }
+    return words;
+}
+
+function isWordBoundary(characterCode) {
+    return [
+        32, // <space>
+        13, // \r
+        10, // \n
+        9, // \t
+        45 // -
+    ].indexOf(characterCode) !== -1;
+}
+
+function hasUnicode(string) {
+    return /[^\u0000-\u00ff]/.test(string);
+}
+
+function Proxy(src, proxyUrl, document) {
+    var callback = createCallback(supportsCORS);
+    var url = createProxyUrl(proxyUrl, src, callback);
+
+    return supportsCORS ? XHR(url) : (jsonp(document, url, callback).then(function(response) {
+        return decode64(response.content);
+    }));
+}
+var proxyCount = 0;
+
+var supportsCORS = ('withCredentials' in new XMLHttpRequest());
+var supportsCORSImage = ('crossOrigin' in new Image());
+
+function ProxyURL(src, proxyUrl, document) {
+    var callback = createCallback(supportsCORSImage);
+    var url = createProxyUrl(proxyUrl, src, callback);
+    return (supportsCORSImage ? Promise.resolve(url) : jsonp(document, url, callback).then(function(response) {
+        return "data:" + response.type + ";base64," + response.content;
+    }));
+}
+
+function jsonp(document, url, callback) {
+    return new Promise(function(resolve, reject) {
+        var s = document.createElement("script");
+        var cleanup = function() {
+            delete window.html2canvas.proxy[callback];
+            document.body.removeChild(s);
+        };
+        window.html2canvas.proxy[callback] = function(response) {
+            cleanup();
+            resolve(response);
+        };
+        s.src = url;
+        s.onerror = function(e) {
+            cleanup();
+            reject(e);
+        };
+        document.body.appendChild(s);
+    });
+}
+
+function createCallback(useCORS) {
+    return !useCORS ? "html2canvas_" + Date.now() + "_" + (++proxyCount) + "_" + Math.round(Math.random() * 100000) : "";
+}
+
+function createProxyUrl(proxyUrl, src, callback) {
+    return proxyUrl + "?url=" + encodeURIComponent(src) + (callback.length ? "&callback=html2canvas.proxy." + callback : "");
+}
+
+function ProxyImageContainer(src, proxy) {
+    var script = document.createElement("script");
+    var link = document.createElement("a");
+    link.href = src;
+    src = link.href;
+    this.src = src;
+    this.image = new Image();
+    var self = this;
+    this.promise = new Promise(function(resolve, reject) {
+        self.image.crossOrigin = "Anonymous";
+        self.image.onload = resolve;
+        self.image.onerror = reject;
+
+        new ProxyURL(src, proxy, document).then(function(url) {
+            self.image.src = url;
+        })['catch'](reject);
+    });
+}
+
+function Renderer(width, height, images, options, document) {
+    this.width = width;
+    this.height = height;
+    this.images = images;
+    this.options = options;
+    this.document = document;
+}
+
+Renderer.prototype.renderImage = function(container, bounds, borderData, imageContainer) {
+    var paddingLeft = container.cssInt('paddingLeft'),
+        paddingTop = container.cssInt('paddingTop'),
+        paddingRight = container.cssInt('paddingRight'),
+        paddingBottom = container.cssInt('paddingBottom'),
+        borders = borderData.borders;
+
+    var width = bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight);
+    var height = bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom);
+    this.drawImage(
+        imageContainer,
+        0,
+        0,
+        imageContainer.image.width || width,
+        imageContainer.image.height || height,
+        bounds.left + paddingLeft + borders[3].width,
+        bounds.top + paddingTop + borders[0].width,
+        width,
+        height
+    );
+};
+
+Renderer.prototype.renderBackground = function(container, bounds, borderData) {
+    if (bounds.height > 0 && bounds.width > 0) {
+        this.renderBackgroundColor(container, bounds);
+        this.renderBackgroundImage(container, bounds, borderData);
+    }
+};
+
+Renderer.prototype.renderBackgroundColor = function(container, bounds) {
+    var color = container.css("backgroundColor");
+    if (!this.isTransparent(color)) {
+        this.rectangle(bounds.left, bounds.top, bounds.width, bounds.height, container.css("backgroundColor"));
+    }
+};
+
+Renderer.prototype.renderBorders = function(borders) {
+    borders.forEach(this.renderBorder, this);
+};
+
+Renderer.prototype.renderBorder = function(data) {
+    if (!this.isTransparent(data.color) && data.args !== null) {
+        this.drawShape(data.args, data.color);
+    }
+};
+
+Renderer.prototype.renderBackgroundImage = function(container, bounds, borderData) {
+    var backgroundImages = container.parseBackgroundImages();
+    backgroundImages.reverse().forEach(function(backgroundImage, index, arr) {
+        switch(backgroundImage.method) {
+            case "url":
+                var image = this.images.get(backgroundImage.args[0]);
+                if (image) {
+                    this.renderBackgroundRepeating(container, bounds, image, arr.length - (index+1), borderData);
+                } else {
+                    log("Error loading background-image", backgroundImage.args[0]);
+                }
+                break;
+            case "linear-gradient":
+            case "gradient":
+                var gradientImage = this.images.get(backgroundImage.value);
+                if (gradientImage) {
+                    this.renderBackgroundGradient(gradientImage, bounds, borderData);
+                } else {
+                    log("Error loading background-image", backgroundImage.args[0]);
+                }
+                break;
+            case "none":
+                break;
+            default:
+                log("Unknown background-image type", backgroundImage.args[0]);
+        }
+    }, this);
+};
+
+Renderer.prototype.renderBackgroundRepeating = function(container, bounds, imageContainer, index, borderData) {
+    var size = container.parseBackgroundSize(bounds, imageContainer.image, index);
+    var position = container.parseBackgroundPosition(bounds, imageContainer.image, index, size);
+    var repeat = container.parseBackgroundRepeat(index);
+    switch (repeat) {
+        case "repeat-x":
+        case "repeat no-repeat":
+            this.backgroundRepeatShape(imageContainer, position, size, bounds, bounds.left + borderData[3], bounds.top + position.top + borderData[0], 99999, imageContainer.image.height, borderData);
+            break;
+        case "repeat-y":
+        case "no-repeat repeat":
+            this.backgroundRepeatShape(imageContainer, position, size, bounds, bounds.left + position.left + borderData[3], bounds.top + borderData[0], imageContainer.image.width, 99999, borderData);
+            break;
+        case "no-repeat":
+            this.backgroundRepeatShape(imageContainer, position, size, bounds, bounds.left + position.left + borderData[3], bounds.top + position.top + borderData[0], imageContainer.image.width, imageContainer.image.height, borderData);
+            break;
+        default:
+            this.renderBackgroundRepeat(imageContainer, position, size, {top: bounds.top, left: bounds.left}, borderData[3], borderData[0]);
+            break;
+    }
+};
+
+Renderer.prototype.isTransparent = function(color) {
+    return (!color || color === "transparent" || color === "rgba(0, 0, 0, 0)");
+};
+
+function StackingContext(hasOwnStacking, opacity, element, parent) {
+    NodeContainer.call(this, element, parent);
+    this.ownStacking = hasOwnStacking;
+    this.contexts = [];
+    this.children = [];
+    this.opacity = (this.parent ? this.parent.stack.opacity : 1) * opacity;
+}
+
+StackingContext.prototype = Object.create(NodeContainer.prototype);
+
+StackingContext.prototype.getParentStack = function(context) {
+    var parentStack = (this.parent) ? this.parent.stack : null;
+    return parentStack ? (parentStack.ownStacking ? parentStack : parentStack.getParentStack(context)) : context.stack;
+};
+
+function Support(document) {
+    this.rangeBounds = this.testRangeBounds(document);
+    this.cors = this.testCORS();
+    this.svg = this.testSVG();
+}
+
+Support.prototype.testRangeBounds = function(document) {
+    var range, testElement, rangeBounds, rangeHeight, support = false;
+
+    if (document.createRange) {
+        range = document.createRange();
+        if (range.getBoundingClientRect) {
+            testElement = document.createElement('boundtest');
+            testElement.style.height = "123px";
+            testElement.style.display = "block";
+            document.body.appendChild(testElement);
+
+            range.selectNode(testElement);
+            rangeBounds = range.getBoundingClientRect();
+            rangeHeight = rangeBounds.height;
+
+            if (rangeHeight === 123) {
+                support = true;
+            }
+            document.body.removeChild(testElement);
+        }
+    }
+
+    return support;
+};
+
+Support.prototype.testCORS = function() {
+    return typeof((new Image()).crossOrigin) !== "undefined";
+};
+
+Support.prototype.testSVG = function() {
+    var img = new Image();
+    var canvas = document.createElement("canvas");
+    var ctx =  canvas.getContext("2d");
+    img.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>";
+
+    try {
+        ctx.drawImage(img, 0, 0);
+        canvas.toDataURL();
+    } catch(e) {
+        return false;
+    }
+    return true;
+};
+
+function SVGContainer(src) {
+    this.src = src;
+    this.image = null;
+    var self = this;
+
+    this.promise = this.hasFabric().then(function() {
+        return (self.isInline(src) ? Promise.resolve(self.inlineFormatting(src)) : XHR(src));
+    }).then(function(svg) {
+        return new Promise(function(resolve) {
+            html2canvas.fabric.loadSVGFromString(svg, self.createCanvas.call(self, resolve));
+        });
+    });
+}
+
+SVGContainer.prototype.hasFabric = function() {
+    return !html2canvas.fabric ? Promise.reject(new Error("html2canvas.svg.js is not loaded, cannot render svg")) : Promise.resolve();
+};
+
+SVGContainer.prototype.inlineFormatting = function(src) {
+    return (/^data:image\/svg\+xml;base64,/.test(src)) ? this.decode64(this.removeContentType(src)) : this.removeContentType(src);
+};
+
+SVGContainer.prototype.removeContentType = function(src) {
+    return src.replace(/^data:image\/svg\+xml(;base64)?,/,'');
+};
+
+SVGContainer.prototype.isInline = function(src) {
+    return (/^data:image\/svg\+xml/i.test(src));
+};
+
+SVGContainer.prototype.createCanvas = function(resolve) {
+    var self = this;
+    return function (objects, options) {
+        var canvas = new html2canvas.fabric.StaticCanvas('c');
+        self.image = canvas.lowerCanvasEl;
+        canvas
+            .setWidth(options.width)
+            .setHeight(options.height)
+            .add(html2canvas.fabric.util.groupSVGElements(objects, options))
+            .renderAll();
+        resolve(canvas.lowerCanvasEl);
+    };
+};
+
+SVGContainer.prototype.decode64 = function(str) {
+    return (typeof(window.atob) === "function") ? window.atob(str) : decode64(str);
+};
+
+/*
+ * base64-arraybuffer
+ * https://github.com/niklasvh/base64-arraybuffer
+ *
+ * Copyright (c) 2012 Niklas von Hertzen
+ * Licensed under the MIT license.
  */
 
-_html2canvas.Preload = function( options ) {
+function decode64(base64) {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var len = base64.length, i, encoded1, encoded2, encoded3, encoded4, byte1, byte2, byte3;
 
-    var images = {
-        numLoaded: 0,   // also failed are counted here
-        numFailed: 0,
-        numTotal: 0,
-        cleanupDone: false
-    },
-    pageOrigin,
-    methods,
-    i,
-    count = 0,
-    element = options.elements[0] || document.body,
-    doc = element.ownerDocument,
-    domImages = doc.images, // TODO probably should limit it to images present in the element only
-    imgLen = domImages.length,
-    link = doc.createElement("a"),
-    supportCORS = (function( img ){
-        return (img.crossOrigin !== undefined);
-    })(new Image()),
-    timeoutTimer;
+    var output = "";
 
-    link.href = window.location.href;
-    pageOrigin  = link.protocol + link.host;
+    for (i = 0; i < len; i+=4) {
+        encoded1 = chars.indexOf(base64[i]);
+        encoded2 = chars.indexOf(base64[i+1]);
+        encoded3 = chars.indexOf(base64[i+2]);
+        encoded4 = chars.indexOf(base64[i+3]);
 
-
-
-
-
-
-    function isSameOrigin(url){
-        link.href = url;
-        link.href = link.href; // YES, BELIEVE IT OR NOT, that is required for IE9 - http://jsfiddle.net/niklasvh/2e48b/
-        var origin = link.protocol + link.host;
-        return (origin === pageOrigin);
-    }
-
-    function start(){
-        h2clog("html2canvas: start: images: " + images.numLoaded + " / " + images.numTotal + " (failed: " + images.numFailed + ")");
-        if (!images.firstRun && images.numLoaded >= images.numTotal){
-            h2clog("Finished loading images: # " + images.numTotal + " (failed: " + images.numFailed + ")");
-
-            if (typeof options.complete === "function"){
-                options.complete(images);
-            }
-
+        byte1 = (encoded1 << 2) | (encoded2 >> 4);
+        byte2 = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+        byte3 = ((encoded3 & 3) << 6) | encoded4;
+        if (encoded3 === 64) {
+            output += String.fromCharCode(byte1);
+        } else if (encoded4 === 64 || encoded4 === -1) {
+            output += String.fromCharCode(byte1, byte2);
+        } else{
+            output += String.fromCharCode(byte1, byte2, byte3);
         }
     }
 
-    // TODO modify proxy to serve images with CORS enabled, where available
-    function proxyGetImage(url, img, imageObj){
-        var callback_name,
-        scriptUrl = options.proxy,
-        script;
-
-        link.href = url;
-        url = link.href; // work around for pages with base href="" set - WARNING: this may change the url
-
-        callback_name = 'html2canvas_' + (count++);
-        imageObj.callbackname = callback_name;
-
-        if (scriptUrl.indexOf("?") > -1) {
-            scriptUrl += "&";
-        } else {
-            scriptUrl += "?";
-        }
-        scriptUrl += 'url=' + encodeURIComponent(url) + '&callback=' + callback_name;
-        script = doc.createElement("script");
-
-        window[callback_name] = function(a){
-            if (a.substring(0,6) === "error:"){
-                imageObj.succeeded = false;
-                images.numLoaded++;
-                images.numFailed++;
-                start();
-            } else {
-                setImageLoadHandlers(img, imageObj);
-                img.src = a;
-            }
-            window[callback_name] = undefined; // to work with IE<9  // NOTE: that the undefined callback property-name still exists on the window object (for IE<9)
-            try {
-                delete window[callback_name];  // for all browser that support this
-            } catch(ex) {}
-            script.parentNode.removeChild(script);
-            script = null;
-            delete imageObj.script;
-            delete imageObj.callbackname;
-        };
-
-        script.setAttribute("type", "text/javascript");
-        script.setAttribute("src", scriptUrl);
-        imageObj.script = script;
-        window.document.body.appendChild(script);
-
-    }
-
-    function getImages (el) {
-
-
-
-        // if (!this.ignoreRe.test(el.nodeName)){
-        //
-        
-        var contents = _html2canvas.Util.Children(el),
-        i,
-        background_image,
-        src,
-        img,
-        elNodeType = false;
-
-        // Firefox fails with permission denied on pages with iframes
-        try {
-            var contentsLen = contents.length;
-            for (i = 0;  i < contentsLen; i+=1 ){
-                // var ignRe = new RegExp("("+this.ignoreElements+")");
-                // if (!ignRe.test(element.nodeName)){
-                getImages(contents[i]);
-                // }
-            }
-        }
-        catch( e ) {}
-
-
-        // }
-        try {
-            elNodeType = el.nodeType;
-        } catch (ex) {
-            elNodeType = false;
-            h2clog("html2canvas: failed to access some element's nodeType - Exception: " + ex.message);
-        }
-
-        if (elNodeType === 1 || elNodeType === undefined){
-
-            // opera throws exception on external-content.html
-            try {
-                background_image = _html2canvas.Util.getCSS(el, 'backgroundImage');
-            }catch(e) {
-                h2clog("html2canvas: failed to get background-image - Exception: " + e.message);
-            }
-            if ( background_image && background_image !== "1" && background_image !== "none" ) {
-
-                // TODO add multi image background support
-
-                if (/^(-webkit|-o|-moz|-ms|linear)-/.test( background_image )) {
-
-                    img = _html2canvas.Generate.Gradient( background_image, _html2canvas.Util.Bounds( el ) );
-
-                    if ( img !== undefined ){
-                        images[background_image] = {
-                            img: img,
-                            succeeded: true
-                        };
-                        images.numTotal++;
-                        images.numLoaded++;
-                        start();
-
-                    }
-
-                } else {
-                    src = _html2canvas.Util.backgroundImage(background_image.match(/data:image\/.*;base64,/i) ? background_image : background_image.split(",")[0]);
-                    methods.loadImage(src);
-                }
-
-                /*
-            if (background_image && background_image !== "1" && background_image !== "none" && background_image.substring(0,7) !== "-webkit" && background_image.substring(0,3)!== "-o-" && background_image.substring(0,4) !== "-moz"){
-                // TODO add multi image background support
-                src = _html2canvas.Util.backgroundImage(background_image.split(",")[0]);
-                methods.loadImage(src);            */
-            }
-        }
-    }
-
-    function setImageLoadHandlers(img, imageObj) {
-        img.onload = function() {
-            if ( imageObj.timer !== undefined ) {
-                // CORS succeeded
-                window.clearTimeout( imageObj.timer );
-            }
-
-            images.numLoaded++;
-            imageObj.succeeded = true;
-            img.onerror = img.onload = null;
-            start();
-        };
-        img.onerror = function() {
-
-            if (img.crossOrigin === "anonymous") {
-                // CORS failed
-                window.clearTimeout( imageObj.timer );
-
-                // let's try with proxy instead
-                if ( options.proxy ) {
-                    var src = img.src;
-                    img = new Image();
-                    imageObj.img = img;
-                    img.src = src;
-
-                    proxyGetImage( img.src, img, imageObj );
-                    return;
-                }
-            }
-
-
-            images.numLoaded++;
-            images.numFailed++;
-            imageObj.succeeded = false;
-            img.onerror = img.onload = null;
-            start();
-
-        };
-
-        // TODO Opera has no load/error event for SVG images
-
-        // Opera ninja onload's cached images
-        /*
-        window.setTimeout(function(){
-            if ( img.width !== 0 && imageObj.succeeded === undefined ) {
-                img.onload();
-            }
-        }, 100); // needs a reflow for base64 encoded images? interestingly timeout of 0 doesn't work but 1 does.
-         */
-    }
-
-
-    methods = {
-        loadImage: function( src ) {
-            var img, imageObj;
-            if ( src && images[src] === undefined ) {
-                img = new Image();
-                if ( src.match(/data:image\/.*;base64,/i) ) {
-                    img.src = src.replace(/url\(['"]{0,}|['"]{0,}\)$/ig, '');
-                    imageObj = images[src] = {
-                        img: img
-                    };
-                    images.numTotal++;
-                    setImageLoadHandlers(img, imageObj);
-                } else if ( isSameOrigin( src ) || options.allowTaint ===  true ) {
-                    imageObj = images[src] = {
-                        img: img
-                    };
-                    images.numTotal++;
-                    setImageLoadHandlers(img, imageObj);
-                    img.src = src;
-                } else if ( supportCORS && !options.allowTaint && options.useCORS ) {
-                    // attempt to load with CORS
-
-                    img.crossOrigin = "anonymous";
-                    imageObj = images[src] = {
-                        img: img
-                    };
-                    images.numTotal++;
-                    setImageLoadHandlers(img, imageObj);
-                    img.src = src;
-
-                    // work around for https://bugs.webkit.org/show_bug.cgi?id=80028
-                    img.customComplete = function () {
-                        if (!this.img.complete) {
-                            this.timer = window.setTimeout(this.img.customComplete, 100);
-                        } else {
-                            this.img.onerror();
-                        }
-                    }.bind(imageObj);
-                    img.customComplete();
-
-                } else if ( options.proxy ) {
-                    imageObj = images[src] = {
-                        img: img
-                    };
-                    images.numTotal++;
-                    proxyGetImage( src, img, imageObj );
-                }
-            }
-
-        },
-        cleanupDOM: function(cause) {
-            var img, src;
-            if (!images.cleanupDone) {
-                if (cause && typeof cause === "string") {
-                    h2clog("html2canvas: Cleanup because: " + cause);
-                } else {
-                    h2clog("html2canvas: Cleanup after timeout: " + options.timeout + " ms.");
-                }
-
-                for (src in images) {
-                    if (images.hasOwnProperty(src)) {
-                        img = images[src];
-                        if (typeof img === "object" && img.callbackname && img.succeeded === undefined) {
-                            // cancel proxy image request
-                            window[img.callbackname] = undefined; // to work with IE<9  // NOTE: that the undefined callback property-name still exists on the window object (for IE<9)
-                            try {
-                                delete window[img.callbackname];  // for all browser that support this
-                            } catch(ex) {}
-                            if (img.script && img.script.parentNode) {
-                                img.script.setAttribute("src", "about:blank");  // try to cancel running request
-                                img.script.parentNode.removeChild(img.script);
-                            }
-                            images.numLoaded++;
-                            images.numFailed++;
-                            h2clog("html2canvas: Cleaned up failed img: '" + src + "' Steps: " + images.numLoaded + " / " + images.numTotal);
-                        }
-                    }
-                }
-
-                // cancel any pending requests
-                if(window.stop !== undefined) {
-                    window.stop();
-                } else if(document.execCommand !== undefined) {
-                    document.execCommand("Stop", false);
-                }
-                if (document.close !== undefined) {
-                    document.close();
-                }
-                images.cleanupDone = true;
-                if (!(cause && typeof cause === "string")) {
-                    start();
-                }
-            }
-        },
-        renderingDone: function() {
-            if (timeoutTimer) {
-                window.clearTimeout(timeoutTimer);
-            }
-        }
-
-    };
-
-    if (options.timeout > 0) {
-        timeoutTimer = window.setTimeout(methods.cleanupDOM, options.timeout);
-    }
-    h2clog('html2canvas: Preload starts: finding background-images');
-    images.firstRun = true;
-
-    getImages( element );
-
-    h2clog('html2canvas: Preload: Finding images');
-    // load <img> images
-    for (i = 0; i < imgLen; i+=1){
-        methods.loadImage( domImages[i].getAttribute( "src" ) );
-    }
-
-    images.firstRun = false;
-    h2clog('html2canvas: Preload: Done.');
-    if ( images.numTotal === images.numLoaded ) {
-        start();
-    }
-
-    return methods;
-
-};
-
-
-
-
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
-
-  Released under MIT License
-*/
-function h2cRenderContext(width, height) {
-    var storage = [];
-    return {
-        storage: storage,
-        width: width,
-        height: height,
-        fillRect: function () {
-            storage.push({
-                type: "function",
-                name: "fillRect",
-                'arguments': arguments
-            });
-        },
-        drawImage: function () {
-            storage.push({
-                type: "function",
-                name: "drawImage",
-                'arguments': arguments
-            });
-        },
-        fillText: function () {
-            storage.push({
-                type: "function",
-                name: "fillText",
-                'arguments': arguments
-            });
-        },
-        setVariable: function (variable, value) {
-            storage.push({
-                type: "variable",
-                name: variable,
-                'arguments': value
-            });
-        }
-    };
+    return output;
 }
 
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
+function SVGNodeContainer(node, native) {
+    this.src = node;
+    this.image = null;
+    var self = this;
 
-  Released under MIT License
-*/
-_html2canvas.Renderer = function(parseQueue, options){
-
-
-    var queue = [];
-
-    function sortZ(zStack){
-        var subStacks = [],
-        stackValues = [],
-        zStackChildren = zStack.children,
-        s,
-        i,
-        stackLen,
-        zValue,
-        zLen,
-        stackChild,
-        b,
-        subStackLen;
-
-
-        for (s = 0, zLen = zStackChildren.length; s < zLen; s+=1){
-
-            stackChild = zStackChildren[s];
-
-            if (stackChild.children && stackChild.children.length > 0){
-                subStacks.push(stackChild);
-                stackValues.push(stackChild.zindex);
-            }else{
-                queue.push(stackChild);
-            }
-
+    this.promise = native ? new Promise(function(resolve, reject) {
+        self.image = new Image();
+        self.image.onload = resolve;
+        self.image.onerror = reject;
+        self.image.src = "data:image/svg+xml," + (new XMLSerializer()).serializeToString(node);
+        if (self.image.complete === true) {
+            resolve(self.image);
         }
-
-        stackValues.sort(function(a, b) {
-            return a - b;
+    }) : this.hasFabric().then(function() {
+        return new Promise(function(resolve) {
+            html2canvas.fabric.parseSVGDocument(node, self.createCanvas.call(self, resolve));
         });
+    });
+}
 
-        for (i = 0, stackLen = stackValues.length; i < stackLen; i+=1){
-            zValue = stackValues[i];
-            for (b = 0, subStackLen = subStacks.length; b <= subStackLen; b+=1){
+SVGNodeContainer.prototype = Object.create(SVGContainer.prototype);
 
-                if (subStacks[b].zindex === zValue){
-                    stackChild = subStacks.splice(b, 1);
-                    sortZ(stackChild[0]);
-                    break;
+function TextContainer(node, parent) {
+    NodeContainer.call(this, node, parent);
+}
 
-                }
-            }
-        }
+TextContainer.prototype = Object.create(NodeContainer.prototype);
 
+TextContainer.prototype.applyTextTransform = function() {
+    this.node.data = this.transform(this.parent.css("textTransform"));
+};
+
+TextContainer.prototype.transform = function(transform) {
+    var text = this.node.data;
+    switch(transform){
+        case "lowercase":
+            return text.toLowerCase();
+        case "capitalize":
+            return text.replace(/(^|\s|:|-|\(|\))([a-z])/g, capitalize);
+        case "uppercase":
+            return text.toUpperCase();
+        default:
+            return text;
     }
+};
 
-
-    sortZ(parseQueue.zIndex);
-    if ( typeof options._renderer._create !== "function" ) {
-        throw new Error("Invalid renderer defined");
+function capitalize(m, p1, p2) {
+    if (m.length > 0) {
+        return p1 + p2.toUpperCase();
     }
-    return options._renderer._create( parseQueue, options, document, queue, _html2canvas );
+}
 
-};
+function WebkitGradientContainer(imageData) {
+    GradientContainer.apply(this, arguments);
+    this.type = (imageData.args[0] === "linear") ? this.TYPES.LINEAR : this.TYPES.RADIAL;
+}
 
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
+WebkitGradientContainer.prototype = Object.create(GradientContainer.prototype);
 
-  Released under MIT License
-*/
+function XHR(url) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
 
-
-html2canvas = function( elements, opts ) {
-
-    var queue,
-    canvas,
-    options = {
-        // general
-        logging: false,
-        elements: elements,
-
-        // preload options
-        proxy: "http://html2canvas.appspot.com/",
-        timeout: 0,    // no timeout
-        useCORS: false, // try to load images as CORS (where available), before falling back to proxy
-        allowTaint: false, // whether to allow images to taint the canvas, won't need proxy if set to true
-
-        // parse options
-        svgRendering: false, // use svg powered rendering where available (FF11+)
-        iframeDefault: "default",
-        ignoreElements: "IFRAME|OBJECT|PARAM",
-        useOverflow: true,
-        letterRendering: false,
-
-        // render options
-
-        flashcanvas: undefined, // path to flashcanvas
-        width: null,
-        height: null,
-        taintTest: true, // do a taint test with all images before applying to canvas
-		renderer: "Canvas"
-    }, renderer;
-
-    options = _html2canvas.Util.Extend(opts, options);
-
-	if (typeof options.renderer === "string" && _html2canvas.Renderer[options.renderer] !== undefined) {
-		options._renderer = _html2canvas.Renderer[options.renderer]( options );
-	} else if (typeof options.renderer === "function") {
-		options._renderer = options.renderer( options );
-	} else {
-		throw("Unknown renderer");
-	}
-
-    _html2canvas.logging = options.logging;
-    options.complete = function( images ) {
-
-        if (typeof options.onpreloaded === "function") {
-            if ( options.onpreloaded( images ) === false ) {
-                return;
-            }
-        }
-        queue = _html2canvas.Parse( images, options );
-
-        if (typeof options.onparsed === "function") {
-            if ( options.onparsed( queue ) === false ) {
-                return;
-            }
-        }
-
-        canvas = _html2canvas.Renderer( queue, options );
-
-        if (typeof options.onrendered === "function") {
-            options.onrendered( canvas );
-        }
-
-
-    };
-
-    // for pages without images, we still want this to be async, i.e. return methods before executing
-    window.setTimeout( function(){
-        _html2canvas.Preload( options );
-    }, 0 );
-
-    return {
-        render: function( queue, opts ) {
-            return _html2canvas.Renderer( queue, _html2canvas.Util.Extend(opts, options) );
-        },
-        parse: function( images, opts ) {
-            return _html2canvas.Parse( images, _html2canvas.Util.Extend(opts, options) );
-        },
-        preload: function( opts ) {
-            return _html2canvas.Preload( _html2canvas.Util.Extend(opts, options) );
-        },
-        log: h2clog
-    };
-};
-
-html2canvas.log = h2clog; // for renderers
-html2canvas.Renderer = {
-    Canvas: undefined // We are assuming this will be used
-};
-
-/*
-  html2canvas v0.34 <http://html2canvas.hertzen.com>
-  Copyright (c) 2011 Niklas von Hertzen. All rights reserved.
-  http://www.twitter.com/niklasvh
-
-  Released under MIT License
-*/
-
-
-_html2canvas.Renderer.Canvas = function( options ) {
-
-    options = options || {};
-
-    var doc = document,
-    canvas = options.canvas || doc.createElement('canvas'),
-    usingFlashcanvas = false,
-    _createCalled = false,
-    canvasReadyToDraw = false,
-    methods,
-    flashMaxSize = 2880; // flash bitmap limited to 2880x2880px // http://stackoverflow.com/questions/2033792/argumenterror-error-2015-invalid-bitmapdata
-
-
-    if (canvas.getContext){
-        h2clog("html2canvas: Renderer: using canvas renderer");
-        canvasReadyToDraw = true;
-    } else if ( options.flashcanvas !== undefined ){
-        usingFlashcanvas = true;
-        h2clog("html2canvas: Renderer: canvas not available, using flashcanvas");
-        var script = doc.createElement("script");
-        script.src = options.flashcanvas;
-
-        script.onload = (function(script, func){
-            var intervalFunc;
-
-            if (script.onload === undefined) {
-                // IE lack of support for script onload
-
-                if( script.onreadystatechange !== undefined ) {
-
-                    intervalFunc = function() {
-                        if (script.readyState !== "loaded" && script.readyState !== "complete") {
-                            window.setTimeout( intervalFunc, 250 );
-
-                        } else {
-                            // it is loaded
-                            func();
-
-                        }
-
-                    };
-
-                    window.setTimeout( intervalFunc, 250 );
-
-                } else {
-                    h2clog("html2canvas: Renderer: Can't track when flashcanvas is loaded");
-                }
-
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                resolve(xhr.responseText);
             } else {
-                return func;
+                reject(new Error(xhr.statusText));
             }
+        };
 
-        })(script, function(){
+        xhr.onerror = function() {
+            reject(new Error("Network Error"));
+        };
 
-            if (typeof window.FlashCanvas !== "undefined") {
-                h2clog("html2canvas: Renderer: Flashcanvas initialized");
-                window.FlashCanvas.initElement( canvas );
+        xhr.send();
+    });
+}
 
-                canvasReadyToDraw = true;
-                if ( _createCalled !== false ) {
-                    methods._create.apply( null, _createCalled );
-                }
-            }
+function CanvasRenderer(width, height) {
+    Renderer.apply(this, arguments);
+    this.canvas = this.document.createElement("canvas");
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.ctx = this.canvas.getContext("2d");
+    this.taintCtx = this.document.createElement("canvas").getContext("2d");
+    this.ctx.textBaseline = "bottom";
+    this.variables = {};
+    log("Initialized CanvasRenderer");
+}
+
+CanvasRenderer.prototype = Object.create(Renderer.prototype);
+
+CanvasRenderer.prototype.setFillStyle = function(color) {
+    this.ctx.fillStyle = color;
+    return this.ctx;
+};
+
+CanvasRenderer.prototype.rectangle = function(left, top, width, height, color) {
+    this.setFillStyle(color).fillRect(left, top, width, height);
+};
+
+CanvasRenderer.prototype.drawShape = function(shape, color) {
+    this.shape(shape);
+    this.setFillStyle(color).fill();
+};
+
+CanvasRenderer.prototype.taints = function(imageContainer) {
+    if (imageContainer.tainted === null) {
+        this.taintCtx.drawImage(imageContainer.image, 0, 0);
+        try {
+            this.taintCtx.getImageData(0, 0, 1, 1);
+            imageContainer.tainted = false;
+        } catch(e) {
+            this.taintCtx = document.createElement("canvas").getContext("2d");
+            imageContainer.tainted = true;
+        }
+    }
+
+    return imageContainer.tainted;
+};
+
+CanvasRenderer.prototype.drawImage = function(imageContainer, sx, sy, sw, sh, dx, dy, dw, dh) {
+    if (!this.taints(imageContainer) || this.options.allowTaint) {
+        this.ctx.drawImage(imageContainer.image, sx, sy, sw, sh, dx, dy, dw, dh);
+    }
+};
+
+CanvasRenderer.prototype.clip = function(shape, callback, context) {
+    this.ctx.save();
+    this.shape(shape).clip();
+    callback.call(context);
+    this.ctx.restore();
+};
+
+CanvasRenderer.prototype.shape = function(shape) {
+    this.ctx.beginPath();
+    shape.forEach(function(point, index) {
+        this.ctx[(index === 0) ? "moveTo" : point[0] + "To" ].apply(this.ctx, point.slice(1));
+    }, this);
+    this.ctx.closePath();
+    return this.ctx;
+};
+
+CanvasRenderer.prototype.font = function(color, style, variant, weight, size, family) {
+    this.setFillStyle(color).font = [style, variant, weight, size, family].join(" ");
+};
+
+CanvasRenderer.prototype.fontShadow = function(color, offsetX, offsetY, blur) {
+    this.setVariable("shadowColor", color)
+        .setVariable("shadowOffsetY", offsetX)
+        .setVariable("shadowOffsetX", offsetY)
+        .setVariable("shadowBlur", blur);
+};
+
+CanvasRenderer.prototype.clearShadow = function() {
+    this.setVariable("shadowColor", "rgba(0,0,0,0)");
+};
+
+CanvasRenderer.prototype.setOpacity = function(opacity) {
+    this.ctx.globalAlpha = opacity;
+};
+
+CanvasRenderer.prototype.setTransform = function(transform) {
+    this.ctx.translate(transform.origin[0], transform.origin[1]);
+    this.ctx.transform.apply(this.ctx, transform.matrix);
+    this.ctx.translate(-transform.origin[0], -transform.origin[1]);
+};
+
+CanvasRenderer.prototype.setVariable = function(property, value) {
+    if (this.variables[property] !== value) {
+        this.variables[property] = this.ctx[property] = value;
+    }
+
+    return this;
+};
+
+CanvasRenderer.prototype.text = function(text, left, bottom) {
+    this.ctx.fillText(text, left, bottom);
+};
+
+CanvasRenderer.prototype.backgroundRepeatShape = function(imageContainer, backgroundPosition, size, bounds, left, top, width, height, borderData) {
+    var shape = [
+        ["line", Math.round(left), Math.round(top)],
+        ["line", Math.round(left + width), Math.round(top)],
+        ["line", Math.round(left + width), Math.round(height + top)],
+        ["line", Math.round(left), Math.round(height + top)]
+    ];
+    this.clip(shape, function() {
+        this.renderBackgroundRepeat(imageContainer, backgroundPosition, size, bounds, borderData[3], borderData[0]);
+    }, this);
+};
+
+CanvasRenderer.prototype.renderBackgroundRepeat = function(imageContainer, backgroundPosition, size, bounds, borderLeft, borderTop) {
+    var offsetX = Math.round(bounds.left + backgroundPosition.left + borderLeft), offsetY = Math.round(bounds.top + backgroundPosition.top + borderTop);
+    this.setFillStyle(this.ctx.createPattern(this.resizeImage(imageContainer, size), "repeat"));
+    this.ctx.translate(offsetX, offsetY);
+    this.ctx.fill();
+    this.ctx.translate(-offsetX, -offsetY);
+};
+
+CanvasRenderer.prototype.renderBackgroundGradient = function(gradientImage, bounds) {
+    if (gradientImage instanceof LinearGradientContainer) {
+        var gradient = this.ctx.createLinearGradient(
+            bounds.left + bounds.width * gradientImage.x0,
+            bounds.top + bounds.height * gradientImage.y0,
+            bounds.left +  bounds.width * gradientImage.x1,
+            bounds.top +  bounds.height * gradientImage.y1);
+        gradientImage.colorStops.forEach(function(colorStop) {
+            gradient.addColorStop(colorStop.stop, colorStop.color);
         });
-
-        doc.body.appendChild( script );
-
+        this.rectangle(bounds.left, bounds.top, bounds.width, bounds.height, gradient);
     }
-
-    methods = {
-        _create: function( zStack, options, doc, queue, _html2canvas ) {
-
-            if ( !canvasReadyToDraw ) {
-                _createCalled = arguments;
-                return canvas;
-            }
-
-            var ctx = canvas.getContext("2d"),
-            storageContext,
-            i,
-            queueLen,
-            a,
-            newCanvas,
-            bounds,
-            testCanvas = document.createElement("canvas"),
-            hasCTX = ( testCanvas.getContext !== undefined ),
-            storageLen,
-            renderItem,
-            testctx = ( hasCTX ) ? testCanvas.getContext("2d") : {},
-            safeImages = [],
-            fstyle;
-
-            canvas.width = canvas.style.width = (!usingFlashcanvas) ? options.width || zStack.ctx.width : Math.min(flashMaxSize, (options.width || zStack.ctx.width) );
-            canvas.height = canvas.style.height = (!usingFlashcanvas) ? options.height || zStack.ctx.height : Math.min(flashMaxSize, (options.height || zStack.ctx.height) );
-
-            fstyle = ctx.fillStyle;
-            ctx.fillStyle = zStack.backgroundColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = fstyle;
-
-            if ( options.svgRendering && zStack.svgRender !== undefined ) {
-                // TODO: enable async rendering to support this
-                ctx.drawImage( zStack.svgRender, 0, 0 );
-            } else {
-                for ( i = 0, queueLen = queue.length; i < queueLen; i+=1 ) {
-
-                    storageContext = queue.splice(0, 1)[0];
-                    storageContext.canvasPosition = storageContext.canvasPosition || {};
-
-                    //this.canvasRenderContext(storageContext,parentctx);
-
-                    // set common settings for canvas
-                    ctx.textBaseline = "bottom";
-
-                    if (storageContext.clip){
-                        ctx.save();
-                        ctx.beginPath();
-                        // console.log(storageContext);
-                        ctx.rect(storageContext.clip.left, storageContext.clip.top, storageContext.clip.width, storageContext.clip.height);
-                        ctx.clip();
-
-                    }
-
-                    if (storageContext.ctx.storage){
-
-                        for (a = 0, storageLen = storageContext.ctx.storage.length; a < storageLen; a+=1){
-
-                            renderItem = storageContext.ctx.storage[a];
-
-
-                            switch(renderItem.type){
-                                case "variable":
-                                    ctx[renderItem.name] = renderItem['arguments'];
-                                    break;
-                                case "function":
-                                    if (renderItem.name === "fillRect") {
-
-                                        if (!usingFlashcanvas || renderItem['arguments'][0] + renderItem['arguments'][2] < flashMaxSize  && renderItem['arguments'][1] + renderItem['arguments'][3] < flashMaxSize) {
-                                            ctx.fillRect.apply( ctx, renderItem['arguments'] );
-                                        }
-                                    }else if(renderItem.name === "fillText") {
-                                        if (!usingFlashcanvas || renderItem['arguments'][1] < flashMaxSize  && renderItem['arguments'][2] < flashMaxSize) {
-                                            ctx.fillText.apply( ctx, renderItem['arguments'] );
-                                        }
-                                    }else if(renderItem.name === "drawImage") {
-
-                                        if (renderItem['arguments'][8] > 0 && renderItem['arguments'][7]){
-                                            if ( hasCTX && options.taintTest ) {
-                                                if ( safeImages.indexOf( renderItem['arguments'][ 0 ].src ) === -1 ) {
-                                                    testctx.drawImage( renderItem['arguments'][ 0 ], 0, 0 );
-                                                    try {
-                                                        testctx.getImageData( 0, 0, 1, 1 );
-                                                    } catch(e) {
-                                                        testCanvas = doc.createElement("canvas");
-                                                        testctx = testCanvas.getContext("2d");
-                                                        continue;
-                                                    }
-
-                                                    safeImages.push( renderItem['arguments'][ 0 ].src );
-
-                                                }
-                                            }
-                                            ctx.drawImage.apply( ctx, renderItem['arguments'] );
-                                        }
-                                    }
-
-
-                                    break;
-                                default:
-
-                            }
-
-                        }
-
-                    }
-                    if (storageContext.clip){
-                        ctx.restore();
-                    }
-
-                }
-            }
-
-            h2clog("html2canvas: Renderer: Canvas renderer done - returning canvas obj");
-
-            queueLen = options.elements.length;
-
-            if (queueLen === 1) {
-                if (typeof options.elements[ 0 ] === "object" && options.elements[ 0 ].nodeName !== "BODY" && usingFlashcanvas === false) {
-                    // crop image to the bounds of selected (single) element
-                    bounds = _html2canvas.Util.Bounds( options.elements[ 0 ] );
-                    newCanvas = doc.createElement('canvas');
-                    newCanvas.width = bounds.width;
-                    newCanvas.height = bounds.height;
-                    ctx = newCanvas.getContext("2d");
-
-                    ctx.drawImage( canvas, bounds.left, bounds.top, bounds.width, bounds.height, 0, 0, bounds.width, bounds.height );
-                    canvas = null;
-                    return newCanvas;
-                }
-            } /*else {
-        // TODO clip and resize multiple elements
-
-            for ( i = 0; i < queueLen; i+=1 ) {
-                if (options.elements[ i ] instanceof Element) {
-
-                }
-
-            }
-        }
-        */
-
-
-
-            return canvas;
-        }
-    };
-
-    return methods;
-
 };
 
-window.html2canvas = html2canvas;
-}(window, document));
+CanvasRenderer.prototype.resizeImage = function(imageContainer, size) {
+    var image = imageContainer.image;
+    if(image.width === size.width && image.height === size.height) {
+        return image;
+    }
 
+    var ctx, canvas = document.createElement('canvas');
+    canvas.width = size.width;
+    canvas.height = size.height;
+    ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, size.width, size.height );
+    return canvas;
+};
+
+})(window, document);
