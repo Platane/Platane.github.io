@@ -1,0 +1,45 @@
+#fonzie
+    display none
+    
+    position fixed
+    left 2%
+    bottom -50px
+
+    transform-origin 50% 100%
+
+    &.visible
+        -webkit-animation Pop 500ms , Gigle 500ms linear infinite
+        -msie-animation Pop 500ms , Gigle 500ms linear infinite
+        -moz-animation Pop 500ms , Gigle 500ms linear infinite
+        animation Pop 500ms , Gigle 500ms linear infinite
+        display block
+
+
+
+
+@keyframes Pop {
+    0% {
+        transform  translate3d( 0, 50px , 0 ) rotate3d(0,0,1,90deg)
+    }
+    80% {
+        transform  translate3d( 0, 0 , 0 ) rotate3d(0,0,1,-10deg)
+    }
+    100% {
+        transform  rotate3d(0,0,1,0deg)
+    }
+}
+
+@keyframes Gigle {
+    0% {
+        transform  rotate3d(0,0,1,0deg)
+    }
+    25% {
+        transform  rotate3d(0,0,1,-2deg)
+    }
+    75% {
+        transform  rotate3d(0,0,1,2deg)
+    }
+    100% {
+        transform  rotate3d(0,0,1,0deg)
+    }
+}

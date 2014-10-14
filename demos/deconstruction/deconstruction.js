@@ -342,10 +342,6 @@ var deconstruction = (function( scope ){
 				
 				var body =  Body.create( piece , this.visual.material , textureO , textureU , textureV );
 				
-				body.visual.castShadow = true;
-				body.visual.receiveShadow = true;
-				body.visual.useQuaternion = true;
-				
 				body.attach();
 				body.unableInteraction();
 				
@@ -887,62 +883,9 @@ var deconstruction = (function( scope ){
 					if( bodies[ i ].label == label )
 						bodies[ i ].burst();
 			};
-			var action_addFonzie = function( label ){
-				/*
-				var geometry = new THREE.Geometry();
-					geometry.vertices = [ 
-						new THREE.Vector3( 0 / ratioVisual , 0 / ratioVisual , 0 / ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 0 / ratioVisual , 16/ ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 20 / ratioVisual , 16/ ratioVisual ),
-						new THREE.Vector3( 0 / ratioVisual , 20 / ratioVisual , 0/ ratioVisual )
-						];
-					geometry.faces = [ new THREE.Face4( 0 , 1 , 2 , 3 ),new THREE.Face4( 3 , 2 , 1 , 0 ) ];
-					
-					geometry.faceVertexUvs[ 0 ].push( [ 
-						new THREE.UV( 0 , 0 ) , 
-						new THREE.UV( 1 , 0 ) , 
-						new THREE.UV( 1,  1 ) , 
-						new THREE.UV( 0,  1 ) 
-						
-						] );
-						
-					geometry.faceVertexUvs[ 0 ].push( [ 
-
-						new THREE.UV( 0 , 1 ) , 
-						new THREE.UV( 1 , 1 ) , 
-						new THREE.UV( 1,  0 ) , 
-						new THREE.UV( 0,  0 )  
-						
-						] );
-					geometry.computeCentroids();
-					geometry.computeFaceNormals();
-					
-					
-					var texture = THREE.ImageUtils.loadTexture("./ressource/fonzie.png");
-					var material = new THREE.MeshBasicMaterial( {map: texture } );
-					material.transparent = true;
-					
-					fonzie = new THREE.Mesh( geometry, material );
-					
-					scene.add( fonzie );
-					
-					fonzie.rotation.y = Math.PI/2;
-					fonzie.rotation.x = 3*Math.PI/2;
-					
-					fonzie.position.x = 25;
-					fonzie.position.y = 0;
-					fonzie.position.z = -5;
-				*/
-				$("#fonzie").css({ "display" : "block"});
-				$(".thanks").css({ "display" : "block"});
-				
-			};
-			var action_addFonzie2 = function(  ){
+			var action_addFonzie = function(  ){
 				$("#fonzie").addClass( "visible" );
-				$(".thanks").addClass( "visible" );
-			};
-			var action_rotateFonzie = function(  ){
-				//fonzie.rotation.x += Math.PI/200;
+				//$(".thanks").addClass( "visible" );
 			};
 			
 			speedTween = [ 
@@ -980,10 +923,7 @@ var deconstruction = (function( scope ){
 				{ t : 33000 , f : function(){ action_bum( "exp" ); } },
 				{ t : 33300 , f : function(){ action_bum( "training" ); } },
 				{ t : 40000 , f : function(){ action_addFonzie(); } },
-				{ t : 40500 , f : function(){ action_addFonzie2(); } },
 			];
-			for( var t = 0 ; t < 100 ; t ++ )
-				action.push( { t : 40500 + t*18 , f : action_rotateFonzie } );
 			
 			
 			var splines = tween;

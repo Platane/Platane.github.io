@@ -352,19 +352,12 @@ window.onload = function(){
 				deconstruction.init()
 
 				$("#sound_player_loop")[0].pause();
-				$("#sound_player_loop")[0].currentTime = 0;
+				$("#sound_player")[0] = $("#sound_player_loop")[0].currentTime = 0;
 			
 				$("#sound_player")[0].play(); 
 
 				deconstruction.go()
 			}
-
-			$("#sound_player_loop")[0].pause();
-			$("#sound_player_loop")[0].currentTime = 0;
-			
-			$("#sound_player")[0].play(); 
-			
-			$("body").css({ "cursor" : "auto" });
 
 			// launch
 			if( preload === true )
