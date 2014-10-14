@@ -135,15 +135,20 @@
 
 <style>
 #UI{
+	font-family: consolas,arial,freesans,clean,sans-serif;
+	font-size:12px;
 	position : fixed;
 	top : 10%;
-	right : 5px;
-	background: rgba(200,200,200,0.5);
-	padding : 5px;
+	right : 15px;
+	border-left: solid 5px rgba(102, 126, 42, 0.39);
 	z-index: 100;
 }
 #UI ul{
 	padding-left: 0;
+}
+#UI li{
+	padding: 0;
+	margin: 0;
 }
 @media print{
 	#UI{
@@ -156,18 +161,17 @@
 
 
 <div id="UI" class="UI">
-	<form>
-		<ul>
-			<li data->
-				<input type="radio" name="style" value="cool" checked="checked"></input> cool
-			</li>
-			<li>
-				<input type="radio" name="style" value="classy"></input> classy
-			</li>
-			<li>
-				<input type="radio" name="style" value="printable"></input> printable classy
-			</li>
-		</ul>
+	<ul>
+		<li data->
+			<input type="radio" name="style" value="cool" checked="checked"></input> cool
+		</li>
+		<li>
+			<input type="radio" name="style" value="classy"></input> classy
+		</li>
+		<li>
+			<input type="radio" name="style" value="printable"></input> printable classy
+		</li>
+	</ul>
 </div>
 
 <!-- fixed Fonzie -->
