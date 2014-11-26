@@ -41,11 +41,12 @@ var alterImage = function( operations ){
 
     stream.write = function( file ){
 
-        // 
+        try{
+        //
         var proc = spawn( "gm" , operationAsCmd( operations )  )
 
-        
-        // monitor the error and standard output stream 
+
+        // monitor the error and standard output stream
         var buffer = []
           , stderr = ''
 
@@ -58,13 +59,13 @@ var alterImage = function( operations ){
         })
 
         // listen to the operation's end
-        proc.on('close', onExit = function (code, signal) {
-            
+        proc.on('close', function (code, signal) {
+
             // something bad happend
             if (code !== 0 || signal !== null) {
-                stream.emit('error', new Error('Command failed: ' + stderr) )
-                stream.emit('close')
-            };
+                console.log('xxx fail to launch imageMagic for '+file.path)
+                stream.emit('end')
+            }
 
             // everythings are ok, the new image buffer is stored in stout
             // set it, and push the file in the output pipe
@@ -81,9 +82,8 @@ var alterImage = function( operations ){
             working --
             checkForEnd()
         });
-        proc.on('error', function(err){
-            stream.emit('error', new Error('Command failed: ' + stderr) )
-            stream.emit('close')
+        proc.on('error', function(err,a){
+            stream.emit('end')
         });
 
         // push the file buffer into the standard input stream
@@ -92,6 +92,12 @@ var alterImage = function( operations ){
 
         proc.stdin.write( file.contents )
         proc.stdin.end()
+
+    }catch(e){
+        //will be catch in proc.on error
+    }finally{
+
+    }
     }
 
     return stream;
@@ -108,10 +114,10 @@ gulp.task('build.image-assets', function() {
 gulp.task('build.works-illustration', function() {
 
   return gulp.src( '../sources/assets/works-illustrations/*.{jpeg,jpg,png}')
-    
+
       .pipe( alterImage(
         {
-            
+
             resize : {
                 width : 820,
                 height : 680
@@ -137,7 +143,7 @@ gulp.task('build.works-illustration-thumbnails', function() {
   return gulp.src( '../sources/assets/works-illustrations/*.{jpeg,jpg,png,gif}')
       .pipe( alterImage(
         {
-            
+
             resize : {
                 width : 180,
                 height : 180
