@@ -106,7 +106,22 @@ var alterImage = function( operations ){
 
 gulp.task('build.image-assets', function() {
 
-  return gulp.src( '../sources/assets/images/*.{jpeg,jpg,png,gif}')
+  gulp.src( '../sources/assets/images/pic.png' )
+    .pipe( alterImage({
+        resize : {
+            width : 230,
+            height : 230
+        },
+        noProfile : true,
+        format : 'png'
+    }))
+    .pipe(gulp.dest('../build/assets/images/'));
+
+  return gulp.src( ['../sources/assets/images/*.{jpeg,jpg,png,gif}', '!../sources/assets/images/pic.png' ])
+      .pipe( alterImage({
+          noProfile : true,
+          format : 'png'
+      }))
       .pipe(gulp.dest('../build/assets/images/'));
 });
 
@@ -117,7 +132,6 @@ gulp.task('build.works-illustration', function() {
 
       .pipe( alterImage(
         {
-
             resize : {
                 width : 820,
                 height : 680

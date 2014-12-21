@@ -1,5 +1,5 @@
 var gulp = require('gulp')
-  , htmlmin = require('gulp-html-minifier')
+  , minifyHTML = require('gulp-minify-html')
   , Stream = require('promisableStream')
 
 var uid = 0
@@ -45,9 +45,14 @@ var bundleHTML = function(){
 }
 
 gulp.task('build.html', function() {
-  return gulp.src('../sources/**/*.html')
+  gulp.src('../sources/*.html')
   	.pipe(bundleHTML())
+    .pipe(minifyHTML())
     .pipe(gulp.dest('../build/'));
+
+  return gulp.src('../sources/templates/*.html')
+    .pipe(bundleHTML())
+    .pipe(gulp.dest('../build/templates/'));
 });
 
 gulp.task('build.html-indexHtml', function() {

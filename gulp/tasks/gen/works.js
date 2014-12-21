@@ -2,7 +2,7 @@ var   gulp = require('gulp')
     , rename = require('gulp-rename')
     , templating = require('./templating')
     , markdown = require('markdown').markdown
-    , htmlmin = require('gulp-html-minifier')
+    , minifyHTML = require('gulp-minify-html')
 
 var parseDate = function( s ){
     if( s == '..' )
@@ -56,7 +56,7 @@ var prepareData = function( data ){
 gulp.task('gen.works', function() {
 
     templating( '../build/templates/works.html' , '../build/data/works.json' , prepareData )
-    .pipe( htmlmin() )
+    .pipe( minifyHTML() )
     .pipe( rename('works.html') )
     .pipe( gulp.dest('../build/') )
 

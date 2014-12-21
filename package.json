@@ -18,7 +18,7 @@
     "mustache" : "*",
     "markdown" : "*",
     "gulp-minify-css" : "*",
-    "gulp-html-minifier" : "*",
+    "gulp-minify-html" : "*",
     "gulp-stylus" : "1.0.0",
     "gulp-rename" : "*",
     "gulp-concat" : "*",

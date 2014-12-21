@@ -19,3 +19,5 @@ index.html
 !sources/**/index.html
 !gulp/**/index.html
 !demo/**/index.html
+
+Thumbs.db
