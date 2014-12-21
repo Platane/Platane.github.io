@@ -3,6 +3,8 @@
 
 <body version="{{build}}">
 
+<image src="http://platane-me-dynamic-content.herokuapp.com/tracking/resume-land.png" style="display:none"></img>
+
 <div class="resume">
 		<header class="header" data-z="-30">
 		{{#header}}
@@ -17,7 +19,7 @@
 				</span>
 				{{/mail}}
 
-				
+
 				{{#portefolio}}
 				<span>
 					<span class="icon icon-portefolio"></span>
@@ -271,7 +273,7 @@ fonzie.addEventListener('mouseenter',function(e){
 
 
 window.onscroll = function ( ) {
-	
+
 	if( document.getElementsByTagName('html')[0].offsetHeight - ( window.innerHeight + window.pageYOffset ) < 120 )
 		fonzie.className = 'fonzie visible'
 	else
@@ -289,4 +291,3 @@ window.onscroll()
 
 </body>
 </html>
-

@@ -6,6 +6,8 @@
 
   "dependencies": {
     "three" : "*",
+    "html2canvas" : "https://github.com/niklasvh/html2canvas/tarball/master",
+    "cannon" : "*",
     "jquery" : "2.x"
   }
 }

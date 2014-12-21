@@ -2,7 +2,7 @@ var   gulp = require('gulp')
     , rename = require('gulp-rename')
     , templating = require('./templating')
     , markdown = require('markdown').markdown
-    , htmlmin = require('gulp-html-minifier')
+    , minifyHTML = require('gulp-minify-html')
 
 var parseDate = function( s ){
     if( s == '..' )
@@ -11,7 +11,7 @@ var parseDate = function( s ){
     return  new Date( parseInt( m[2] ) , parseInt( m[1] )-1 , parseInt( m[0] ) )
 }
 var prepareData = function( data ){
-        
+
     data=JSON.parse( data )
 
     data.works = data.works
@@ -34,14 +34,14 @@ var prepareData = function( data ){
         var weight = Math.sqrt( w['coolness'] * 1.5 * w['weight'] ) *10
         w['rank'] = parseDate( w['to'] || '01/01/2012' ).getTime()
 
-       
+
         w['height'] = Math.max( Math.min( Math.sqrt( (0.4+Math.random()*0.8) * weight )*1.4 , 12 ) , 4 )*45
 
         w['id'] = w['title'].split(' ').join('-')
 
         return w
     })
-    
+
     .sort(function(a,b){
         return a.rank < b.rank ? 1 : -1
     });
@@ -54,9 +54,9 @@ var prepareData = function( data ){
 }
 
 gulp.task('gen.works', function() {
-    
-    templating( '../sources/templates/works.html' , '../build/data/works.json' , prepareData )
-    .pipe( htmlmin() )
+
+    templating( '../build/templates/works.html' , '../build/data/works.json' , prepareData )
+    .pipe( minifyHTML() )
     .pipe( rename('works.html') )
     .pipe( gulp.dest('../build/') )
 

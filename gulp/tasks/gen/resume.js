@@ -1,7 +1,7 @@
 var   gulp = require('gulp')
     , rename = require('gulp-rename')
     , templating = require('./templating')
-    , htmlmin = require('gulp-html-minifier')
+    , minifyHTML = require('gulp-minify-html')
     , cloudMaker = require('cloudMaker')
 
 
@@ -24,7 +24,7 @@ var formateWhen=function( from , to ){
     return from.getFullYear() +'<span class="info"> ('+length+ ' month'+( length>1 ? 's' : '' )+')</span>'
 }
 var prepareData = function( data ){
-        
+
     data=JSON.parse( data )
 
     ///// header
@@ -35,7 +35,7 @@ var prepareData = function( data ){
         data.header.firstName = m.slice(0,-1).join(' ')
         data.header.lastName = m.slice(-1).join(' ')
     }
-    
+
     // age
     if( !data.header.age ){
         data.header.age = Math.floor( ( new Date().getTime() - parseDate( data.header.birthDate ).getTime() )/1000/60/60/24/365.24 )
@@ -52,7 +52,7 @@ var prepareData = function( data ){
         return tr
     })
 
-    // sort 
+    // sort
     data.skills = data.skills.sort(function(a,b){
         return ( a.power + a.relevance * 0.3 ) > ( b.power + b.relevance * 0.3 ) ? 1 : -1
     })
@@ -91,9 +91,9 @@ var prepareData = function( data ){
 }
 
 gulp.task('gen.resume', function() {
-    
+
     templating( '../sources/templates/resume.html' , '../build/data/resume.json' , prepareData )
-    .pipe( htmlmin() )
+    .pipe( minifyHTML() )
     .pipe( rename('resume.html') )
     .pipe( gulp.dest('../build/') )
 
