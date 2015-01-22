@@ -1,13 +1,13 @@
 {
 	"options" : {
 
-		
+
 		"formatDate" : "fr",
 
-		
+
 		"theme" : "atlantic",
 
-		
+
 		"i18n" : {
 			"experiences" : "experiences",
 			"skills" : "skills",
@@ -19,7 +19,7 @@
 	"header" : {
 		"name" : "Arthur Brongniart",
 		"birthDate" : "03/01/1991",
-		
+
 
 		"ext" : {
 			"linkedin" : "http://www.linkedin.com/pub/arthur-brongniart/65/2b/ab8",
@@ -34,6 +34,30 @@
 	"xp" : [
 
 		{
+			"title" : "Torrent media player inside the browser",
+			"localisation" : "Netanya (IL)",
+			"at" : "Hola",
+			"at@" : "http://hola.org/",
+			"from" : "20/10/2014",
+			"to" : "15/01/2015",
+
+			"subject" : "I work on the front of the app.",
+			"info" : "All communications in English."
+		},
+
+		{
+			"title" : "3d Home design app",
+			"localisation" : "Lyon",
+			"at" : "Wanadev",
+			"at@" : "https://www.wanadev.fr/",
+			"from" : "10/04/2014",
+			"to" : "10/10/2014",
+
+			"subject" : "I did several math / webGL related features.",
+			"info" : "Really cool project, I was let free to implement awesome stuffs."
+		},
+
+		{
 			"title" : "Online UML diagram editor",
 			"localisation" : "Nancy",
 			"at" : "Prometheus",
@@ -42,7 +66,7 @@
 			"to" : "01/03/2014",
 
 			"subject" : "An academic project, my team and I conduct a project for an external company.",
-			"info" : "The web app is based on AngularJs, uses websokect to ensure the collaboration between users." 
+			"info" : "The web app is based on AngularJs, uses websokect to ensure the collaboration between users."
 
 		},
 
@@ -67,7 +91,7 @@
 			"to" : "01/04/2013",
 
 			"subject" : "As employe of my school Junior Company, I developed a game which exposes the research of the team on the 2D Turing Engine.",
-			"info" : "Lots of interactivity, performance was a critical issue." 
+			"info" : "Lots of interactivity, performance was a critical issue."
 
 		},
 
@@ -80,7 +104,7 @@
 			"to" : "01/03/2013",
 
 			"subject" : "An academic project, we made an ambitious prototype of a map editor.",
-			"info" : "Store the map's atomic components in a mongoDB, arrange them into a map and style them with a css - like language. The app is based on backbone and uses Leaflet." 
+			"info" : "Store the map's atomic components in a mongoDB, arrange them into a map and style them with a css - like language. The app is based on backbone and uses Leaflet."
 
 		},
 
@@ -92,7 +116,7 @@
 			"to" : "01/09/2012",
 
 			"subject" : "As a trainee, I improved the editor of the html5 based stories.",
-			"info" : "I proposed and added new features, prototyped a game engine." 
+			"info" : "I proposed and added new features, prototyped a game engine."
 
 		}
 	],
@@ -119,23 +143,29 @@
 	],
 
 	"literal skills" : [
-		{ 
+		{
 			"subsection" : "IT skills",
 			"s" : [
 				{
-					"title" : "Web langages",
-					"subject" : "Solid experiences with html / Js through several decisive projects."
+					"title" : "Front",
+					"subject" : "Solid experiences in Js.",
+					"info" : "Use of various framework."
 				},
 
 				{
-					"title" : "Other langages",
-					"subject" : "Python, Node, Java, C, php",
-					"info" : "Validated in various academic projects."
+					"title" : "3D",
+					"subject" : "Good capacities in 3d Geometry, especially in 3d rendering problematics. Good knowledge on WebGL."
+				},
+
+				{
+					"title" : "Good practices",
+					"subject" : "Code quality, TDD, CI, code convention ...",
+					"info" : "are good thing to work with."
 				}
 			]
 		},
 
-		{ 
+		{
 			"subsection" : "Languages",
 			"s" : [
 				{
@@ -148,23 +178,12 @@
 					"subject" : "Native language"
 				}
 			]
-		},
-
-		{ 
-			"subsection" : "Organisation",
-			"s" : [
-				{
-					"title" : "",
-					"subject" : "Sensibilized to organisation methods:",
-					"info" :  "SCRUM, Xp"
-				}
-			]
 		}
 
 	],
 
 	"hobbies" : [
-		{ 
+		{
 			"subsection" : "Video game",
 			"s":[
 				{
@@ -174,10 +193,10 @@
 				{
 					"title" : "Make them",
 					"subject" : "I did some game jam events and some personal projects."
-				}	
+				}
 			]
 		},
-		{ 
+		{
 			"subsection" : "Drawing",
 			"s":[]
 		}
@@ -193,31 +212,25 @@
 		{
 			"tag" : "html",
 			"power" : 8,
-			"relevance" : 10
+			"relevance" : 8
 		},
 
 		{
 			"tag" : "css",
 			"power" : 8,
-			"relevance" : 7
-		},
-
-		{
-			"tag" : "sass",
-			"power" : 6,
-			"relevance" : 3
+			"relevance" : 6
 		},
 
 		{
 			"tag" : "python",
-			"power" : 6,
+			"power" : 4,
 			"relevance" : 8
 		},
 
 		{
-			"tag" : "Java",
-			"power" : 6,
-			"relevance" : 7
+			"tag" : "Unix",
+			"power" : 4,
+			"relevance" : 6
 		},
 
 		{
@@ -241,19 +254,13 @@
 		{
 			"tag" : "jQuery",
 			"power" : 9,
-			"relevance" : 5
+			"relevance" : 1
 		},
 
 		{
 			"tag" : "node",
 			"power" : 6,
 			"relevance" : 5
-		},
-
-		{
-			"tag" : "Algorithm",
-			"power" : 7,
-			"relevance" : 4
 		},
 
 		{
@@ -266,12 +273,6 @@
 			"tag" : "Pencil drawing",
 			"power" : 6,
 			"relevance" : 4
-		},
-
-		{
-			"tag" : "Git",
-			"power" : 5,
-			"relevance" : 5
 		},
 
 		{
@@ -288,13 +289,13 @@
 
 		{
 			"tag" : "ThreeJs",
-			"power" : 6,
+			"power" : 9,
 			"relevance" : 5
 		},
 
 		{
-			"tag" : "WebGL",
-			"power" : 4,
+			"tag" : "WebGL.",
+			"power" : 7,
 			"relevance" : 6
 		},
 
@@ -305,7 +306,19 @@
 		},
 
 		{
+			"tag" : "Gulp",
+			"power" : 6,
+			"relevance" : 2
+		},
+
+		{
 			"tag" : "Requirejs",
+			"power" : 6,
+			"relevance" : 2
+		},
+
+		{
+			"tag" : "browsersify",
 			"power" : 6,
 			"relevance" : 2
 		},
@@ -320,6 +333,24 @@
 			"tag" : "App Engine",
 			"power" : 5,
 			"relevance" : 3
+		},
+
+		{
+			"tag" : "Test Driven Dev",
+			"power" : 7,
+			"relevance" : 6
+		},
+
+		{
+			"tag" : "Continuous Integration",
+			"power" : 6,
+			"relevance" : 4
+		},
+
+		{
+			"tag" : "Node",
+			"power" : 7,
+			"relevance" : 6
 		}
 	]
 
