@@ -11,6 +11,6 @@ To update :
 - switch to master
 - apply dev modification `git checkout dev -- .`
 - keep the .gitignore `git checkout master -- .gitignore`
-- build `grunt fullBuild`  ( need image magic to process the images )
-- test `grunt serve` go to localhost:8081
+- build `cd gulp`  `gulp fullBuild`  ( need imageMagic to process the images )
+- test `gulp serve` go to http://localhost:8081
 - commit and push
