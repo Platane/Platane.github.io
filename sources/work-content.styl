@@ -3,7 +3,7 @@ miniatureSize = 60px
 
 
 
-.grid-tile-large 
+.grid-tile-large
 
     .work-illu-group,
     .work-content-shrinked
@@ -38,7 +38,7 @@ miniatureSize = 60px
 
             div
                 transform rotateZ(3deg) rotateY(13deg) translate3d(0px,-10%,0px)
-        
+
 
         /*
         margin 5px 0 5px 5px
@@ -52,22 +52,22 @@ miniatureSize = 60px
                 top calc( 20% + 8px)
 
         */
- 
 
-    
+
+
 
     .work-main
-        
+
         display inline-block
-        
+
         display flex
         flex-direction row
-        
+
         align-items stretch
 
         align-content stretch
         flex-wrap nowrap
-        
+
         width 100%
         overflow hidden
 
@@ -98,13 +98,13 @@ miniatureSize = 60px
     bottom 0
     display flex
     align-items center
-    
+
     flex-direction column
     padding 5px
     /* box-shadow 0 0 8px 0px rgba(175, 175, 175, 0.62) inset */
 
 .work-illu-primar.work-illu
-    
+
     height 100%
 
 
@@ -112,9 +112,10 @@ miniatureSize = 60px
         background-size contain
         background-repeat no-repeat
         background-position center
+        background-color #eee
 
 .work-illu-caption
-    
+
     flex 0 1 1.4em
     font-size 0.9em
     font-style italic
@@ -128,6 +129,8 @@ miniatureSize = 60px
     transition width 1000ms ease
     overflow hidden
     cursor pointer
+    z-index 2
+    background #fff
     &.dragged
         transition none
 
@@ -136,8 +139,9 @@ miniatureSize = 60px
     overflow hidden
     width 0
     position relative
+        z-index: 1;
 
-.illu-displayed 
+.illu-displayed
     .work-content-wrapper
         width 50px
 
@@ -170,7 +174,7 @@ miniatureSize = 60px
 /* nav  */
 
 .link
-    
+
     margin-left 18px
     height 2em
     a
@@ -181,7 +185,7 @@ miniatureSize = 60px
         text-decoration none
         font-family helvetica,Geneva,Verdana,sans-serif
 
-        
+
 
         &:hover
             color #000
