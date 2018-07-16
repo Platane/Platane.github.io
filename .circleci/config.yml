@@ -27,7 +27,12 @@ jobs:
 
       - run: yarn build
 
-      - run: rm dist/stats.json
+      - run:
+          name: prepare dist
+          command: |
+            rm dist/stats.json
+            mv README.md dist/README.md
+            mv .circleci dist/.circleci
 
       - persist_to_workspace:
           root: *workspace_root
@@ -52,7 +57,7 @@ jobs:
             git init
             git add .
             git commit -m "Deploy to Github Pages"
-            git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" master:gh-pages > /dev/null 2>&1
+            git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" master:master > /dev/null 2>&1
 
 workflows:
   version: 2
@@ -61,10 +66,10 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: gh-pages
+              ignore: master
       - deploy:
           filters:
             branches:
-              only: master
+              only: dev
           requires:
             - build
