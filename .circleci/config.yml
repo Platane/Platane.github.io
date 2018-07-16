@@ -40,11 +40,11 @@ jobs:
     steps:
 
       - attach_workspace:
-        at: dist
+          at: .
 
       - run:
-        name: deploy
-        command: |
+          name: deploy
+          command: |
             git config --global user.email bot@circleci.com
             git config --global user.name circleci
 
