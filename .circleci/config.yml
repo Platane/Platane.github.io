@@ -11,11 +11,22 @@ references:
     attach_workspace:
       at: *workspace_root
 
-
   node_config: &node_config
     docker:
       - image: *node_image
     working_directory: *workspace_root
+
+  gcloud_sdk_config: &gcloud_sdk_config
+    docker:
+      - image: google/cloud-sdk:214.0.0-slim
+    working_directory: *workspace_root
+
+  activate_gcloud_sdk: &activate_gcloud_sdk
+    run:
+      name: activate gcloud sdk
+      command: |
+        echo $GC_JSON_KEY_FILE >> secret.json
+        CLOUDSDK_PYTHON_SITEPACKAGES=1 gcloud auth activate-service-account --key-file secret.json
 
 jobs:
   build:
@@ -40,7 +51,7 @@ jobs:
             - dist
             - package.json
 
-  deploy:
+  deploy-gh-pages:
     <<: *node_config
     steps:
 
@@ -59,6 +70,46 @@ jobs:
             git commit -m "Deploy to Github Pages"
             git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" master:master > /dev/null 2>&1
 
+
+  deploy-google:
+    <<: *gcloud_sdk_config
+    steps:
+      - *activate_gcloud_sdk
+      - *attach_workspace
+
+      - run:
+          name: install jq
+          command: apt-get install jq
+
+      - run:
+          name: create CNAME
+          command: echo $APP_URL > dist/CNAME
+
+      - run:
+          name: publish into bucket
+          command: |
+
+            export BUCKET=`echo $APP_URL`
+
+            # extract project id
+            export GC_PROJECT=`echo $GC_JSON_KEY_FILE | jq '.project_id' | cut -d'"' -f2`
+
+            # create the bucket
+            gsutil mb -c STANDARD -l EUROPE-WEST1 -p $GC_PROJECT gs://$BUCKET || echo 1
+
+            # sync the folder dist with the bucket ( options -d is for removing from the bucket )
+            gsutil -m rsync -r dist gs://$BUCKET
+
+            # use gzip with this files
+            gsutil -m cp -r -z html,css,js,xml,txt,json,map,svg dist/* gs://$BUCKET
+
+            # set the bucket accessibility
+            gsutil -m acl set -R -a public-read gs://$BUCKET
+
+            # set the bucket index and 404 files
+            gsutil web set -m index.html -e index.html gs://$BUCKET
+
+
 workflows:
   version: 2
   build-deploy:
@@ -67,7 +118,13 @@ workflows:
           filters:
             branches:
               ignore: master
-      - deploy:
+      - deploy-gh-pages:
+          filters:
+            branches:
+              only: dev
+          requires:
+            - build
+      - deploy-google:
           filters:
             branches:
               only: dev

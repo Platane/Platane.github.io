@@ -6,6 +6,11 @@ const plugins = [
   // ['@babel/plugin-transform-react-jsx', {pragma: 'React'}],
 
   [
+    'babel-plugin-transform-inline-environment-variables',
+    { include: ['APP_URL'] },
+  ],
+
+  [
     'babel-plugin-module-resolver',
     {
       alias: {
@@ -32,8 +37,8 @@ if (process.env.NODE_ENV === 'build') {
         name: '[hash:8].[ext]',
       },
     ],
-    '@babel/plugin-transform-modules-commonjs',
+    '@babel/plugin-transform-modules-commonjs'
   )
 }
 
-module.exports = {plugins, presets}
+module.exports = { plugins, presets }
