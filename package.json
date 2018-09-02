@@ -2,37 +2,35 @@
   "name": "platane.github.io",
   "version": "2.0.0",
   "dependencies": {
-    "emotion": "9.2.6",
-    "emotion-server": "9.2.6",
-    "preact": "8.2.9",
-    "preact-compat": "3.18.0",
-    "preact-emotion": "9.2.6",
+    "emotion": "9.2.8",
+    "emotion-server": "9.2.8",
+    "preact": "8.3.1",
+    "preact-compat": "3.18.4",
+    "preact-emotion": "9.2.8",
     "prop-types": "15.6.2"
   },
   "devDependencies": {
-    "@babel/cli": "7.0.0-beta.53",
-    "@babel/core": "7.0.0-beta.53",
-    "@babel/node": "7.0.0-beta.53",
-    "@babel/plugin-proposal-class-properties": "7.0.0-beta.53",
-    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.53",
-    "@babel/plugin-transform-modules-commonjs": "7.0.0-beta.53",
-    "@babel/preset-env": "7.0.0-beta.53",
-    "@babel/preset-react": "7.0.0-beta.53",
-    "babel-loader": "8.0.0-beta.3",
+    "@babel/cli": "7.0.0",
+    "@babel/core": "7.0.0",
+    "@babel/node": "7.0.0",
+    "@babel/plugin-proposal-class-properties": "7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0",
+    "@babel/plugin-transform-modules-commonjs": "7.0.0",
+    "@babel/preset-env": "7.0.0",
+    "@babel/preset-react": "7.0.0",
+    "babel-loader": "8.0.1",
     "babel-plugin-module-resolver": "3.1.1",
     "babel-plugin-transform-assets": "1.0.2",
     "babel-plugin-transform-inline-environment-variables": "0.4.3",
-    "file-loader": "1.1.11",
-    "preact-render-to-string": "3.7.0",
-    "webpack": "4.16.1",
-    "webpack-assets-manifest": "3.0.1",
-    "webpack-cli": "3.0.8",
-    "webpack-dev-server": "3.1.4"
+    "file-loader": "2.0.0",
+    "preact-render-to-string": "3.8.2",
+    "webpack": "4.17.1",
+    "webpack-assets-manifest": "3.0.2",
+    "webpack-cli": "3.1.0",
+    "webpack-dev-server": "3.1.7"
   },
   "scripts": {
-    "start":
-      "webpack-dev-server --mode development --config ./script/webpack.config.js",
-    "build":
-      "rm -rf ./dist && mkdir ./dist && NODE_ENV=production webpack --mode production --config ./script/webpack.config.js --json > dist/stats.json && NODE_ENV=build babel-node ./script/build/index.js"
+    "start": "webpack-dev-server --mode development --config ./script/webpack.config.js",
+    "build": "rm -rf ./dist && mkdir ./dist && NODE_ENV=production webpack --mode production --config ./script/webpack.config.js --json > dist/stats.json && NODE_ENV=build babel-node ./script/build/index.js"
   }
 }
