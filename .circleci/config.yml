@@ -1,11 +1,9 @@
 version: 2
 
 references:
-  workspace_root: &workspace_root
-    /home/circleci/project
+  workspace_root: &workspace_root /home/circleci/project
 
-  node_image: &node_image
-    circleci/node:9.9
+  node_image: &node_image circleci/node:12
 
   attach_workspace: &attach_workspace
     attach_workspace:
@@ -54,7 +52,6 @@ jobs:
   deploy-gh-pages:
     <<: *node_config
     steps:
-
       - attach_workspace:
           at: .
 
@@ -69,7 +66,6 @@ jobs:
             git add .
             git commit -m "Deploy to Github Pages"
             git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" master:master > /dev/null 2>&1
-
 
   deploy-google:
     <<: *gcloud_sdk_config
@@ -108,7 +104,6 @@ jobs:
 
             # set the bucket index and 404 files
             gsutil web set -m index.html -e index.html gs://$BUCKET
-
 
 workflows:
   version: 2
