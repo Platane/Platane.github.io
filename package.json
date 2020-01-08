@@ -1,0 +1,42 @@
+{
+  "name": "platane.github.io",
+  "version": "3.0.0",
+  "repository": "github:platane/platane.github.io",
+  "description": "Arthur Brongniart, gifted web developper.",
+  "author": {
+    "name": "Platane",
+    "email": "me@platane.me",
+    "url": "https://platane.me",
+    "twitter": "platane_",
+    "github": "platane",
+    "linkedin": "https://www.linkedin.com/in/arthur-brongniart-ab802b65/",
+    "toptal": "https://www.toptal.com/resume/arthur-brongniart"
+  },
+  "homepage": "https://platane.me",
+  "license": "MIT",
+  "engines": {
+    "node": "12"
+  },
+  "dependencies": {
+    "@emotion/core": "10.0.27",
+    "@emotion/styled": "10.0.27",
+    "next": "9.1.7",
+    "react": "16.12.0",
+    "react-dom": "16.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "13.1.4",
+    "@types/react": "16.9.17",
+    "@types/react-dom": "16.9.4",
+    "now": "16.7.1",
+    "prettier": "1.19.1",
+    "typescript": "3.7.4"
+  },
+  "scripts": {
+    "type": "tsc --noEmit",
+    "lint": "yarn prettier -c '**/*.{ts,tsx,js,jsx,json,md}' '!.next/**'",
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  }
+}

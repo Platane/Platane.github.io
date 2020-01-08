@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "lib": ["dom"],
+    "target": "es5",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+}

@@ -1,0 +1,32 @@
+name: main
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn type
+
+      - run: yarn lint
+
+      - run: yarn build
+
+      - run: yarn next export
+
+      - uses: crazy-max/ghaction-github-pages@068e494
+        with:
+          target_branch: master
+          build_dir: out
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_GH_PAGES }}
