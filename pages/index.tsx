@@ -13,7 +13,7 @@ const Page = () => (
 
     <Separator />
 
-    <Occupation>Gifted web developper</Occupation>
+    <Occupation>Gifted web developer</Occupation>
 
     <Separator />
 
