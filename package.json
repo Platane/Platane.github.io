@@ -2,41 +2,24 @@
   "name": "platane.github.io",
   "version": "3.0.0",
   "repository": "github:platane/platane.github.io",
-  "description": "Arthur Brongniart, gifted web developper.",
+  "description": "Arthur Brongniart, gifted web developer.",
   "author": {
-    "name": "Platane",
-    "email": "me@platane.me",
-    "url": "https://platane.me",
-    "twitter": "platane_",
-    "github": "platane",
-    "linkedin": "https://www.linkedin.com/in/arthur-brongniart-ab802b65/",
-    "toptal": "https://www.toptal.com/resume/arthur-brongniart"
+    "name": "Platane"
   },
-  "homepage": "https://platane.me",
-  "license": "MIT",
-  "engines": {
-    "node": "12"
-  },
+  "private": true,
+  "type": "module",
   "dependencies": {
-    "@emotion/core": "10.0.27",
-    "@emotion/styled": "10.0.27",
-    "next": "9.1.7",
-    "react": "16.12.0",
-    "react-dom": "16.12.0"
+    "gl-matrix": "3.4.3",
+    "jurassic-nursery": "git://github.com/platane/jurassic-nursery#19315f0"
   },
   "devDependencies": {
-    "@types/node": "13.1.4",
-    "@types/react": "16.9.17",
-    "@types/react-dom": "16.9.4",
-    "now": "16.7.1",
-    "prettier": "1.19.1",
-    "typescript": "3.7.4"
+    "bun-types": "1.0.31",
+    "chokidar": "3.6.0",
+    "typescript": "5.4.2"
   },
   "scripts": {
-    "type": "tsc --noEmit",
-    "lint": "yarn prettier -c '**/*.{ts,tsx,js,jsx,json,md}' '!.next/**'",
-    "dev": "next",
-    "build": "next build",
-    "start": "next start"
+    "build:model": "mkdir ./node_modules/jurassic-nursery/packages/game/assets -p ; curl -o ./node_modules/jurassic-nursery/packages/game/assets/geometry.bin https://platane.github.io/jurassic-nursery/0",
+    "build": "bun scripts/build.ts",
+    "dev": "bun scripts/dev.ts"
   }
 }

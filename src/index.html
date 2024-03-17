@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>platane's website</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <style>
+      #background-scene {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: calc(100vh - 45px);
+        pointer-events: none;
+        z-index: 1;
+      }
+      body {
+        margin: 90px auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+      #profile-picture {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: contain;
+        object-position: center;
+      }
+      h1 {
+        margin: 0;
+        color: #333;
+      }
+      h2 {
+        margin: 0;
+        color: #666;
+      }
+
+      ul.link-list {
+        all: unset;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        margin-top: 20px;
+        position: relative;
+      }
+      ul.link-list::before {
+        content: "";
+        top: -20px;
+        position: absolute;
+        width: calc(100vw - 20px);
+        max-width: 360px;
+        height: 1px;
+        background-color: #ddd;
+        z-index: 0;
+      }
+      ul.link-list > li {
+        all: unset;
+      }
+      @media (max-width: 500px) {
+        ul.link-list {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas
+      id="background-scene"
+      alt="a floc of cute triceratops running in circle"
+    ></canvas>
+
+    <img
+      id="profile-picture"
+      src="/assets/img/avatar-460x460.jpg"
+      alt="platane profile picture"
+    />
+
+    <h1>Arthur Brongniart</h1>
+
+    <h2>Gifted web developer</h2>
+
+    <ul class="link-list">
+      <li>
+        <a
+          href="https://twitter.com/platane_"
+          target="_blank"
+          rel="noopener noreferrer"
+          >twitter</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://github.com/platane"
+          target="_blank"
+          rel="noopener noreferrer"
+          >github</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://www.toptal.com/resume/arthur-brongniart"
+          target="_blank"
+          rel="noopener noreferrer"
+          >toptal</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://www.linkedin.com/in/arthur-brongniart-ab802b65/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >linkedin</a
+        >
+      </li>
+    </ul>
+
+    <script src="index.js" async=""></script>
+  </body>
+</html>
