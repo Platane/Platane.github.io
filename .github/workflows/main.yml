@@ -3,7 +3,7 @@ name: main
 on: push
 
 jobs:
-  test:
+  build-deploy:
     runs-on: ubuntu-latest
     permissions:
       pages: write
