@@ -1,9 +1,6 @@
 name: main
 
-on:
-  push:
-    branches:
-      - dev
+on: push
 
 jobs:
   test:
@@ -28,4 +25,5 @@ jobs:
           path: dist
 
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/master'
         uses: actions/deploy-pages@v4
