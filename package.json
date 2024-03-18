@@ -18,7 +18,7 @@
     "typescript": "5.4.2"
   },
   "scripts": {
-    "build:model": "mkdir ./node_modules/jurassic-nursery/packages/game/assets -p ; curl -o ./node_modules/jurassic-nursery/packages/game/assets/geometry.bin https://platane.github.io/jurassic-nursery/0",
+    "build:model": "mkdir ./node_modules/jurassic-nursery/packages/game/assets -p ; curl --location --output ./node_modules/jurassic-nursery/packages/game/assets/geometry.bin https://platane.github.io/jurassic-nursery/0",
     "build": "bun scripts/build.ts",
     "dev": "bun scripts/dev.ts"
   }
