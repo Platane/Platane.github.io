@@ -27,3 +27,15 @@ jobs:
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/master'
         uses: actions/deploy-pages@v4
+
+      - name: Deploy static asset to vercel
+        if: github.ref == 'refs/heads/master'
+        run: |
+          mkdir -p .vercel/output
+          echo '{"version":3}' > .vercel/output/config.json
+          cp -r dist .vercel/output/static
+
+          bunx vercel --prod --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
