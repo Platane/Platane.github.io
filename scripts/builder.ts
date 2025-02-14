@@ -4,7 +4,9 @@ import { readdir } from "node:fs/promises";
 export const build = async () => {
   const outdir = __dirname + "/../dist";
 
-  fs.rmdirSync(outdir, { recursive: true });
+  try {
+    fs.rmdirSync(outdir, { recursive: true });
+  } catch (err) { }
 
   //
   // build index
