@@ -15,4 +15,6 @@ bun build:model
 # dev server
 bun dev
 
+# deployed to vercel as static assets in github workflow
+
 ```
